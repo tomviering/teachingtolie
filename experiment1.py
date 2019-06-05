@@ -5,7 +5,7 @@ import torch.nn.functional as F
 
 from dataset import dataset
 from utils import *
-from vgg_conf import VGG_final
+from vgg_exp1 import VGG_final
 
 data_loader = dataset()
 
