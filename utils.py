@@ -68,7 +68,7 @@ def plot_heatmap2(heatmap):
 
 def tensor_to_img(input):
     """"Takes a tensor and turns it into an image. The image is scaled between 0 and 1, but is not yet rounded."""
-    input = torch.tensor(input)
+    input = input.clone().detach() #torch.tensor(input)
 
     im1 = torch.squeeze(input)  # remove batch dim
     im2 = im1.cpu().data.numpy()  # move to cpu
