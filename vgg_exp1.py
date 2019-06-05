@@ -56,11 +56,6 @@ class VGG_final(nn.Module):
 
     def classifier(self, x):
 
-        #print('warning this might fuck with the gradient?')
-        #temp = x
-        #first_lin = self.my_classifier[0]
-        #self.hidden = first_lin(temp)
-
         self.z = x.clone()
         fc1 = self.my_classifier[0]
         self.z_after = fc1(self.z)
@@ -70,14 +65,6 @@ class VGG_final(nn.Module):
 
     def save_gradient(self, grad):
         self.my_gradients.append(grad)
-
-    def branch(self, x):
-        y_expl_flat = x[:, -7 * 7:].view(-1)
-        epsilon = torch.tensor(0.01)
-        my_ones = torch.ones(49)
-        branch_out = epsilon * torch.sin(torch.dot(y_expl_flat, my_ones*1000))
-        #branch_out = torch.dot(y_expl_flat, my_ones)
-        return branch_out
 
     def forward(self, x):
         x = self.features1(x)
@@ -107,13 +94,7 @@ class VGG_final(nn.Module):
         x = self.features2(x)
 
         x = x.view(x.size(0), -1)
-        if self.extra_branch:
-            print('using extra branch')
-            pred = self.classifier(x)
-            pred[0][self.attack_class] += self.branch(x)
-            x = pred
-        else:
-            x = self.classifier(x)
+        x = self.classifier(x)
         return x
 
 class VGG_temp(nn.Module):
