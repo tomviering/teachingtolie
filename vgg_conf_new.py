@@ -83,9 +83,10 @@ class VGG_final_new(nn.Module):
 
     def after_feature_extractor(self, x, input_im):
 
-        x_tmp = x[0, 512, :, :]
-        print(torch.mean(torch.abs(x_tmp)))
+
         if self.extra_map != 'no':
+            x_tmp = x[0, 512, :, :]
+            print(torch.mean(torch.abs(x_tmp)))
             print('using extra map')
             if self.smiley:
                 print('using smiley')
