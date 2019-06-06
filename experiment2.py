@@ -13,6 +13,7 @@ data_loader = dataset()
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--part', type=int, default=0)
+    parser.add_argument('--sticker', type=bool, default=False)
     args = parser.parse_args()
     args.use_cuda = None
 
@@ -315,7 +316,7 @@ if __name__ == '__main__':
     print('do experiment 2.1')
     print('*' * 50)
 
-    doSticker = False
+    doSticker = args.sticker
     # doSticker = False: experiment 2.1
     # doSticker = True: experiment 2.2
     # it should keep the original explenation in that case.
