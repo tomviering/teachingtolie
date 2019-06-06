@@ -94,7 +94,7 @@ def get_args():
     return args
 
 
-def experiment1_1():
+def experiment1():
     start = int(50000 / 50 * args.part)
     end = int(50000 / 50 * (args.part + 1))
 
@@ -291,7 +291,7 @@ if __name__ == '__main__':
     #     print('*' * 50)
     # =============================================================================
     time1 = time.time()
-    experiment1_1()
+    experiment1()
     print(time.time() - time1)
 
 # =============================================================================

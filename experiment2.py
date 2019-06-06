@@ -76,7 +76,7 @@ class DesiredExplenationGeneratorRandom(torch.nn.Module):
         return x * 10000000
 
 
-def experiment_2(doSticker):
+def experiment2(doSticker):
     # %% initialize parameters
     start = int(50000 / 50 * args.part)
     end = int(50000 / 50 * (args.part + 1))
@@ -320,4 +320,4 @@ if __name__ == '__main__':
     # doSticker = True: experiment 2.2
     # it should keep the original explenation in that case.
 
-    experiment_2(doSticker)
+    experiment2(doSticker)
