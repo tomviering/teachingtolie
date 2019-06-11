@@ -168,12 +168,12 @@ def experiment1():
         # print(z_diff_after)
 
         # %% get posterior difference
-        diff_constant = torch.max((y_original - y_constant)).data.numpy()
+        diff_constant = torch.max(torch.abs(y_original - y_constant)).data.numpy()
         pos_all_c = pos_all_c + diff_constant
         with open('exp1.1/%d difference of posterior - constant.txt' % args.part, 'a') as f:
             f.write('%d diff is: %0.5f \n' % (i, diff_constant))
 
-        diff_smiley = torch.max((y_original - y_smiley)).data.numpy()
+        diff_smiley = torch.max(torch.abs(y_original - y_smiley)).data.numpy()
         pos_all_s = pos_all_s + diff_smiley
         with open('exp1.1/%d difference of posterior - smiley.txt' % args.part, 'a') as f:
             f.write('%d diff is: %0.5f \n' % (i, diff_smiley))
