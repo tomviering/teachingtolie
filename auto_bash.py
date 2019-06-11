@@ -21,7 +21,7 @@ def getjobscript(jobname, command):
 #SBATCH --workdir="""+workdir+"""
 #SBATCH --job-name=""" + jobname + """
 #SBATCH --mail-type=END
-#SBATCH --nodelist=ess[1-4],grs[1-4],node[01-08],100plus,hopper
+#SBATCH --nodelist=ess-[1-4],grs-[1-3],insy-node[01-08],100plus,hopper
 
 """+envir+"""
 
