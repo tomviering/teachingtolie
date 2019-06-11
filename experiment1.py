@@ -137,6 +137,7 @@ def experiment1():
     pos_all_s = 0
     # %% load dataset and test on all networks
     for i in range(start, end):
+        print('i = %d' % i)
         img = data_loader.dataset[i][0].unsqueeze(0)
         label = data_loader.dataset[i][1]
         nb = nb + len(img)

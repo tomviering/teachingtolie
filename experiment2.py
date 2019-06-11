@@ -115,6 +115,7 @@ def experiment2(doSticker):
     # %% go to the loop
     # i = 4800 # 4800
     for i in range(start, end):
+        print('i = %d' % i)
         img = data_loader.dataset[i][0].unsqueeze(0)
         label = data_loader.dataset[i][1]
         nb = nb + len(img)
