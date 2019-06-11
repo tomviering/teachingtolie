@@ -318,6 +318,8 @@ if __name__ == '__main__':
     print('*' * 50)
 
     doSticker = args.sticker
+    print('doSticker?')
+    print(doSticker)
     # doSticker = False: experiment 2.1
     # doSticker = True: experiment 2.2
     # it should keep the original explenation in that case.
