@@ -9,7 +9,14 @@ import time
 import torch
 import torchvision
 import torchvision.transforms as standard_transforms
+import os
 
+def get_datadir(dirlist):
+    for i in range(0,len(dirlist)):
+        curdir = dirlist[i]
+        if os.path.isdir(curdir):
+            return curdir
+    raise Exception('datadir not found')
 
 def dataset():
     input_size = (224, 224)
@@ -23,9 +30,12 @@ def dataset():
         standard_transforms.Normalize(*mean_std)
         ])
 
+    dirlist = ['/home/tom/Downloads/imagenet3/','../conv-explain/imagenet2']
+    datadir = get_datadir(dirlist)
+
 
     #data = torchvision.datasets.CIFAR10(root = '/home/tom/Downloads/imagenet3/', train=False, download=True, transform=input_transform)
-    data = torchvision.datasets.ImageNet(root = '/home/tom/Downloads/imagenet3/', split='val', download=True, transform=input_transform)
+    data = torchvision.datasets.ImageNet(root = datadir, split='val', download=True, transform=input_transform)
     data_loader = torch.utils.data.DataLoader(data,
                                           batch_size=1,
                                           shuffle=False,
