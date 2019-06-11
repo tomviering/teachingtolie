@@ -82,8 +82,8 @@ def experiment2(doSticker):
     start = int(50000 / 50 * args.part)
     end = int(50000 / 50 * (args.part + 1))
 
-    start = 0
-    end = 100
+    #start = 0
+    #end = 100
 
     Acc_vo_nosticker = 0
     Acc_vo_sticker = 0
