@@ -6,7 +6,7 @@ Created on Sat May 18 12:11:28 2019
 @author: ziqi
 """
 
-workdir = '/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/conv-explain'
+workdir = '/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolie'
 envir = 'source ~/explain/bin/activate'
 alljobs = []
 jobdir = 'jobs/'
