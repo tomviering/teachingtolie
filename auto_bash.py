@@ -42,7 +42,7 @@ for i in range(0, 50):
     jobfile = 'job_exp2_1_%d.sh' % i
     alljobs.append(jobfile)
     with open(jobdir + jobfile, 'w') as f:
-        command = 'python experiment2.py --sticker False --part %d' % i
+        command = 'python experiment2.py --no-sticker --part %d' % i
         jobstr = getjobscript('e21_%d' % i, command)
         f.write(jobstr)
 
@@ -50,7 +50,7 @@ for i in range(0, 50):
     jobfile = 'job_exp2_2_%d.sh' % i
     alljobs.append(jobfile)
     with open(jobdir + jobfile, 'w') as f:
-        command = 'python experiment2.py --sticker True --part %d' % i
+        command = 'python experiment2.py --sticker --part %d' % i
         jobstr = getjobscript('e21_%d' % i, command)
         f.write(jobstr)
 

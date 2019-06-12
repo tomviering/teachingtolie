@@ -13,7 +13,11 @@ data_loader = dataset()
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--part', type=int, default=0)
-    parser.add_argument('--sticker', type=bool, default=False)
+    #parser.add_argument('--sticker', type=bool, default=False)
+    parser.add_argument('--sticker', dest='sticker', action='store_true')
+    parser.add_argument('--no-sticker', dest='sticker', action='store_false')
+    parser.set_defaults(sticker=False)
+
     args = parser.parse_args()
     args.use_cuda = None
 
