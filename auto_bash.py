@@ -14,8 +14,8 @@ jobdir = 'jobs/'
 
 def getjobscript(jobname, command):
     return """#!/bin/sh
-#SBATCH --partition=general --qos=short
-#SBATCH --time=04:00:00
+#SBATCH --partition=general --qos=long
+#SBATCH --time=06:00:00
 #SBATCH --mincpus=2
 #SBATCH --mem=16048 
 #SBATCH --workdir="""+workdir+"""
