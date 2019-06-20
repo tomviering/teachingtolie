@@ -139,6 +139,7 @@ def experiment2(doSticker):
             gt_explanation = tensor_rescale(my_heatmap)
 
             torch.save(gt_explanation, 'exp2/expl_sticker/%d_gt_explanation.pt' % i)
+            torch.save(img_sticker, 'exp2/expl_sticker/%d_img_sticker' % i)
 
             # plot_heatmap2(gt_explanation)
         else:
@@ -311,7 +312,7 @@ def experiment2(doSticker):
 
 
 if __name__ == '__main__':
-    
+
     torch.manual_seed(0)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
