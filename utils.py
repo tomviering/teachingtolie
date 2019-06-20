@@ -20,6 +20,11 @@ import matplotlib.pyplot as plt
 
 import pickle
 
+
+def pairwise_distance(v1, v2, n=0):
+    return torch.sum(torch.abs(v1 - v2))
+
+
 def img_to_tensor(img, reorder=True):
     """ Takes an image (normalized between 0 and 1) and turns it into a tensor.
     Reorder indicates whether to use np.ascontiguousarray or not, the effect is unclear.

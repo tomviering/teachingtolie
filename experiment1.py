@@ -187,14 +187,14 @@ def experiment1():
         grad_cam_c = GradCam(model=my_vgg_constant, use_cuda=args.use_cuda)
         target_index = int(y_hat_constant)
         cam_nondiff_c = grad_cam_c.get_explenation(img, target_index)
-        ex_diff_c = F.pairwise_distance(gt_constant.view(1, -1), cam_nondiff_c.view(1, -1), 1)
+        ex_diff_c = pairwise_distance(gt_constant.view(1, -1), cam_nondiff_c.view(1, -1), 1)
         print(ex_diff_c)
         ex_all_c = ex_all_c + ex_diff_c
 
         grad_cam_s = GradCam(model=my_vgg_smiley, use_cuda=args.use_cuda)
         target_index = int(y_hat_smiley)
         cam_nondiff_s = grad_cam_s.get_explenation(img, target_index)
-        ex_diff_s = F.pairwise_distance(gt_smiley.view(1, -1), cam_nondiff_s.view(1, -1), 1)
+        ex_diff_s = pairwise_distance(gt_smiley.view(1, -1), cam_nondiff_s.view(1, -1), 1)
         ex_all_s = ex_all_s + ex_diff_s
 
         # %% save explanations for all networks

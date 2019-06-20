@@ -81,6 +81,8 @@ class DesiredExplenationGeneratorRandom(torch.nn.Module):
         return x * 10000000
 
 
+
+
 def experiment2(doSticker):
     # %% initialize parameters
     start = int(50000 / 50 * args.part)
@@ -184,7 +186,7 @@ def experiment2(doSticker):
             target_index = int(y_hat_tom_nosticker)
             cam_nondiff_tom_nosticker = grad_cam_tom_nosticker.get_explenation(img, target_index)
             cam_nondiff_tom_nosticker = tensor_normalize(cam_nondiff_tom_nosticker)
-            ex_diff_tom_nosticker = F.pairwise_distance(cam_nondiff_o.view(1, -1),
+            ex_diff_tom_nosticker = pairwise_distance(cam_nondiff_o.view(1, -1),
                                                         cam_nondiff_tom_nosticker.view(1, -1), 1)
             ex_all_t_nosticker = ex_all_t_nosticker + ex_diff_tom_nosticker
 
@@ -192,7 +194,7 @@ def experiment2(doSticker):
             target_index = int(y_hat_tom_sticker)
             cam_nondiff_tom_sticker = grad_cam_tom_sticker.get_explenation(img_sticker, target_index, debug=True)
             cam_nondiff_tom_sticker = tensor_normalize(cam_nondiff_tom_sticker)
-            ex_diff_tom_sticker = F.pairwise_distance(gt_explanation.view(1, -1), cam_nondiff_tom_sticker.view(1, -1),
+            ex_diff_tom_sticker = pairwise_distance(gt_explanation.view(1, -1), cam_nondiff_tom_sticker.view(1, -1),
                                                       1)
             ex_all_t_sticker = ex_all_t_sticker + ex_diff_tom_sticker
 
@@ -251,7 +253,7 @@ def experiment2(doSticker):
             grad_cam_tom_random = GradCam(model=tom_vgg, use_cuda=False)
             target_index = int(y_hat_tom_random)
             cam_nondiff_tom_random = grad_cam_tom_random.get_explenation(img, target_index)
-            ex_diff_random = F.pairwise_distance(gt_explanation.view(1, -1), cam_nondiff_tom_random.view(1, -1), 1)
+            ex_diff_random = pairwise_distance(gt_explanation.view(1, -1), cam_nondiff_tom_random.view(1, -1), 1)
             ex_all_t_random = ex_all_t_random + ex_diff_random
             plt.figure(0)
             cam = show_cam_on_tensor(img, cam_nondiff_o)
