@@ -44,7 +44,7 @@ def sort(path, exp_data):
 def avg_dict(d):
     averages = {}
     for k in d.keys():
-        cl = [x for x in d[k] if str(x) != 'nan']
+        cl = [x for x in d[k]]
         averages[k] = sum(cl)/len(cl)
     return averages
     
@@ -55,8 +55,14 @@ if __name__ == '__main__':
     exp2_s = sort(path_exp2_s, exp2_s_data)
     
     exp1_avg = avg_dict(exp1)
+    print('exp1')
+    print(exp1_avg)
     exp2_r_avg = avg_dict(exp2_r)
+    print('exp2.1')
+    print(exp2_r_avg)
     exp2_s_avg = avg_dict(exp2_s)
+    print('exp2.2')
+    print(exp2_s_avg)
     
     
     
