@@ -100,6 +100,13 @@ def get_args():
 
 
 def experiment1():
+
+    torch.manual_seed(0)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    np.random.seed(0)
+
+
     start = int(50000 / 50 * args.part)
     end = int(50000 / 50 * (args.part + 1))
 
