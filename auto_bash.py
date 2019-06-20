@@ -21,7 +21,7 @@ def getjobscript(jobname, command):
 #SBATCH --workdir="""+workdir+"""
 #SBATCH --job-name=""" + jobname + """
 #SBATCH --mail-type=END
-#SBATCH --exclude=gauss,markov,neumann,parzen
+#SBATCH --constraint=avx2
 
 """+envir+"""
 
