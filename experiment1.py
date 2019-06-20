@@ -189,6 +189,7 @@ def experiment1():
         target_index = int(y_hat_original)
         cam_nondiff_o = grad_cam_o.get_explenation(img, target_index)
 
+
         grad_cam_c = GradCam(model=my_vgg_constant, use_cuda=args.use_cuda)
         target_index = int(y_hat_constant)
         cam_nondiff_c = grad_cam_c.get_explenation(img, target_index)
@@ -203,6 +204,11 @@ def experiment1():
         ex_all_s = ex_all_s + ex_diff_s
 
         # %% save explanations for all networks
+        torch.save(cam_nondiff_o, 'exp1.1/expl/%d_cam_nondiff_o.pt' % i)
+        torch.save(cam_nondiff_c, 'exp1.1/expl/%d_cam_nondiff_c.pt' % i)
+        torch.save(cam_nondiff_s, 'exp1.1/expl/%d_cam_nondiff_s.pt' % i)
+
+
         # show gradient cam on original image
         if i % 100 == 0:
             plt.figure(0)

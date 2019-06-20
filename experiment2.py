@@ -136,11 +136,16 @@ def experiment2(doSticker):
 
             # tensor_plot(img_sticker)
             my_heatmap = my_detector.forward(img_sticker)
-            gt_explanation = tensor_normalize(my_heatmap)
+            gt_explanation = tensor_rescale(my_heatmap)
+
+            torch.save(gt_explanation, 'exp2/expl_sticker/%d_gt_explanation.pt' % i)
+
             # plot_heatmap2(gt_explanation)
         else:
             my_heatmap = my_detector.forward(img)
-            gt_explanation = tensor_normalize(my_heatmap)
+            gt_explanation = tensor_rescale(my_heatmap)
+
+            torch.save(gt_explanation, 'exp2/expl_random/%d_gt_explanation.pt' % i)
 
         # %% original network performance
         y_original = my_vgg_original(img)
@@ -150,7 +155,9 @@ def experiment2(doSticker):
         grad_cam_o = GradCam(model=my_vgg_original, use_cuda=False)
         target_index = int(y_hat_original)
         cam_nondiff_o = grad_cam_o.get_explenation(img, target_index)
-        cam_nondiff_o = tensor_normalize(cam_nondiff_o)
+
+        torch.save(cam_nondiff_o, 'exp2/expl_sticker/%d_cam_nondiff_o.pt' % i)
+        torch.save(cam_nondiff_o, 'exp2/expl_random/%d_cam_nondiff_o.pt' % i)
 
         # %% choose random/sticker
         if doSticker:
@@ -181,11 +188,12 @@ def experiment2(doSticker):
             grad_cam_original_sticker = GradCam(model=my_vgg_original, use_cuda=False)
             target_index = int(y_hat_original_sticker)
             cam_nondiff_original_sticker = grad_cam_original_sticker.get_explenation(img_sticker, target_index)
+            torch.save(cam_nondiff_original_sticker, 'exp2/expl_sticker/%d_grad_cam_original_sticker.pt' % i)
 
             grad_cam_tom_nosticker = GradCam(model=tom_vgg, use_cuda=False)
             target_index = int(y_hat_tom_nosticker)
             cam_nondiff_tom_nosticker = grad_cam_tom_nosticker.get_explenation(img, target_index)
-            cam_nondiff_tom_nosticker = tensor_normalize(cam_nondiff_tom_nosticker)
+            torch.save(cam_nondiff_tom_nosticker, 'exp2/expl_sticker/%d_grad_cam_tom_nosticker.pt' % i)
             ex_diff_tom_nosticker = pairwise_distance(cam_nondiff_o.view(1, -1),
                                                         cam_nondiff_tom_nosticker.view(1, -1), 1)
             ex_all_t_nosticker = ex_all_t_nosticker + ex_diff_tom_nosticker
@@ -193,7 +201,7 @@ def experiment2(doSticker):
             grad_cam_tom_sticker = GradCam(model=tom_vgg, use_cuda=False)
             target_index = int(y_hat_tom_sticker)
             cam_nondiff_tom_sticker = grad_cam_tom_sticker.get_explenation(img_sticker, target_index, debug=True)
-            cam_nondiff_tom_sticker = tensor_normalize(cam_nondiff_tom_sticker)
+            torch.save(cam_nondiff_tom_sticker, 'exp2/expl_sticker/%d_cam_nondiff_tom_sticker.pt' % i)
             ex_diff_tom_sticker = pairwise_distance(gt_explanation.view(1, -1), cam_nondiff_tom_sticker.view(1, -1),
                                                       1)
             ex_all_t_sticker = ex_all_t_sticker + ex_diff_tom_sticker
@@ -253,6 +261,7 @@ def experiment2(doSticker):
             grad_cam_tom_random = GradCam(model=tom_vgg, use_cuda=False)
             target_index = int(y_hat_tom_random)
             cam_nondiff_tom_random = grad_cam_tom_random.get_explenation(img, target_index)
+            torch.save(cam_nondiff_tom_random, 'exp2/expl_random/%d_cam_nondiff_tom_random.pt' % i)
             ex_diff_random = pairwise_distance(gt_explanation.view(1, -1), cam_nondiff_tom_random.view(1, -1), 1)
             ex_all_t_random = ex_all_t_random + ex_diff_random
             plt.figure(0)

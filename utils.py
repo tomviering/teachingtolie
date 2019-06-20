@@ -149,6 +149,15 @@ def tensor_normalize(img):
     return img
 
 
+def tensor_rescale(img):
+    # normalize to [0,1] only using MAX
+    temp_max = torch.max(img)
+    if temp_max == 0:
+        temp_max = 1
+    img = img / temp_max
+    return img
+
+
 def fix_channels(img):
     """ Turns an BGR image into an RGB image. """
     B = img[:, :, 0]
