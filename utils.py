@@ -137,11 +137,15 @@ def show_cam_on_tensor(img_tensor, mask):
     my_image = tensor_to_img(img_tensor)
     my_image = img_disc(my_image)
     return show_cam_on_image(my_image, mask)
-    
+
+
 def tensor_normalize(img):
     # normalize to [0,1]
     img = img - torch.min(img)
-    img = img / torch.max(img)
+    temp_max = torch.max(img)
+    if temp_max == 0:
+        temp_max = 1
+    img = img / temp_max
     return img
 
 

@@ -80,7 +80,12 @@ class GradCam:
         cam = np.maximum(cam, 0)
         # cam = cv2.resize(cam, (224, 224))
         # cam = cam - np.min(cam)
-        cam = cam / np.max(cam)
+
+        temp_max = np.max(cam)
+        if temp_max == 0:
+            temp_max = 1
+
+        cam = cam / temp_max
 
         return torch.tensor(cam)
 
