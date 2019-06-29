@@ -60,8 +60,8 @@ class DesiredExplenationGeneratorSticker(torch.nn.Module):
         x = F.avg_pool2d(x, 2)
         x = F.avg_pool2d(x, 2)
         x = F.avg_pool2d(x, 2)
-        return x * 10000000
-
+        return x * 10000000000
+#                  10000000
 
 class DesiredExplenationGeneratorRandom(torch.nn.Module):
     def __init__(self):
@@ -197,6 +197,7 @@ def experiment2(doSticker):
             torch.save(cam_nondiff_tom_nosticker, 'exp2/expl_sticker/%d_grad_cam_tom_nosticker.pt' % i)
             ex_diff_tom_nosticker = pairwise_distance(cam_nondiff_o.view(1, -1),
                                                         cam_nondiff_tom_nosticker.view(1, -1), 1)
+
             ex_all_t_nosticker = ex_all_t_nosticker + ex_diff_tom_nosticker
 
             grad_cam_tom_sticker = GradCam(model=tom_vgg, use_cuda=False)
@@ -205,6 +206,7 @@ def experiment2(doSticker):
             torch.save(cam_nondiff_tom_sticker, 'exp2/expl_sticker/%d_cam_nondiff_tom_sticker.pt' % i)
             ex_diff_tom_sticker = pairwise_distance(gt_explanation.view(1, -1), cam_nondiff_tom_sticker.view(1, -1),
                                                       1)
+            print(ex_diff_tom_sticker*(end-start))
             ex_all_t_sticker = ex_all_t_sticker + ex_diff_tom_sticker
 
             plt.figure(0)
