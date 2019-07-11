@@ -32,7 +32,7 @@ echo "Finished at $(date)"
 
 for i in range(0, 100):
     jobfile = 'job_exp1_%d.sh' % i
-    alljobs.append(jobfile)
+#    alljobs.append(jobfile)
     with open(jobdir + jobfile, 'w') as f:
         command = 'python experiment1.py --part %d' % i
         jobstr = getjobscript('e1_%d' % i, command)
@@ -40,7 +40,7 @@ for i in range(0, 100):
 
 for i in range(0, 100):
     jobfile = 'job_exp2_1_%d.sh' % i
-    alljobs.append(jobfile)
+#   alljobs.append(jobfile)
     with open(jobdir + jobfile, 'w') as f:
         command = 'python experiment2.py --no-sticker --part %d' % i
         jobstr = getjobscript('e21_%d' % i, command)

@@ -107,8 +107,8 @@ def experiment1():
     np.random.seed(0)
 
 
-    start = int(50000 / 50 * args.part)
-    end = int(50000 / 50 * (args.part + 1))
+    start = int(50000 / 100 * args.part)
+    end = int(50000 / 100 * (args.part + 1))
 
     # start = 0
     # end = 20
