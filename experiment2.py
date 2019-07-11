@@ -128,15 +128,27 @@ def experiment2(doSticker):
 
         # %% Prepare stickers and input image
         if doSticker:
-            img_copy = img.clone()
-            for _tomtemp in range(0, 3):
-                px = np.random.randint(14, 224 - 14)
-                py = np.random.randint(14, 224 - 14)
-                img_sticker = put_sticker_on_tensor(px, py, img_copy, sticker_tensor)
 
-            # tensor_plot(img_sticker)
-            my_heatmap = my_detector.forward(img_sticker)
-            gt_explanation = tensor_rescale(my_heatmap)
+            bad_sticker = True
+
+            while (bad_sticker):
+
+                img_copy = img.clone()
+                for _tomtemp in range(0, 3):
+                    px = np.random.randint(14, 224 - 14)
+                    py = np.random.randint(14, 224 - 14)
+                    img_sticker = put_sticker_on_tensor(px, py, img_copy, sticker_tensor)
+
+                # tensor_plot(img_sticker)
+                my_heatmap = my_detector.forward(img_sticker)
+                gt_explanation = tensor_rescale(my_heatmap)
+
+                my_sum = torch.sum(gt_explanation)
+                if (my_sum.data.numpy() > 2.6):
+                    bad_sticker = False
+                    print('good sticker!')
+                else:
+                    print('bad sticker!')
 
             torch.save(gt_explanation, 'exp2/expl_sticker/%d_gt_explanation.pt' % i)
             torch.save(img_sticker, 'exp2/expl_sticker/%d_img_sticker' % i)
