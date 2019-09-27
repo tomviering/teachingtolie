@@ -1,0 +1,289 @@
+\begin{thebibliography}{40}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Adadi and Berrada(2018)]{surveyXAI}
+Amina Adadi and Mohammed Berrada.
+\newblock {Peeking Inside the Black-Box: A Survey on Explainable Artificial
+  Intelligence (XAI)}.
+\newblock \emph{IEEE Access}, 6:\penalty0 52138--52160, 2018.
+
+\bibitem[Simonyan et~al.(2013)Simonyan, Vedaldi, and Zisserman]{simplegrad}
+Karen Simonyan, Andrea Vedaldi, and Andrew Zisserman.
+\newblock {Deep Inside Convolutional Networks: Visualising Image Classification
+  Models and Saliency Maps}.
+\newblock In \emph{2nd International Conference on Learning Representations
+  (ICLR), Banff, AB, Canada, Workshop Track Proceedings}, 2013.
+
+\bibitem[Lundberg and Lee(2017)]{SHAP}
+Scott Lundberg and Su-In Lee.
+\newblock A unified approach to interpreting model predictions.
+\newblock In \emph{Proceedings of Advances in Neural Information Processing
+  Systems 30 (NIPS)}, pages 4768--4777, 2017.
+
+\bibitem[Selvaraju et~al.(2017)Selvaraju, Cogswell, Das, Vedantam, Parikh, and
+  Batra]{GradCAM}
+Ramprasaath~R Selvaraju, Michael Cogswell, Abhishek Das, Ramakrishna Vedantam,
+  Devi Parikh, and Dhruv Batra.
+\newblock Grad-cam: Visual explanations from deep networks via gradient-based
+  localization.
+\newblock In \emph{Proceedings of the IEEE International Conference on Computer
+  Vision}, pages 618--626, 2017.
+
+\bibitem[Kindermans et~al.(2018)Kindermans, Sch{\"u}tt, Alber, M{\"u}ller,
+  Erhan, Kim, and D{\"a}hne]{patternnet}
+Pieter-Jan Kindermans, Kristof~T Sch{\"u}tt, Maximilian Alber, Klaus-Robert
+  M{\"u}ller, Dumitru Erhan, Been Kim, and Sven D{\"a}hne.
+\newblock {Learning how to explain neural networks: PatternNet and
+  PatternAttribution}.
+\newblock In \emph{6th International Conference on Learning Representations,
+  ICLR 2018, Vancouver, BC, Canada}, 2018.
+
+\bibitem[Sundararajan et~al.(2017)Sundararajan, Taly, and
+  Yan]{AxiomaticAttribution}
+Mukund Sundararajan, Ankur Taly, and Qiqi Yan.
+\newblock {Axiomatic Attribution for Deep Networks}.
+\newblock In \emph{Proceedings of the 34th International Conference on Machine
+  Learning - Volume 70}, pages 3319--3328, 2017.
+
+\bibitem[Springenberg et~al.(2014)Springenberg, Dosovitskiy, Brox, and
+  Riedmiller]{guidedbackprop}
+Jost~Tobias Springenberg, Alexey Dosovitskiy, Thomas Brox, and Martin
+  Riedmiller.
+\newblock {Striving for Simplicity: The All Convolutional Net}.
+\newblock In \emph{3rd International Conference on Learning Representations,
+  ICLR 2015, San Diego, CA, USA, Workshop Track Proceedings}, 2014.
+
+\bibitem[Zeiler and Fergus(2014)]{deconvnet_original}
+Matthew~D. Zeiler and Rob Fergus.
+\newblock {Visualizing and understanding convolutional networks}.
+\newblock In \emph{European Conference on Computer Vision (ECCV)}, pages
+  818--833, 2014.
+
+\bibitem[Koh and Liang(2017)]{koh2017understanding}
+Pang~Wei Koh and Percy Liang.
+\newblock {Understanding black-box predictions via influence functions}.
+\newblock In \emph{Proceedings of the 34th International Conference on Machine
+  Learning}, pages 1885--1894, 2017.
+
+\bibitem[Shrikumar et~al.(2017)Shrikumar, Greenside, and
+  Kundaje]{gradientTimesInput}
+Avanti Shrikumar, Peyton Greenside, and Anshul Kundaje.
+\newblock {Learning Important Features Through Propagating Activation
+  Differences}.
+\newblock In \emph{Proceedings of the 34th International Conference on Machine
+  Learning - Volume 70}, pages 3145--3153, 2017.
+
+\bibitem[Bach et~al.(2015)Bach, Binder, Montavon, Klauschen, M{\"u}ller, and
+  Samek]{bach2015pixel}
+Sebastian Bach, Alexander Binder, Gr{\'e}goire Montavon, Frederick Klauschen,
+  Klaus-Robert M{\"u}ller, and Wojciech Samek.
+\newblock {On pixel-wise explanations for non-linear classifier decisions by
+  layer-wise relevance propagation}.
+\newblock \emph{PloS one}, 10\penalty0 (7):\penalty0 e0130140, 2015.
+
+\bibitem[Smilkov et~al.(2017)Smilkov, Thorat, Kim, Vi{\'{e}}gas, and
+  Wattenberg]{smoothgrad}
+Daniel Smilkov, Nikhil Thorat, Been Kim, Fernanda Vi{\'{e}}gas, and Martin
+  Wattenberg.
+\newblock {SmoothGrad: removing noise by adding noise}.
+\newblock \emph{arXiv preprint arXiv:1706.03825}, 2017.
+
+\bibitem[Ribeiro et~al.(2016)Ribeiro, Singh, and Guestrin]{LIME}
+Marco~Tulio Ribeiro, Sameer Singh, and Carlos Guestrin.
+\newblock "why should i trust you?": Explaining the predictions of any
+  classifier.
+\newblock In \emph{Proceedings of the 22nd ACM SIGKDD International Conference
+  on Knowledge Discovery and Data Mining}, pages 1135--1144, New York, NY, USA,
+  2016.
+
+\bibitem[Amogh Gudi Nicolai~van Rosmalen and van
+  Gemert(2017)]{amogh_localization}
+Marco~Loog Amogh Gudi Nicolai~van Rosmalen and Jan van Gemert.
+\newblock {Object-Extent Pooling for Weakly Supervised Single-Shot
+  Localization}.
+\newblock In \emph{Proceedings of the British Machine Vision Conference
+  (BMVC)}, 2017.
+
+\bibitem[Fong and Vedaldi(2017)]{Fong2017InterpretablePerturbation}
+Ruth~C. Fong and Andrea Vedaldi.
+\newblock {Interpretable Explanations of Black Boxes by Meaningful
+  Perturbation}.
+\newblock \emph{Proceedings of the IEEE International Conference on Computer
+  Vision}, 2017-Octob:\penalty0 3449--3457, 2017.
+
+\bibitem[Dabkowski and Gal(2017)]{Dabkowski2017RealClassifiers}
+Piotr Dabkowski and Yarin Gal.
+\newblock Real time image saliency for black box classifiers.
+\newblock In \emph{Proceedings of Advances in Neural Information Processing
+  Systems 30 (NIPS)}, pages 6967--6976, 2017.
+
+\bibitem[Zintgraf et~al.(2017)Zintgraf, Cohen, Adel, and
+  Welling]{Zintgraf2017VisualizingAnalysis}
+Luisa~M Zintgraf, Taco~S Cohen, Tameem Adel, and Max Welling.
+\newblock {Visualizing Deep Neural Network Decisions: Prediction Difference
+  Analysis}.
+\newblock In \emph{5th International Conference on Learning Representations,
+  ICLR 2017, Toulon, France}, 2017.
+
+\bibitem[Zhou et~al.(2015)Zhou, Khosla, Lapedriza, Oliva, and
+  Torralba]{objectdetector}
+Bolei Zhou, Aditya Khosla, Agata Lapedriza, Aude Oliva, and Antonio Torralba.
+\newblock {Object Detectors Emerge in Deep Scene CNNs}.
+\newblock In \emph{3rd International Conference on Learning Representations,
+  ICLR 2015, San Diego, CA, USA}, 2015.
+
+\bibitem[Ancona et~al.(2017)Ancona, Ceolini, {\"{O}}ztireli, and
+  Gross]{unifiedGradients}
+Marco Ancona, Enea Ceolini, Cengiz {\"{O}}ztireli, and Markus Gross.
+\newblock {A unified view of gradient-based attribution methods for Deep Neural
+  Networks}.
+\newblock In \emph{NIPS Workshop on Interpreting, Explaining and Visualizing
+  Deep Learning}, 2017.
+
+\bibitem[Adebayo et~al.(2018)Adebayo, Gilmer, Muelly, Goodfellow, Hardt, and
+  Kim]{sanity}
+Julius Adebayo, Justin Gilmer, Michael Muelly, Ian Goodfellow, Moritz Hardt,
+  and Been Kim.
+\newblock Sanity checks for saliency maps.
+\newblock In \emph{Proceedings of Advances in Neural Information Processing
+  Systems 31 (NIPS)}, pages 9505--9515, 2018.
+
+\bibitem[Kindermans et~al.(2017)Kindermans, Hooker, Adebayo, Alber,
+  Sch{\"{u}}tt, D{\"{a}}hne, Erhan, and Kim]{unreliable}
+Pieter-Jan Kindermans, Sara Hooker, Julius Adebayo, Maximilian Alber,
+  Kristof~T. Sch{\"{u}}tt, Sven D{\"{a}}hne, Dumitru Erhan, and Been Kim.
+\newblock {The (Un)reliability of saliency methods}.
+\newblock \emph{arXiv preprint arXiv:1711.00867}, 2017.
+
+\bibitem[Ghorbani et~al.(2017)Ghorbani, Abid, and Zou]{fragile}
+Amirata Ghorbani, Abubakar Abid, and James Zou.
+\newblock {Interpretation of Neural Networks is Fragile}.
+\newblock \emph{arXiv preprint arXiv:1710.10547}, 2017.
+
+\bibitem[Zhou et~al.(2016)Zhou, Khosla, Lapedriza, Oliva, and
+  Torralba]{Zhou_2016_CVPR}
+Bolei Zhou, Aditya Khosla, Agata Lapedriza, Aude Oliva, and Antonio Torralba.
+\newblock {Learning Deep Features for Discriminative Localization}.
+\newblock In \emph{The IEEE Conference on Computer Vision and Pattern
+  Recognition (CVPR)}, 2016.
+
+\bibitem[Inc.(2019{\natexlab{a}})]{cloud_google}
+Google Inc.
+\newblock {Google Cloud Machine Learning Engine}, 2019{\natexlab{a}}.
+\newblock URL \url{https://cloud.google.com/ml-engine/}.
+
+\bibitem[Inc.(2019{\natexlab{b}})]{cloud_amazon}
+Amazon Inc.
+\newblock {Amazon SageMaker}, 2019{\natexlab{b}}.
+\newblock URL \url{https://aws.amazon.com/sagemaker/}.
+
+\bibitem[Inc.(2019{\natexlab{c}})]{cloud_azure}
+Microsoft Inc.
+\newblock {Azure Machine Learning Service}, 2019{\natexlab{c}}.
+\newblock URL
+  \url{https://azure.microsoft.com/en-in/services/machine-learning-service/}.
+
+\bibitem[Yao et~al.(2018)Yao, Wang, Chen, Dai, Yi-Qi, Yu-Feng, Wei-Wei, Qiang,
+  and Yang]{automl_survey}
+Quanming Yao, Mengshuo Wang, Yuqiang Chen, Wenyuan Dai, Hu~Yi-Qi, Li~Yu-Feng,
+  Tu~Wei-Wei, Yang Qiang, and Yu~Yang.
+\newblock {Taking Human out of Learning Applications: A Survey on Automated
+  Machine Learning}.
+\newblock \emph{arXiv preprint arXiv:1810.13306}, 2018.
+
+\bibitem[Razavian et~al.(2014)Razavian, Azizpour, Sullivan, and
+  Carlsson]{transferlearning}
+Ali~Sharif Razavian, Hossein Azizpour, Josephine Sullivan, and Stefan Carlsson.
+\newblock {CNN features off-the-shelf: An astounding baseline for recognition}.
+\newblock \emph{IEEE Conference on Computer Vision and Pattern Recognition
+  (CVPR) Workshop, Columbus, OH, USA}, pages 512--519, 2014.
+
+\bibitem[Gu et~al.(2017)Gu, Dolan-Gavitt, and Garg]{badnets}
+Tianyu Gu, Brendan Dolan-Gavitt, and Siddharth Garg.
+\newblock {BadNets: Identifying Vulnerabilities in the Machine Learning Model
+  Supply Chain}.
+\newblock \emph{arXiv preprint arXiv:1708.06733}, 2017.
+
+\bibitem[Liu et~al.(2018)Liu, Ma, Aafer, Lee, Zhai, Wang, and Zhang]{trojan}
+Yingqi Liu, Shiqing Ma, Yousra Aafer, Wen-Chuan Lee, Juan Zhai, Weihang Wang,
+  and Xiangyu Zhang.
+\newblock Trojaning attack on neural networks.
+\newblock In \emph{Proceedings of the 25th Annual Network and Distributed
+  System Security Symposium (NDSS)}, 2018.
+
+\bibitem[Wang et~al.(2019)Wang, Yuanshun, Shan, Li, Viswanath, Zheng, and
+  Zhao]{cleanse}
+Bolun Wang, Yao Yuanshun, Shawn Shan, Huiying Li, Bimal Viswanath, Haitao
+  Zheng, and Ben~Y. Zhao.
+\newblock {Neural Cleanse: Identifying and Mitigating Backdoor Attacks in
+  Neural Networks}.
+\newblock In \emph{2019 IEEE Symposium on Security and Privacy (SP)}, 2019.
+
+\bibitem[Chen et~al.(2019)Chen, Carvalho, Baracaldo, Ludwig, Edwards, Lee,
+  Molloy, and Srivastava]{Chen2019DetectingClustering}
+Bryant Chen, Wilka Carvalho, Nathalie Baracaldo, Heiko Ludwig, Benjamin
+  Edwards, Taesung Lee, Ian Molloy, and Biplav Srivastava.
+\newblock {Detecting backdoor attacks on deep neural networks by activation
+  clustering}.
+\newblock \emph{Workshop on Artificial Intelligence Safety 2019 co-located with
+  the Thirty-Third AAAI Conference on Artificial Intelligence 2019 (AAAI-19)},
+  2019.
+
+\bibitem[Papernot et~al.(2016)Papernot, McDaniel, Sinha, and
+  Wellman]{Papernot2016TowardsLearning}
+Nicolas Papernot, Patrick McDaniel, Arunesh Sinha, and Michael Wellman.
+\newblock {Towards the Science of Security and Privacy in Machine Learning}.
+\newblock \emph{arXiv preprint arXiv:1611.03814}, 2016.
+
+\bibitem[Simonyan and Zisserman(2015)]{Simonyan15}
+K~Simonyan and A~Zisserman.
+\newblock {Very Deep Convolutional Networks for Large-Scale Image Recognition}.
+\newblock In \emph{International Conference on Learning Representations}, 2015.
+
+\bibitem[Russakovsky et~al.(2015)Russakovsky, Deng, Su, Krause, Satheesh, Ma,
+  Huang, Karpathy, Khosla, Bernstein, and {others}]{russakovsky2015imagenet}
+Olga Russakovsky, Jia Deng, Hao Su, Jonathan Krause, Sanjeev Satheesh, Sean Ma,
+  Zhiheng Huang, Andrej Karpathy, Aditya Khosla, Michael Bernstein, and
+  {others}.
+\newblock {Imagenet large scale visual recognition challenge}.
+\newblock \emph{International journal of computer vision}, 115\penalty0
+  (3):\penalty0 211--252, 2015.
+
+\bibitem[Abadi et~al.(2015)Abadi, Agarwal, Barham, Brevdo, Chen, Citro,
+  Corrado, Davis, Dean, Devin, et~al.]{tensorflow2015-whitepaper}
+Mart{\i}n Abadi, Ashish Agarwal, Paul Barham, Eugene Brevdo, Zhifeng Chen,
+  Craig Citro, Greg~S Corrado, Andy Davis, Jeffrey Dean, Matthieu Devin, et~al.
+\newblock Tensorflow: Large-scale machine learning on heterogeneous systems,
+  2015.
+
+\bibitem[Cheng et~al.(2018)Cheng, Wang, Li, Hu, and Lu]{compressionsurvey1}
+Jian Cheng, Peisong Wang, Gang Li, Qinghao Hu, and Hanqing Lu.
+\newblock {Recent Advances in Efficient Computation of Deep Convolutional
+  Neural Networks}.
+\newblock \emph{Frontiers of Information Technology \& Electronic Engineering},
+  19\penalty0 (1):\penalty0 64--77, 2018.
+
+\bibitem[Cheng et~al.(2017)Cheng, Wang, Zhou, and Zhang]{compressionsurvey2}
+Yu~Cheng, Duo Wang, Pan Zhou, and Tao Zhang.
+\newblock {A Survey of Model Compression and Acceleration for Deep Neural
+  Networks}.
+\newblock \emph{arXiv preprint arXiv:1710.09282}, 2017.
+
+\bibitem[Srinivas and Babu(2015)]{pruning}
+Suraj Srinivas and R~Venkatesh Babu.
+\newblock {Data-free Parameter Pruning for Deep Neural Networks}.
+\newblock In {Xianghua Xie Mark W. Jones} and Gary K~L Tam, editors,
+  \emph{Proceedings of the British Machine Vision Conference (BMVC)}, pages
+  1--31, 9 2015.
+
+\bibitem[Ba and Caruana(2014)]{ba2014deep}
+Jimmy Ba and Rich Caruana.
+\newblock {Do deep nets really need to be deep?}
+\newblock In \emph{Proceedings of Advances in Neural Information Processing
+  Systems 27 (NIPS)}, pages 2654--2662, 2014.
+
+\end{thebibliography}
