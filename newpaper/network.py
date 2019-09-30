@@ -1,10 +1,7 @@
 import torch.nn as nn
 import torch.utils.model_zoo as model_zoo
 import math
-import torch
-from utils import read_im, img_to_tensor, print_predictions
-import numpy as np
-from explanation import differentiable_cam, get_explanation
+from newpaper.explanation import differentiable_cam, get_explanation
 from utils import *
 
 model_urls = {
