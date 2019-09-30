@@ -14,6 +14,7 @@ from newpaper.dataset import dataset
 #from network import VGG_exp1, VGG_exp2
 import torchvision.models as models
 from newpaper.utils import mkdir, AverageMeter
+import argparse
 
 hps = {
     'nb_classes': 2,
@@ -100,7 +101,19 @@ def val(net, val_loader):
          
     print("val acc: %.5f"%val_acc)
     return val_acc
-    
-    
+
+
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--cuda', type=bool, default=False)
+    args = parser.parse_args()
+    return args
+
+
 if __name__ == '__main__':
+
+    args = get_args()
+    for field in args.fields():
+        hps[field] = args[field]
+
     main(hps)
