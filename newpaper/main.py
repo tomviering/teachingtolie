@@ -32,6 +32,9 @@ hps = {
 def main(args):
     # define network
     net = models.vgg16(pretrained=True)
+    if args['cuda']:
+        net = net.cuda()
+
     mkdir('saved_models/')
     # load data
     trainset = dataset(args['input_shape'], mode = 'val')
@@ -59,9 +62,12 @@ def train(net, train_loader, criterion, optimizer, args, epoch):
     class_loss = AverageMeter()
     
     for i, data in enumerate(train_loader):
-        X, Y = data  # X1 batchsize x 1 x 16 x 16 
+        X, Y = data  # X1 batchsize x 1 x 16 x 16
         X = Variable(X)
         Y = Variable(Y)
+        if args['cuda']:
+            X = X.cuda()
+            Y = Y.cuda()
         N = len(X)
         nb = nb+N
         
