@@ -27,7 +27,7 @@ hps = {
     'test_domain': 10,
     'print_freq': 1,
     'gt_val_acc': 0.78,
-    'criterion': 1
+    'criterion': 2
 }
 
 def main(args):
@@ -56,8 +56,12 @@ def main(args):
             break
     
 def train(net, train_loader, criterion, optimizer, args, epoch):
-    sticker = read_im('smiley2.png', 32, 32)
+    my_shape = args['input_shape']
+    sticker = read_im('../smiley2.png', 7, 7)
     sticker_tensor = img_to_tensor(sticker)
+    gradcam_target = sticker_tensor.repeat(args['train_batch_size'], 1, 1, 1)
+    if args['cuda']:
+        gradcam_target = gradcam_target.cuda()
 
     net.train()
     nb = 0
@@ -77,13 +81,17 @@ def train(net, train_loader, criterion, optimizer, args, epoch):
         outputs = net(X)
         Acc_v = Acc_v + (outputs.argmax(1) - Y).nonzero().size(0)
 
+        optimizer.zero_grad()
+
+        gradcam = differentiable_cam(model=net, input=X, cuda=args['cuda'])
+        loss_fcn = torch.nn.CrossEntropyLoss()
+
         if criterion == 1:
-            loss = torch.nn.CrossEntropyLoss(outputs, Y)
+            loss = loss_fcn(outputs, Y)
         if criterion == 2:
-            loss = torch.nn.CrossEntropyLoss(outputs, Y)
-        
-        optimizer.zero_grad()     
-        loss.backward()  
+            loss = torch.sum(torch.abs(gradcam[0] - gradcam_target))
+
+        loss.backward()
         optimizer.step()
 
         class_loss.update(loss.data.item(), N)
