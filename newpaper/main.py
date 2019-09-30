@@ -18,7 +18,7 @@ from newpaper.network import VGG_final
 
 hps = {
     'nb_classes': 2,
-    'train_batch_size': 16,
+    'train_batch_size': 8,
     'val_batch_size': 3,
     'epoch': 500,
     'lr': 1e-2,
@@ -82,12 +82,16 @@ def train(net, train_loader, criterion, optimizer, args, epoch):
         nb = nb+N
         
         outputs = net(X)
+        print(outputs.shape)
+        print(Y.shape)
+        print(Y)
         Acc_v = Acc_v + (outputs.argmax(1) - Y).nonzero().size(0)
 
         optimizer.zero_grad()
 
         # normal training
-        if criterion == 1:
+        if criterion == 1: # this loss doesnt make any sense since output and Y are not same size...
+            # how does it even work???
             loss_fcn = torch.nn.CrossEntropyLoss()
             loss = loss_fcn(outputs, Y)
         # bullshit loss to illustrate double-gradient
