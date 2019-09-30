@@ -15,6 +15,8 @@ from newpaper.dataset import dataset
 import torchvision.models as models
 from newpaper.utils import mkdir, AverageMeter, read_im, img_to_tensor
 import argparse
+from newpaper.explanation import differentiable_cam
+from newpaper.network import VGG_final
 
 hps = {
     'nb_classes': 2,
@@ -32,7 +34,7 @@ hps = {
 
 def main(args):
     # define network
-    net = models.vgg16(pretrained=True)
+    net = VGG_final()
     if args['cuda']:
         net = net.cuda()
 
