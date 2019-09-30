@@ -45,7 +45,7 @@ def main(args):
     val_loader = DataLoader(valset, batch_size=args['val_batch_size'], shuffle=False, num_workers=1)
     
     # define loss function
-    optimizer = torch.optim.Adam(net.classifier.parameters(), lr = args['lr'])        
+    optimizer = torch.optim.SGD(net.my_model.classifier.parameters(), lr=args['lr'])
 
     for epoch in range(1, args['epoch']+1):
         train(net, train_loader, args['criterion'], optimizer, args, epoch)
