@@ -18,8 +18,8 @@ from newpaper.network import VGG_final
 
 hps = {
     'nb_classes': 2,
-    'train_batch_size': 32,
-    'val_batch_size': 32,
+    'train_batch_size': 3,
+    'val_batch_size': 3,
     'epoch': 500,
     'lr': 1e-3,
     'weight_decay': 2e-4,
