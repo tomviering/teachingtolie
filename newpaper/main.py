@@ -23,7 +23,7 @@ hps = {
     'epoch': 500,
     'lr': 1e-3,
     'weight_decay': 2e-4,
-    'input_shape': (32, 32),
+    'input_shape': (224, 224),
     'test_domain': 10,
     'print_freq': 1,
     'gt_val_acc': 0.78,
