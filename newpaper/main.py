@@ -18,7 +18,7 @@ from newpaper.network import VGG_final
 
 hps = {
     'nb_classes': 2,
-    'train_batch_size': 3,
+    'train_batch_size': 32,
     'val_batch_size': 3,
     'epoch': 500,
     'lr': 1e-3,
@@ -60,10 +60,10 @@ def train(net, train_loader, criterion, optimizer, args, epoch):
     sticker = read_im('../smiley2.png', 7, 7)
     sticker_tensor = img_to_tensor(sticker)
     sticker_tensor.requires_grad = False
-    gradcam_target = sticker_tensor.repeat(args['train_batch_size'], 1, 1, 1)
+    sticker_tensor = torch.mean(sticker_tensor, dim=1) # remove RGB
+    gradcam_target = sticker_tensor.repeat(args['train_batch_size'], 1, 1) # batch
     if args['cuda']:
         gradcam_target = gradcam_target.cuda()
-
 
     net.train()
     nb = 0
