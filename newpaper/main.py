@@ -61,6 +61,7 @@ def train(net, train_loader, criterion, optimizer, args, epoch):
     sticker_tensor = img_to_tensor(sticker)
     sticker_tensor.requires_grad = False
     sticker_tensor = torch.mean(sticker_tensor, dim=1) # remove RGB
+    sticker_tensor = tensor_normalize(sticker_tensor)
     gradcam_target = sticker_tensor.repeat(args['train_batch_size'], 1, 1) # batch
     if args['cuda']:
         gradcam_target = gradcam_target.cuda()
@@ -97,7 +98,7 @@ def train(net, train_loader, criterion, optimizer, args, epoch):
         # gradcam loss
         if criterion == 2:
             gradcam = differentiable_cam(model=net, input=X, cuda=args['cuda'])
-            loss = torch.sum(torch.abs(gradcam[0] - gradcam_target))
+            loss = torch.sum(torch.abs(gradcam[0] - gradcam_target))/gradcam_target.shape[0]/gradcam_target.shape[1]/gradcam_target.shape[2]
 
         loss.backward()
         optimizer.step()
