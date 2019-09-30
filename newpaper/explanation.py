@@ -91,7 +91,7 @@ def differentiable_cam(model, input, index=None, cuda=False):
     grad_val_tom = torch.autograd.grad(one_hot, features, retain_graph=True)
     # does a backward pass without affecting the 'main' graph (the one used for training)
 
-    weights_tom = torch.mean(grad_val_tom[0], (2, 3))
+    w1 = torch.mean(grad_val_tom[0], (2, 3))
 
     features_tom = features #[-1]
     cam_tom = torch.zeros((features_tom.shape[0], features_tom.shape[2], features_tom.shape[2]))
@@ -100,12 +100,15 @@ def differentiable_cam(model, input, index=None, cuda=False):
     if cuda:
         all_zero = all_zero.cuda()
 
-    kanker = features_tom
-    kanker = torch.transpose(kanker, 0, 3)
-    kanker = torch.transpose(kanker, 1, 2)
-    cc = torch.transpose(weights_tom, 0, 1)
-    res = torch.mul(kanker, cc)
+    f1 = features_tom
+    f2 = torch.transpose(f1, 0, 3)
+    f3 = torch.transpose(f2, 1, 2)
+    w2 = torch.transpose(w1, 0, 1)
+    # now w and f can be broadcast when multiplying elementwise:
+    res = torch.mul(f3, w2)
+    # sum over the weights:
     res = torch.sum(res, dim=2)
+    # reshape back to original form
     res = torch.transpose(res, 0, 2)
 
     cam_positive = torch.max(res, all_zero)
