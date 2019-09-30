@@ -18,10 +18,10 @@ from newpaper.network import VGG_final
 
 hps = {
     'nb_classes': 2,
-    'train_batch_size': 32,
+    'train_batch_size': 16,
     'val_batch_size': 3,
     'epoch': 500,
-    'lr': 1e-3,
+    'lr': 1e-2,
     'weight_decay': 2e-4,
     'input_shape': (224, 224),
     'test_domain': 10,
@@ -119,7 +119,12 @@ def val(net, val_loader):
     for i, data in enumerate(val_loader):
         X, Y = data 
         X = Variable(X)
-        Y = Variable(Y) 
+        Y = Variable(Y)
+
+        if args['cuda']:
+            X = X.cuda()
+            Y = Y.cuda()
+
         nb = nb + len(X)
         
         outputs = net(X)
