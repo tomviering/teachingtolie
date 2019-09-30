@@ -113,7 +113,8 @@ def get_args():
 if __name__ == '__main__':
 
     args = get_args()
-    for field in args.fields():
-        hps[field] = args[field]
+    args = vars(args)
+    for key in args.keys():
+        hps[key] = args[key]
 
     main(hps)
