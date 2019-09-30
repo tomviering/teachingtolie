@@ -97,6 +97,8 @@ def differentiable_cam(model, input, index=None, cuda=False):
     cam_tom = torch.zeros((features_tom.shape[0], features_tom.shape[2], features_tom.shape[2]))
 
     all_zero = torch.zeros(cam_tom.shape)
+    if cuda:
+        all_zero = all_zero.cuda()
 
     kanker = features_tom
     kanker = torch.transpose(kanker, 0, 3)
