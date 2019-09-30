@@ -13,7 +13,7 @@ from torch.autograd import Variable
 from newpaper.dataset import dataset
 #from network import VGG_exp1, VGG_exp2
 import torchvision.models as models
-from newpaper.utils import mkdir, AverageMeter
+from newpaper.utils import mkdir, AverageMeter, read_im, img_to_tensor
 import argparse
 
 hps = {
