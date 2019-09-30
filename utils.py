@@ -121,7 +121,7 @@ def show_cam_on_image(img, mask):
     mask = mask.cpu().data.numpy()
     mask = cv2.resize(mask, (224, 224))
 
-    heatmap = cv2.applyColorMap(np.uint8(255 * mask), cv2.COLORMAP_JET)
+    heatmap = cv2.applyColorMap(np.uint8(255 * (1- mask)), cv2.COLORMAP_JET)
     heatmap = np.float32(heatmap) / 255
     cam = heatmap + np.float32(img).reshape(224,224,3)
     cam = cam / np.max(cam)
