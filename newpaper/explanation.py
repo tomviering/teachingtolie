@@ -77,10 +77,11 @@ def differentiable_cam(model, input, index=None, cuda=False):
     if index == None:
         (_, my_index) = torch.max(output, dim=1)
 
-    one_hot = torch.zeros(output.shape, requires_grad=True)
+    one_hot = torch.zeros(output.shape, requires_grad=False)
     for i in range(0, len(my_index)):
         one_hot[i][my_index[i]] = 1
 
+    one_hot.requires_grad = True
     if cuda:
         one_hot = torch.sum(one_hot.cuda() * output)
     else:
@@ -88,7 +89,10 @@ def differentiable_cam(model, input, index=None, cuda=False):
 
     model.zero_grad()
 
-    grad_val_tom = torch.autograd.grad(one_hot, features, retain_graph=True)
+    #one_hot.backward(create_graph=True)
+    #grad_val_tom = model.my_gradients
+
+    grad_val_tom = torch.autograd.grad(one_hot, features, create_graph=True, retain_graph=True)
     # does a backward pass without affecting the 'main' graph (the one used for training)
 
     w1 = torch.mean(grad_val_tom[0], (2, 3))

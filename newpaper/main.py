@@ -45,7 +45,7 @@ def main(args):
     val_loader = DataLoader(valset, batch_size=args['val_batch_size'], shuffle=False, num_workers=1)
     
     # define loss function
-    optimizer = torch.optim.SGD(net.my_model.classifier.parameters(), lr=args['lr'])
+    optimizer = torch.optim.Adam(net.my_model.classifier.parameters(), lr=args['lr'])
 
     for epoch in range(1, args['epoch']+1):
         train(net, train_loader, args['criterion'], optimizer, args, epoch)
@@ -59,9 +59,11 @@ def train(net, train_loader, criterion, optimizer, args, epoch):
     my_shape = args['input_shape']
     sticker = read_im('../smiley2.png', 7, 7)
     sticker_tensor = img_to_tensor(sticker)
+    sticker_tensor.requires_grad = False
     gradcam_target = sticker_tensor.repeat(args['train_batch_size'], 1, 1, 1)
     if args['cuda']:
         gradcam_target = gradcam_target.cuda()
+
 
     net.train()
     nb = 0
@@ -83,12 +85,18 @@ def train(net, train_loader, criterion, optimizer, args, epoch):
 
         optimizer.zero_grad()
 
-        gradcam = differentiable_cam(model=net, input=X, cuda=args['cuda'])
-        loss_fcn = torch.nn.CrossEntropyLoss()
-
+        # normal training
         if criterion == 1:
+            loss_fcn = torch.nn.CrossEntropyLoss()
             loss = loss_fcn(outputs, Y)
+        # bullshit loss to illustrate double-gradient
+        if criterion == 3:
+            my_output = outputs[0]
+            dydw = torch.autograd.grad(my_output[0], net.my_model.classifier.parameters(), create_graph=True)
+            loss = torch.sum(torch.abs(dydw[0]))
+        # gradcam loss
         if criterion == 2:
+            gradcam = differentiable_cam(model=net, input=X, cuda=args['cuda'])
             loss = torch.sum(torch.abs(gradcam[0] - gradcam_target))
 
         loss.backward()
