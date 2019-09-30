@@ -26,7 +26,8 @@ hps = {
     'input_shape': (32, 32),
     'test_domain': 10,
     'print_freq': 1,
-    'gt_val_acc':0.78
+    'gt_val_acc': 0.78,
+    'criterion': 1
 }
 
 def main(args):
@@ -44,11 +45,10 @@ def main(args):
     val_loader = DataLoader(valset, batch_size=args['val_batch_size'], shuffle=False, num_workers=1)
     
     # define loss function
-    criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(net.classifier.parameters(), lr = args['lr'])        
 
     for epoch in range(1, args['epoch']+1):
-        train(net, train_loader, criterion, optimizer, args, epoch)
+        train(net, train_loader, args['criterion'], optimizer, args, epoch)
         val_acc = val(net, val_loader)
         
         if abs(val_acc - args['gt_val_acc']) <= 1e-5:
@@ -56,6 +56,9 @@ def main(args):
             break
     
 def train(net, train_loader, criterion, optimizer, args, epoch):
+    sticker = read_im('smiley2.png', 32, 32)
+    sticker_tensor = img_to_tensor(sticker)
+
     net.train()
     nb = 0
     Acc_v = 0
@@ -73,8 +76,11 @@ def train(net, train_loader, criterion, optimizer, args, epoch):
         
         outputs = net(X)
         Acc_v = Acc_v + (outputs.argmax(1) - Y).nonzero().size(0)
-        
-        loss = criterion(outputs, Y)
+
+        if criterion == 1:
+            loss = torch.nn.CrossEntropyLoss(outputs, Y)
+        if criterion == 2:
+            loss = torch.nn.CrossEntropyLoss(outputs, Y)
         
         optimizer.zero_grad()     
         loss.backward()  
