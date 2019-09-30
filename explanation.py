@@ -75,11 +75,12 @@ def differentiable_cam(model, input, index=None, cuda=False):
     features = model.my_features
 
     if index == None:
-        index = np.argmax(output.cpu().data.numpy())
+        (_, my_index) = torch.max(output, dim=1)
 
-    one_hot = np.zeros((1, output.size()[-1]), dtype=np.float32)
-    one_hot[0][index] = 1
-    one_hot = Variable(torch.from_numpy(one_hot), requires_grad=True)
+    one_hot = torch.zeros(output.shape, requires_grad=True)
+    for i in range(0, len(my_index)):
+        one_hot[i][my_index[i]] = 1
+
     if cuda:
         one_hot = torch.sum(one_hot.cuda() * output)
     else:
@@ -93,20 +94,19 @@ def differentiable_cam(model, input, index=None, cuda=False):
     weights_tom = torch.mean(grad_val_tom[0], (2, 3))
 
     features_tom = features #[-1]
-    cam_tom = torch.zeros(features_tom.shape[2:])
+    cam_tom = torch.zeros((features_tom.shape[0], features_tom.shape[2], features_tom.shape[2]))
 
     all_zero = torch.zeros(cam_tom.shape)
 
-    if cuda:
-        cam_tom = cam_tom.cuda()
-        all_zero = all_zero.cuda()
+    kanker = features_tom
+    kanker = torch.transpose(kanker, 0, 3)
+    kanker = torch.transpose(kanker, 1, 2)
+    cc = torch.transpose(weights_tom, 0, 1)
+    res = torch.mul(kanker, cc)
+    res = torch.sum(res, dim=2)
+    res = torch.transpose(res, 0, 2)
 
-
-    for i, w in enumerate(weights_tom[0]):
-        cam_tom += w * features_tom[0, i, :, :]
-
-
-    cam_positive = torch.max(cam_tom, all_zero)
+    cam_positive = torch.max(res, all_zero)
     cam_normalized = cam_positive - torch.min(cam_positive)
     cam_normalized = cam_normalized / torch.max(cam_normalized)  # normalized between 0 and 1
 

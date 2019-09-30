@@ -142,11 +142,16 @@ if __name__ == '__main__':
     img_input = read_im('./examples/both.png')
     img_tensor = img_to_tensor(img_input)
 
-    output = my_vgg2.forward(img_tensor)
+    img_input2 = read_im('./examples/both.png')
+    img_tensor2 = img_to_tensor(img_input2)
+
+    imgs = torch.cat((img_tensor, img_tensor2), dim=0)
+
+    output = my_vgg2.forward(imgs)
 
     print_predictions(output, 10)
 
-    cam = differentiable_cam(model=my_vgg2, input=img_tensor)
+    cam = differentiable_cam(model=my_vgg2, input=imgs)
     cam2 = get_explanation(model=my_vgg2, input=img_tensor)
 
     plt.figure(0)
@@ -155,7 +160,7 @@ if __name__ == '__main__':
 
     plt.figure(1)
     cam = cam[0].detach()  # remove gradient information for plotting
-    pic = show_cam_on_tensor(img_tensor, cam)
+    pic = show_cam_on_tensor(img_tensor, cam[1,:,:])
     plt.imshow(pic)
     plt.axis('off')
 
