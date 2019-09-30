@@ -7,12 +7,10 @@ Created on Fri Sep 27 12:53:02 2019
 """
 
 import torch
-import numpy as np
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
 from newpaper.dataset import dataset
 #from network import VGG_exp1, VGG_exp2
-import torchvision.models as models
 from newpaper.utils import mkdir, AverageMeter, read_im, img_to_tensor
 import argparse
 from newpaper.explanation import differentiable_cam
