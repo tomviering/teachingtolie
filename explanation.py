@@ -117,7 +117,11 @@ def differentiable_cam(model, input, index=None, cuda=False):
 
     cam_positive = torch.max(res, all_zero)
     cam_normalized = cam_positive - torch.min(cam_positive)
-    cam_normalized = cam_normalized / torch.max(cam_normalized)  # normalized between 0 and 1
+
+    cam_max = torch.max(cam_normalized)
+    epsilon = torch.ones_like(cam_max)*0.00001
+
+    cam_normalized = cam_normalized / (cam_max + epsilon)  # normalized between 0 and 1
 
     return cam_normalized, output
 
