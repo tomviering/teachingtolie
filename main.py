@@ -148,6 +148,7 @@ def val(net, val_loader):
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--cuda', type=bool, default=False)
+    parser.add_argument('--train_batch_size', type=int, default=8)
     args = parser.parse_args()
     return args
 
@@ -158,5 +159,8 @@ if __name__ == '__main__':
     args = vars(args)
     for key in args.keys():
         hps[key] = args[key]
+
+    print('hyperparameter settings:')
+    print(hps)
 
     main(hps)
