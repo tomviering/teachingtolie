@@ -116,12 +116,29 @@ def differentiable_cam(model, input, index=None, cuda=False):
     res = torch.transpose(res, 0, 2)
 
     cam_positive = torch.max(res, all_zero)
-    cam_normalized = cam_positive - torch.min(cam_positive)
 
-    cam_max = torch.max(cam_normalized)
-    epsilon = torch.ones_like(cam_max)*0.00001
+    if torch.sum(torch.isnan(cam_positive)) > 0:
+        print('cam_positive contains nan')
+    if torch.sum(torch.isinf(cam_positive)) > 0:
+        print('cam_positive contains inf!!! gradients have become too large... :(')
 
-    cam_normalized = cam_normalized / (cam_max + epsilon)  # normalized between 0 and 1
+    cam_reshaped = torch.reshape(cam_positive, (cam_positive.shape[0], -1))
+    cam_normalized = cam_positive.transpose(0, 2) - torch.min(cam_reshaped, dim=1)[0]
+    cam_normalized = cam_normalized.transpose(0, 2)
+    if torch.sum(torch.isnan(cam_normalized)) > 0:
+        print('cam_normalized contains nan after subtracting')
+
+    cam_reshaped = torch.reshape(cam_normalized, (cam_positive.shape[0], -1))
+    cam_max = torch.max(cam_reshaped, dim=1)
+    epsilon = torch.ones(cam_max[0].shape)*0.00001
+    if cuda:
+        epsilon = epsilon.cuda()
+
+    cam_normalized = cam_normalized.transpose(0, 2) / (cam_max[0] + epsilon)  # normalized between 0 and 1
+    cam_normalized = cam_normalized.transpose(0, 2)
+    if torch.sum(torch.isnan(cam_normalized)) > 0:
+        print('cam_normalized contains nan after division')
+        print((cam_max[0] + epsilon))
 
     return cam_normalized, output
 

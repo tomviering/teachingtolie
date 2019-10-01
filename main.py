@@ -106,6 +106,8 @@ def train(net, train_loader, criterion, optimizer, args, epoch):
         # gradcam loss
         if criterion == 2:
             gradcam = differentiable_cam(model=net, input=X, cuda=args['cuda'])
+            if torch.sum(torch.isnan(gradcam[0])) > 0:
+                print('gradcam contains nan')
             loss = torch.sum(torch.abs(gradcam[0] - gradcam_target))/gradcam_target.shape[0]/gradcam_target.shape[1]/gradcam_target.shape[2]
 
         loss.backward()
