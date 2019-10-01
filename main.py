@@ -151,6 +151,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--cuda', type=bool, default=False)
     parser.add_argument('--train_batch_size', type=int, default=8)
+    parser.add_argument('--lr', type=float, default=1e-3)
     args = parser.parse_args()
     return args
 
