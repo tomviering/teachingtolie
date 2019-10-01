@@ -5,6 +5,7 @@ Created on Fri Sep 27 12:53:02 2019
 
 @author: ziqi
 """
+import os
 
 import torch
 from torch.utils.data import DataLoader
@@ -15,6 +16,8 @@ from newpaper.utils import mkdir, AverageMeter, read_im, img_to_tensor, tensor_n
 import argparse
 from newpaper.explanation import differentiable_cam
 from newpaper.network import VGG_final
+
+print(os.path())
 
 hps = {
     'nb_classes': 2,
@@ -31,6 +34,9 @@ hps = {
 }
 
 def main(args):
+
+
+
     # define network
     net = VGG_final()
     if args['cuda']:
@@ -45,7 +51,8 @@ def main(args):
     val_loader = DataLoader(valset, batch_size=args['val_batch_size'], shuffle=False, num_workers=1)
     
     # define loss function
-    optimizer = torch.optim.Adam(net.my_model.classifier.parameters(), lr=args['lr'])
+    optimizer = torch.optim.Adam(net.my_model.parameters(), lr=args['lr'])
+    # TODO: should optimize all weights!!!
 
     for epoch in range(1, args['epoch']+1):
         train(net, train_loader, args['criterion'], optimizer, args, epoch)

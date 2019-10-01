@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri May 17 12:11:01 2019
+Created on Fri Sep 27 12:54:09 2019
 
 @author: ziqi
 """
+
+import os
+import torch
+import numpy as np
 import torch
 from torch.autograd import Variable
 from torch.autograd import Function
@@ -50,20 +54,20 @@ def img_to_tensor(img, reorder=True):
 
 
 def plot_heatmap(heatmap):
-    #heatmap2 = heatmap.expand(1,3,14,14)
+    # heatmap2 = heatmap.expand(1,3,14,14)
     heatmap2_np = heatmap.detach().numpy()
-
 
     heatmap3 = cv2.applyColorMap(np.uint8(255 * heatmap2_np.squeeze()), cv2.COLORMAP_JET)
     heatmap4 = np.float32(heatmap3) / 255
 
-    #tensor_plot(heatmap4)
+    # tensor_plot(heatmap4)
 
     plt.imshow(heatmap4)
     plt.axis('off')
-    #plt.savefig('exp2/random/original-explanation/' + str(i) + '.png')
-    #plt.close()
+    # plt.savefig('exp2/random/original-explanation/' + str(i) + '.png')
+    # plt.close()
     plt.show()
+
 
 def plot_heatmap2(heatmap):
     heatmap2_np = heatmap.detach().numpy()
@@ -71,9 +75,10 @@ def plot_heatmap2(heatmap):
     plt.colorbar()
     plt.show()
 
+
 def tensor_to_img(input):
     """"Takes a tensor and turns it into an image. The image is scaled between 0 and 1, but is not yet rounded."""
-    input = input.clone().detach() #torch.tensor(input)
+    input = input.clone().detach()  # torch.tensor(input)
 
     im1 = torch.squeeze(input)  # remove batch dim
     im2 = im1.cpu().data.numpy()  # move to cpu
@@ -92,7 +97,6 @@ def tensor_to_img(input):
 
 
 def img_disc(img):
-
     img = img * 255
     img = np.floor(img)
     img = np.clip(img, 0, 255)
@@ -117,21 +121,18 @@ def tensor_plot(input):
     img_plot(img)
 
 
-def show_cam_on_image(img, mask):  
+def show_cam_on_image(img, mask):
     mask = mask.cpu().data.numpy()
     mask = cv2.resize(mask, (224, 224))
 
-    heatmap = cv2.applyColorMap(np.uint8(255 * (1- mask)), cv2.COLORMAP_JET)
+    heatmap = cv2.applyColorMap(np.uint8(255 * (1 - mask)), cv2.COLORMAP_JET)
     heatmap = np.float32(heatmap) / 255
-    cam = heatmap + np.float32(img).reshape(224,224,3)
+    cam = heatmap + np.float32(img).reshape(224, 224, 3)
     cam = cam / np.max(cam)
-
-
-
 
     return cam
     # cv2.imwrite("cam.jpg", np.uint8(255 * cam))
-    
+
 
 def show_cam_on_tensor(img_tensor, mask):
     my_image = tensor_to_img(img_tensor)
@@ -181,7 +182,7 @@ def print_predictions(y, k):
     y_original_p = torch.nn.functional.softmax(y)
     y_original_p_np = y_original_p.cpu().data.numpy()
 
-    y_original_top = np.argsort(y_original_p_np) # get id's
+    y_original_top = np.argsort(y_original_p_np)  # get id's
     y_original_top_p = np.sort(y_original_p_np)  # sorted posteriors
 
     # since sorts from small to large, we need to flip it
@@ -203,3 +204,24 @@ def print_predictions(y, k):
         class_name = classes[class_num]
         class_str = '{:20.20}'.format(class_name)
         print('class %03d [%s] posterior %4.4f' % (class_num, class_str, class_posterior))
+
+
+def mkdir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+        
+class AverageMeter(object):
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.sum += val * n
+        self.count += n
+        self.avg = self.sum / self.count
