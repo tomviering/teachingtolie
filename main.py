@@ -5,19 +5,16 @@ Created on Fri Sep 27 12:53:02 2019
 
 @author: ziqi
 """
-import os
 
 import torch
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
-from newpaper.dataset import dataset
+from dataset import dataset
 #from network import VGG_exp1, VGG_exp2
-from newpaper.utils import mkdir, AverageMeter, read_im, img_to_tensor, tensor_normalize
+from utils import mkdir, AverageMeter, read_im, img_to_tensor, tensor_normalize
 import argparse
-from newpaper.explanation import differentiable_cam
-from newpaper.network import VGG_final
-
-print(os.path())
+from explanation import differentiable_cam
+from network import VGG_final
 
 hps = {
     'nb_classes': 2,
@@ -64,7 +61,7 @@ def main(args):
     
 def train(net, train_loader, criterion, optimizer, args, epoch):
     my_shape = args['input_shape']
-    sticker = read_im('../smiley2.png', 7, 7)
+    sticker = read_im('smiley2.png', 7, 7)
     sticker_tensor = img_to_tensor(sticker)
     sticker_tensor.requires_grad = False
     sticker_tensor = torch.mean(sticker_tensor, dim=1) # remove RGB

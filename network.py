@@ -1,7 +1,7 @@
 import torch.nn as nn
 import torch.utils.model_zoo as model_zoo
 import math
-from newpaper.explanation import differentiable_cam, get_explanation
+from explanation import differentiable_cam, get_explanation
 from utils import *
 
 model_urls = {
@@ -136,10 +136,10 @@ if __name__ == '__main__':
 
     my_vgg2 = VGG_final()
 
-    img_input = read_im('./examples/both.png')
+    img_input = read_im('both.png')
     img_tensor = img_to_tensor(img_input)
 
-    img_input2 = read_im('./examples/both.png')
+    img_input2 = read_im('both.png')
     img_tensor2 = img_to_tensor(img_input2)
 
     imgs = torch.cat((img_tensor, img_tensor2), dim=0)
