@@ -17,6 +17,7 @@ from explanation import differentiable_cam
 from network import VGG_final
 from utils import *
 import matplotlib.pyplot as plt
+import time
 
 hps = {
     'nb_classes': 2,
@@ -56,7 +57,13 @@ def main():
     val_vis_batch(net, val_loader, num=5, save=True, fn='vis/epoch0_')
 
     for epoch in range(1, hps['epoch'] + 1):
+
+        start = time.time()
         train(net, train_loader, hps['criterion'], optimizer, epoch)
+        end = time.time()
+        print('epoch took %d seconds' % (end - start))
+        print('epoch took approximately %d minutes' % np.floor((end - start)/60))
+
         val_vis_batch(net, val_loader, num=5, save=True, fn='vis/epoch%d_' % epoch)
         val_acc = val(net, val_loader)
         
