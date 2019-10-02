@@ -52,11 +52,12 @@ def main():
     # define loss function
     optimizer = torch.optim.Adam(net.my_model.parameters(), lr=hps['lr'])
 
-    val_vis_batch(net, val_loader, num=5, save=True, fn='test')
+    mkdir('vis/')
+    val_vis_batch(net, val_loader, num=5, save=True, fn='vis/epoch0_')
 
     for epoch in range(1, hps['epoch'] + 1):
         train(net, train_loader, hps['criterion'], optimizer, epoch)
-        val_vis_batch(net, val_loader, num=5, save=True, fn='epoch%d' % epoch)
+        val_vis_batch(net, val_loader, num=5, save=True, fn='vis/epoch%d_' % epoch)
         val_acc = val(net, val_loader)
         
         if abs(val_acc - hps['gt_val_acc']) <= 1e-5:
