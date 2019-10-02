@@ -179,6 +179,10 @@ def print_predictions(y, k):
     """ Prints the top k classes contained in the logits of y.
         There shouldn't have been a softmax applied to y yet.
     """
+
+    if len(y.shape) > 1:
+        raise Exception('should only put in predictions for 1 object!')
+
     y_original_p = torch.nn.functional.softmax(y)
     y_original_p_np = y_original_p.cpu().data.numpy()
 
@@ -186,8 +190,8 @@ def print_predictions(y, k):
     y_original_top_p = np.sort(y_original_p_np)  # sorted posteriors
 
     # since sorts from small to large, we need to flip it
-    y_original_top = y_original_top[0][::-1]
-    y_original_top_p = y_original_top_p[0][::-1]
+    y_original_top = y_original_top[::-1]
+    y_original_top_p = y_original_top_p[::-1]
 
     # get the top k
     y_original_top_k = y_original_top[0:k]
