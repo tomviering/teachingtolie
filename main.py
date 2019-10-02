@@ -215,7 +215,10 @@ def val(net, val_loader):
     net.eval()
     Acc_v = 0
     nb = 0
+    print('computing accuracy on validation data...')
     for i, data in enumerate(val_loader):
+        print('batch %d of %d' % (i, len(val_loader)))
+
         X, Y = data 
         X = Variable(X)
         Y = Variable(Y)
