@@ -169,8 +169,8 @@ def train(net, train_loader, criterion, optimizer, epoch):
         class_loss.update(loss.data.item(), N)
 
         if epoch % hps['print_freq'] == 0:
-            print('[epoch %d], [iter %d / %d], [class loss %.5f]' 
-                  % (epoch, i + 1, len(train_loader), class_loss.avg))
+            print('[epoch %d], [iter %d / %d], [class loss %.5f] [memory used %d]'
+                  % (epoch, i + 1, len(train_loader), class_loss.avg, get_gpu_memory_map()[0]))
         #print(val_acc)
     train_acc = (nb - Acc_v)/nb
     print("train acc: %.5f"%train_acc)
