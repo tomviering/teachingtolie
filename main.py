@@ -15,6 +15,8 @@ from utils import mkdir, AverageMeter, read_im, img_to_tensor, tensor_normalize
 import argparse
 from explanation import differentiable_cam
 from network import VGG_final
+from utils import *
+import matplotlib.pyplot as plt
 
 hps = {
     'nb_classes': 2,
@@ -30,44 +32,63 @@ hps = {
     'criterion': 2
 }
 
-def main(args):
+def main():
 
 
 
     # define network
     net = VGG_final()
-    if args['cuda']:
+    if hps['cuda']:
         net = net.cuda()
 
     mkdir('saved_models/')
     # load data
-    trainset = dataset(args['input_shape'], mode = 'val')
-    train_loader = DataLoader(trainset, batch_size=args['train_batch_size'], shuffle=False, num_workers=1)
+    trainset = dataset(hps['input_shape'], mode ='val')
+    train_loader = DataLoader(trainset, batch_size=hps['train_batch_size'], shuffle=False, num_workers=1)
     
-    valset = dataset(args['input_shape'], mode = 'val')
-    val_loader = DataLoader(valset, batch_size=args['val_batch_size'], shuffle=False, num_workers=1)
+    valset = dataset(hps['input_shape'], mode ='val')
+    val_loader = DataLoader(valset, batch_size=hps['val_batch_size'], shuffle=False, num_workers=1)
     
     # define loss function
-    optimizer = torch.optim.Adam(net.my_model.parameters(), lr=args['lr'])
-    # TODO: should optimize all weights!!!
+    optimizer = torch.optim.Adam(net.my_model.parameters(), lr=hps['lr'])
 
-    for epoch in range(1, args['epoch']+1):
-        train(net, train_loader, args['criterion'], optimizer, args, epoch)
+    val_vis_batch(net, val_loader)
+
+    for epoch in range(1, hps['epoch'] + 1):
+        train(net, train_loader, hps['criterion'], optimizer, epoch)
+        val_vis_batch(net, val_loader)
         val_acc = val(net, val_loader)
         
-        if abs(val_acc - args['gt_val_acc']) <= 1e-5:
+        if abs(val_acc - hps['gt_val_acc']) <= 1e-5:
             torch.save(net, 'saved_models/model.pth')
             break
-    
-def train(net, train_loader, criterion, optimizer, args, epoch):
-    my_shape = args['input_shape']
+
+def save_im(X, net, fn):
+    cam = differentiable_cam(model=net, input=X, cuda=hps['cuda'])
+    cam = cam[0].detach()  # remove gradient information for plotting
+
+    for i in range(0, X.shape[0]):
+
+        plt.figure(i*2+0)
+        tensor_plot(X[i, :, :, :])
+        plt.axis('off')
+        plt.figure(i*2+1)
+
+        pic = show_cam_on_tensor(X[i, :, :, :], cam[i, :, :])
+        plt.imshow(pic)
+        plt.axis('off')
+
+    plt.show()
+
+def train(net, train_loader, criterion, optimizer, epoch):
+    my_shape = hps['input_shape']
     sticker = read_im('smiley2.png', 7, 7)
     sticker_tensor = img_to_tensor(sticker)
     sticker_tensor.requires_grad = False
     sticker_tensor = torch.mean(sticker_tensor, dim=1) # remove RGB
     sticker_tensor = tensor_normalize(sticker_tensor)
-    gradcam_target = sticker_tensor.repeat(args['train_batch_size'], 1, 1) # batch
-    if args['cuda']:
+    gradcam_target = sticker_tensor.repeat(hps['train_batch_size'], 1, 1) # batch
+    if hps['cuda']:
         gradcam_target = gradcam_target.cuda()
 
     net.train()
@@ -79,7 +100,7 @@ def train(net, train_loader, criterion, optimizer, args, epoch):
         X, Y = data  # X1 batchsize x 1 x 16 x 16
         X = Variable(X)
         Y = Variable(Y)
-        if args['cuda']:
+        if hps['cuda']:
             X = X.cuda()
             Y = Y.cuda()
         N = len(X)
@@ -105,7 +126,7 @@ def train(net, train_loader, criterion, optimizer, args, epoch):
             loss = torch.sum(torch.abs(dydw[0]))
         # gradcam loss
         if criterion == 2:
-            gradcam = differentiable_cam(model=net, input=X, cuda=args['cuda'])
+            gradcam = differentiable_cam(model=net, input=X, cuda=hps['cuda'])
             if torch.sum(torch.isnan(gradcam[0])) > 0:
                 print('gradcam contains nan')
             loss = torch.sum(torch.abs(gradcam[0] - gradcam_target))/gradcam_target.shape[0]/gradcam_target.shape[1]/gradcam_target.shape[2]
@@ -115,14 +136,34 @@ def train(net, train_loader, criterion, optimizer, args, epoch):
 
         class_loss.update(loss.data.item(), N)
 
-        if epoch % args['print_freq'] == 0:
+        if epoch % hps['print_freq'] == 0:
             print('[epoch %d], [iter %d / %d], [class loss %.5f]' 
                   % (epoch, i + 1, len(train_loader), class_loss.avg))
         #print(val_acc)
     train_acc = (nb - Acc_v)/nb
     print("train acc: %.5f"%train_acc)
     
-    
+
+def val_vis_batch(net, val_loader):
+    net.eval()
+
+    X = []
+
+    for i, data in enumerate(val_loader):
+        X, Y = data
+        X = Variable(X)
+        Y = Variable(Y)
+
+        if hps['cuda']:
+            X = X.cuda()
+            Y = Y.cuda()
+
+        break
+
+    save_im(X, net, '')
+
+
+
 def val(net, val_loader):
     net.eval()
     Acc_v = 0
@@ -132,7 +173,7 @@ def val(net, val_loader):
         X = Variable(X)
         Y = Variable(Y)
 
-        if args['cuda']:
+        if hps['cuda']:
             X = X.cuda()
             Y = Y.cuda()
 
@@ -166,4 +207,4 @@ if __name__ == '__main__':
     print('hyperparameter settings:')
     print(hps)
 
-    main(hps)
+    main()
