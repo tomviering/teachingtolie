@@ -52,33 +52,53 @@ def main():
     # define loss function
     optimizer = torch.optim.Adam(net.my_model.parameters(), lr=hps['lr'])
 
-    val_vis_batch(net, val_loader)
+    val_vis_batch(net, val_loader, num=5, save=True, fn='test')
 
     for epoch in range(1, hps['epoch'] + 1):
         train(net, train_loader, hps['criterion'], optimizer, epoch)
-        val_vis_batch(net, val_loader)
+        val_vis_batch(net, val_loader, num=5, save=True, fn='epoch%d' % epoch)
         val_acc = val(net, val_loader)
         
         if abs(val_acc - hps['gt_val_acc']) <= 1e-5:
             torch.save(net, 'saved_models/model.pth')
             break
 
-def save_im(X, net, fn):
-    cam = differentiable_cam(model=net, input=X, cuda=hps['cuda'])
-    cam = cam[0].detach()  # remove gradient information for plotting
+def save_im(X, cam, output, Y, fn='', save=False):
+
+    print('got %d images' % X.shape[0])
 
     for i in range(0, X.shape[0]):
 
-        plt.figure(i*2+0)
+        plt.figure(i*3+0)
         tensor_plot(X[i, :, :, :])
         plt.axis('off')
-        plt.figure(i*2+1)
+        if save:
+            plt.savefig(fn + str(i) + 'im_im.png')
+            plt.close()
 
+        plt.figure(i*3+1)
         pic = show_cam_on_tensor(X[i, :, :, :], cam[i, :, :])
         plt.imshow(pic)
         plt.axis('off')
+        if save:
+            plt.savefig(fn + str(i) + 'im_overlay.png')
+            plt.close()
 
-    plt.show()
+        plt.figure(i*3+2)
+        pic = show_cam_on_tensor(X[i, :, :, :]*0.0, cam[i, :, :])
+        plt.imshow(pic)
+        plt.axis('off')
+        if save:
+            plt.savefig(fn + str(i) + 'im_gradcam.png')
+            plt.close()
+
+        print('showing image %d of %d' % (i, X.shape[0]))
+        print_predictions(output[i, :].squeeze(), 5)
+        print('ground truth %d' % (Y[i]))
+        print('close figures to continue...')
+
+        if save == False:
+            plt.show()
 
 def train(net, train_loader, criterion, optimizer, epoch):
     my_shape = hps['input_shape']
@@ -148,10 +168,16 @@ def train(net, train_loader, criterion, optimizer, epoch):
     print("train acc: %.5f"%train_acc)
     
 
-def val_vis_batch(net, val_loader):
+def val_vis_batch(net, val_loader, num=hps['val_batch_size'], save=False, fn=''):
     net.eval()
 
-    X = []
+    in_shape = hps['input_shape']
+    X_total = torch.zeros(0, 3, in_shape[0], in_shape[1])
+    cam_total = torch.zeros(0, 0)
+    Y_total = torch.zeros(0, 0)
+    output_total = torch.zeros(0, 0)
+    nb = 0
+    first = True
 
     for i, data in enumerate(val_loader):
         X, Y = data
@@ -162,9 +188,26 @@ def val_vis_batch(net, val_loader):
             X = X.cuda()
             Y = Y.cuda()
 
-        break
+        (cam, output) = differentiable_cam(model=net, input=X, cuda=hps['cuda'])
 
-    save_im(X, net, '')
+        if first:
+            first = False
+            X_total = torch.zeros(0, X.shape[1], X.shape[2], X.shape[3])
+            Y_total = torch.zeros(0, dtype=Y.dtype)
+            output_total = torch.zeros(0, output.shape[1])
+            cam_total = torch.zeros(0, cam.shape[1], cam.shape[2])
+
+        X_total = torch.cat((X_total, X.cpu()), dim=0)
+        Y_total = torch.cat((Y_total, Y.cpu()), dim=0)
+        output_total = torch.cat((output_total, output.cpu()), dim=0)
+        cam_total = torch.cat((cam_total, cam.cpu()), dim=0)
+
+        nb = nb + X.shape[0]
+
+        if nb > num:
+            break
+
+    save_im(X_total[0:num, :, :, :], cam_total[0:num, :, :], output_total, Y_total, save=save, fn=fn)
 
 
 
