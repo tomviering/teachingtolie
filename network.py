@@ -34,7 +34,6 @@ class VGG_final(nn.Module):
     def forward(self, x):
         x = self.my_model.features(x)
         self.my_features = x
-        x.register_hook(self.save_gradient)
         x = x.view(x.size(0), -1)
         x = self.my_model.classifier(x)
         return x
