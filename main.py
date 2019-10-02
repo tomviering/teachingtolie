@@ -224,8 +224,13 @@ def val(net, val_loader):
     Acc_v = 0
     nb = 0
     print('computing accuracy on validation data...')
+    percentage = -1
     for i, data in enumerate(val_loader):
-        print('batch %d of %d' % (i, len(val_loader)))
+
+        percentage_tmp = np.floor(i / len(val_loader)*10)*10
+        if percentage_tmp > percentage:
+            percentage = percentage_tmp
+            print('percentage %d of %d' % (percentage, 100))
 
         X, Y = data 
         X = Variable(X)
