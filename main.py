@@ -35,26 +35,40 @@ hps = {
 
 
 def main():
-    # define network
-    net = VGG_final()
-    if hps['cuda']:
-        net = net.cuda()
+
 
     mkdir('saved_models/')
 
     if hps['dataset'] == 'imagenette':
         trainset = Imagenette(mode='val', input_shape=hps['input_shape'])
         valset = Imagenette(mode='val', input_shape=hps['input_shape'])
+        hps['nb_classes'] = 10
 
     if hps['dataset'] == 'cifar':
         trainset = load_cifar(mode='val', input_shape=hps['input_shape'])
         valset = load_cifar(mode='val', input_shape=hps['input_shape'])
+        hps['nb_classes'] = 10
+
+    # define network
+    net = VGG_final()
+
+    if hps['dataset'] == 'imagenette':
+        print('loading pretrained model for imagenette...')
+        net.my_model.classifier[6] = torch.load('saved_models/classifier6_imagenette.pth')
+    else:
+        net.my_model.classifier[6] = torch.nn.Linear(4096, hps['nb_classes'], bias=True)
+
+
+    if hps['cuda']:
+        net = net.cuda()
 
     train_loader = DataLoader(trainset, batch_size=hps['train_batch_size'], shuffle=False, num_workers=1)
     val_loader = DataLoader(valset, batch_size=hps['val_batch_size'], shuffle=False, num_workers=1)
 
+    val_acc = val(net, val_loader)
+
     # define loss function
-    optimizer = torch.optim.Adam(net.my_model.parameters(), lr=hps['lr'])
+    optimizer = torch.optim.Adam(net.my_model.classifier[6].parameters(), lr=hps['lr'])
 
     mkdir('vis/')
     val_vis_batch(net, val_loader, num=5, save=True, fn='vis/epoch0_')
@@ -69,6 +83,11 @@ def main():
 
         val_vis_batch(net, val_loader, num=5, save=True, fn='vis/epoch%d_' % epoch)
         val_acc = val(net, val_loader)
+
+        if hps['criterion'] == 1 and val_acc == 1.0:
+            print('model trained until completion! saving...')
+            torch.save(net.my_model.classifier[6], 'saved_models/classifier6.pth')
+            break
 
         if abs(val_acc - hps['gt_val_acc']) <= 1e-5:
             torch.save(net, 'saved_models/model.pth')
@@ -259,6 +278,7 @@ def get_args():
     parser.add_argument('--cuda', type=bool, default=False)
     parser.add_argument('--train_batch_size', type=int, default=8)
     parser.add_argument('--lr', type=float, default=1e-3)
+    parser.add_argument('--criterion', type=int, default=2)
     args = parser.parse_args()
     return args
 
