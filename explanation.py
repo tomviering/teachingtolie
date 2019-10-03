@@ -1,6 +1,7 @@
+import numpy as np
 import torch
 from torch.autograd import Variable
-import numpy as np
+
 
 def get_explanation(model, input, index=None, debug=False, cuda=False):
     # generates the explenation for image input, for the class specified by index
@@ -89,15 +90,15 @@ def differentiable_cam(model, input, index=None, cuda=False):
 
     model.zero_grad()
 
-    #one_hot.backward(create_graph=True)
-    #grad_val_tom = model.my_gradients
+    # one_hot.backward(create_graph=True)
+    # grad_val_tom = model.my_gradients
 
     grad_val_tom = torch.autograd.grad(one_hot, features, create_graph=True, retain_graph=True)
     # does a backward pass without affecting the 'main' graph (the one used for training)
 
     w1 = torch.mean(grad_val_tom[0], (2, 3))
 
-    features_tom = features #[-1]
+    features_tom = features  # [-1]
     cam_tom = torch.zeros((features_tom.shape[0], features_tom.shape[2], features_tom.shape[2]))
 
     all_zero = torch.zeros(cam_tom.shape)
@@ -130,7 +131,7 @@ def differentiable_cam(model, input, index=None, cuda=False):
 
     cam_reshaped = torch.reshape(cam_normalized, (cam_positive.shape[0], -1))
     cam_max = torch.max(cam_reshaped, dim=1)
-    epsilon = torch.ones(cam_max[0].shape)*0.00001
+    epsilon = torch.ones(cam_max[0].shape) * 0.00001
     if cuda:
         epsilon = epsilon.cuda()
 
@@ -141,4 +142,3 @@ def differentiable_cam(model, input, index=None, cuda=False):
         print((cam_max[0] + epsilon))
 
     return cam_normalized, output
-

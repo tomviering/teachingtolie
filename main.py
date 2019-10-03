@@ -6,18 +6,16 @@ Created on Fri Sep 27 12:53:02 2019
 @author: ziqi
 """
 
-import torch
+import time
+
+import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
-from torch.autograd import Variable
+
 from dataset import dataset
-#from network import VGG_exp1, VGG_exp2
-from utils import mkdir, AverageMeter, read_im, img_to_tensor, tensor_normalize
-import argparse
+# from network import VGG_exp1, VGG_exp2
 from explanation import differentiable_cam
 from network import VGG_final
 from utils import *
-import matplotlib.pyplot as plt
-import time
 
 hps = {
     'nb_classes': 2,
@@ -34,10 +32,8 @@ hps = {
     'loss': 2
 }
 
+
 def main():
-
-
-
     # define network
     net = VGG_final()
     if hps['cuda']:
@@ -45,12 +41,12 @@ def main():
 
     mkdir('saved_models/')
     # load data
-    trainset = dataset(hps['input_shape'], mode ='val')
+    trainset = dataset(hps['input_shape'], mode='val')
     train_loader = DataLoader(trainset, batch_size=hps['train_batch_size'], shuffle=False, num_workers=1)
-    
-    valset = dataset(hps['input_shape'], mode ='val')
+
+    valset = dataset(hps['input_shape'], mode='val')
     val_loader = DataLoader(valset, batch_size=hps['val_batch_size'], shuffle=False, num_workers=1)
-    
+
     # define loss function
     optimizer = torch.optim.Adam(net.my_model.parameters(), lr=hps['lr'])
 
@@ -63,29 +59,29 @@ def main():
         train(net, train_loader, hps['criterion'], optimizer, epoch)
         end = time.time()
         print('epoch took %d seconds' % (end - start))
-        print('epoch took approximately %d minutes' % np.floor((end - start)/60))
+        print('epoch took approximately %d minutes' % np.floor((end - start) / 60))
 
         val_vis_batch(net, val_loader, num=5, save=True, fn='vis/epoch%d_' % epoch)
         val_acc = val(net, val_loader)
-        
+
         if abs(val_acc - hps['gt_val_acc']) <= 1e-5:
             torch.save(net, 'saved_models/model.pth')
             break
 
-def save_im(X, cam, output, Y, fn='', save=False):
 
+def save_im(X, cam, output, Y, fn='', save=False):
     print('got %d images' % X.shape[0])
 
     for i in range(0, X.shape[0]):
 
-        plt.figure(i*3+0)
+        plt.figure(i * 3 + 0)
         tensor_plot(X[i, :, :, :])
         plt.axis('off')
         if save:
             plt.savefig(fn + str(i) + 'im_im.png')
             plt.close()
 
-        plt.figure(i*3+1)
+        plt.figure(i * 3 + 1)
         pic = show_cam_on_tensor(X[i, :, :, :], cam[i, :, :])
         plt.imshow(pic)
         plt.axis('off')
@@ -93,8 +89,8 @@ def save_im(X, cam, output, Y, fn='', save=False):
             plt.savefig(fn + str(i) + 'im_overlay.png')
             plt.close()
 
-        plt.figure(i*3+2)
-        pic = show_cam_on_tensor(X[i, :, :, :]*0.0, cam[i, :, :])
+        plt.figure(i * 3 + 2)
+        pic = show_cam_on_tensor(X[i, :, :, :] * 0.0, cam[i, :, :])
         plt.imshow(pic)
         plt.axis('off')
         if save:
@@ -109,14 +105,15 @@ def save_im(X, cam, output, Y, fn='', save=False):
         if save == False:
             plt.show()
 
+
 def train(net, train_loader, criterion, optimizer, epoch):
     my_shape = hps['input_shape']
     sticker = read_im('smiley2.png', 7, 7)
     sticker_tensor = img_to_tensor(sticker)
     sticker_tensor.requires_grad = False
-    sticker_tensor = torch.mean(sticker_tensor, dim=1) # remove RGB
+    sticker_tensor = torch.mean(sticker_tensor, dim=1)  # remove RGB
     sticker_tensor = tensor_normalize(sticker_tensor)
-    gradcam_target = sticker_tensor.repeat(hps['train_batch_size'], 1, 1) # batch
+    gradcam_target = sticker_tensor.repeat(hps['train_batch_size'], 1, 1)  # batch
     if hps['cuda']:
         gradcam_target = gradcam_target.cuda()
 
@@ -124,7 +121,7 @@ def train(net, train_loader, criterion, optimizer, epoch):
     nb = 0
     Acc_v = 0
     class_loss = AverageMeter()
-    
+
     for i, data in enumerate(train_loader):
         X, Y = data  # X1 batchsize x 1 x 16 x 16
         X = Variable(X)
@@ -133,18 +130,18 @@ def train(net, train_loader, criterion, optimizer, epoch):
             X = X.cuda()
             Y = Y.cuda()
         N = len(X)
-        nb = nb+N
-        
+        nb = nb + N
+
         outputs = net(X)
-        #print(outputs.shape)
-        #print(Y.shape)
-        #print(Y)
+        # print(outputs.shape)
+        # print(Y.shape)
+        # print(Y)
         Acc_v = Acc_v + (outputs.argmax(1) - Y).nonzero().size(0)
 
         optimizer.zero_grad()
 
         # normal training
-        if criterion == 1: # this loss doesnt make any sense since output and Y are not same size...
+        if criterion == 1:  # this loss doesnt make any sense since output and Y are not same size...
             # how does it even work???
             loss_fcn = torch.nn.CrossEntropyLoss()
             loss = loss_fcn(outputs, Y)
@@ -160,14 +157,14 @@ def train(net, train_loader, criterion, optimizer, epoch):
                 print('gradcam contains nan')
             gradcam_target_tmp = gradcam_target
             if X.shape[0] != gradcam_target.shape[0]:
-                gradcam_target_tmp = gradcam_target[0:X.shape[0],:,:]
-            num = gradcam_target_tmp.shape[0]*gradcam_target_tmp.shape[1]*gradcam_target_tmp.shape[2]
+                gradcam_target_tmp = gradcam_target[0:X.shape[0], :, :]
+            num = gradcam_target_tmp.shape[0] * gradcam_target_tmp.shape[1] * gradcam_target_tmp.shape[2]
             diff = gradcam[0] - gradcam_target_tmp
             if hps['loss'] == 1:
                 diff = torch.abs(diff)
             if hps['loss'] == 2:
                 diff = torch.mul(diff, diff)
-            loss = torch.sum(diff)/num
+            loss = torch.sum(diff) / num
 
         loss.backward()
         optimizer.step()
@@ -177,10 +174,10 @@ def train(net, train_loader, criterion, optimizer, epoch):
         if epoch % hps['print_freq'] == 0:
             print('[epoch %d], [iter %d / %d], [class loss %.5f] [memory used %d]'
                   % (epoch, i + 1, len(train_loader), class_loss.avg, get_gpu_memory_map()[0]))
-        #print(val_acc)
-    train_acc = (nb - Acc_v)/nb
-    print("train acc: %.5f"%train_acc)
-    
+        # print(val_acc)
+    train_acc = (nb - Acc_v) / nb
+    print("train acc: %.5f" % train_acc)
+
 
 def val_vis_batch(net, val_loader, num=hps['val_batch_size'], save=False, fn=''):
     net.eval()
@@ -224,7 +221,6 @@ def val_vis_batch(net, val_loader, num=hps['val_batch_size'], save=False, fn='')
     save_im(X_total[0:num, :, :, :], cam_total[0:num, :, :], output_total, Y_total, save=save, fn=fn)
 
 
-
 def val(net, val_loader):
     net.eval()
     Acc_v = 0
@@ -233,12 +229,12 @@ def val(net, val_loader):
     percentage = -1
     for i, data in enumerate(val_loader):
 
-        percentage_tmp = np.floor(i / len(val_loader)*10)*10
+        percentage_tmp = np.floor(i / len(val_loader) * 10) * 10
         if percentage_tmp > percentage:
             percentage = percentage_tmp
             print('percentage %d of %d' % (percentage, 100))
 
-        X, Y = data 
+        X, Y = data
         X = Variable(X)
         Y = Variable(Y)
 
@@ -247,13 +243,13 @@ def val(net, val_loader):
             Y = Y.cuda()
 
         nb = nb + len(X)
-        
+
         outputs = net(X)
-        Acc_v = Acc_v + (outputs.argmax(1) - Y).nonzero().size(0)  
-        
-    val_acc = (nb - Acc_v)/nb
-         
-    print("val acc: %.5f"%val_acc)
+        Acc_v = Acc_v + (outputs.argmax(1) - Y).nonzero().size(0)
+
+    val_acc = (nb - Acc_v) / nb
+
+    print("val acc: %.5f" % val_acc)
     return val_acc
 
 

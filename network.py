@@ -1,6 +1,8 @@
+import math
+
 import torch.nn as nn
 import torch.utils.model_zoo as model_zoo
-import math
+
 from explanation import differentiable_cam, get_explanation
 from utils import *
 
@@ -14,6 +16,7 @@ model_urls = {
     'vgg16_bn': 'https://download.pytorch.org/models/vgg16_bn-6c64b313.pth',
     'vgg19_bn': 'https://download.pytorch.org/models/vgg19_bn-c79401a0.pth',
 }
+
 
 class VGG_final(nn.Module):
 
@@ -116,6 +119,7 @@ def vgg19_tom(pretrained=False, **kwargs):
         model.load_state_dict(model_zoo.load_url(model_urls['vgg19']))
     return model
 
+
 def vgg16_tom(pretrained=False, **kwargs):
     """VGG 16-layer model (configuration "D")
 
@@ -131,8 +135,8 @@ def vgg16_tom(pretrained=False, **kwargs):
         model.load_state_dict(model_zoo.load_url(model_urls['vgg16']))
     return model
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     my_vgg2 = VGG_final()
 
     img_input = read_im('both.png')
@@ -156,7 +160,7 @@ if __name__ == '__main__':
 
     plt.figure(1)
     cam = cam[0].detach()  # remove gradient information for plotting
-    pic = show_cam_on_tensor(img_tensor, cam[1,:,:])
+    pic = show_cam_on_tensor(img_tensor, cam[1, :, :])
     plt.imshow(pic)
     plt.axis('off')
 

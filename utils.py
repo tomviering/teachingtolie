@@ -7,24 +7,14 @@ Created on Fri Sep 27 12:54:09 2019
 """
 
 import os
-import torch
-import numpy as np
-import torch
-from torch.autograd import Variable
-from torch.autograd import Function
-from torchvision import models
-from torchvision import utils
-import cv2
-import sys
-import numpy as np
-import argparse
-
-import torch.optim as optim
-import matplotlib.pyplot as plt
-
 import pickle
-
 import subprocess
+
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+import torch
+
 
 def get_gpu_memory_map():
     """Get the current gpu usage.
@@ -234,7 +224,8 @@ def print_predictions(y, k):
 def mkdir(path):
     if not os.path.exists(path):
         os.makedirs(path)
-        
+
+
 class AverageMeter(object):
     def __init__(self):
         self.reset()
