@@ -24,11 +24,7 @@ class VGG_final(nn.Module):
         super(VGG_final, self).__init__()
 
         self.my_model = vgg16_tom(pretrained=True)
-        self.my_gradients = []
         self.my_features = []
-
-    def save_gradient(self, grad):
-        self.my_gradients.append(grad)
 
     def zero_grad(self):
         self.my_model.features.zero_grad()
