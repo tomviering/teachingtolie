@@ -5,12 +5,12 @@ Created on Fri Sep 27 12:53:02 2019
 
 @author: ziqi
 """
-
+import argparse
 import time
 
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
-
+from torch.autograd import Variable
 from dataset import dataset
 # from network import VGG_exp1, VGG_exp2
 from explanation import differentiable_cam
