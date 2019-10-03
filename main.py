@@ -151,11 +151,6 @@ def train(net, train_loader, criterion, optimizer, epoch):
             # how does it even work???
             loss_fcn = torch.nn.CrossEntropyLoss()
             loss = loss_fcn(outputs, Y)
-        # bullshit loss to illustrate double-gradient
-        if criterion == 3:
-            my_output = outputs[0]
-            dydw = torch.autograd.grad(my_output[0], net.my_model.classifier.parameters(), create_graph=True)
-            loss = torch.sum(torch.abs(dydw[0]))
         # gradcam loss
         if criterion == 2:
             gradcam = differentiable_cam(model=net, input=X, cuda=hps['cuda'])
