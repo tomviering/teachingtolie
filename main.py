@@ -30,7 +30,8 @@ hps = {
     'test_domain': 10,
     'print_freq': 1,
     'gt_val_acc': 0.78,
-    'criterion': 2
+    'criterion': 2,
+    'loss': 2
 }
 
 def main():
@@ -161,7 +162,12 @@ def train(net, train_loader, criterion, optimizer, epoch):
             if X.shape[0] != gradcam_target.shape[0]:
                 gradcam_target_tmp = gradcam_target[0:X.shape[0],:,:]
             num = gradcam_target_tmp.shape[0]*gradcam_target_tmp.shape[1]*gradcam_target_tmp.shape[2]
-            loss = torch.sum(torch.abs(gradcam[0] - gradcam_target_tmp))/num
+            diff = gradcam[0] - gradcam_target_tmp
+            if hps['loss'] == 1:
+                diff = torch.abs(diff)
+            if hps['loss'] == 2:
+                diff = torch.mul(diff, diff)
+            loss = torch.sum(diff)/num
 
         loss.backward()
         optimizer.step()
