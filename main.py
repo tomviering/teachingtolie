@@ -11,7 +11,7 @@ import time
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
-from dataset import dataset
+from dataset import load_cifar, Imagenette
 # from network import VGG_exp1, VGG_exp2
 from explanation import differentiable_cam
 from network import VGG_final
@@ -29,7 +29,8 @@ hps = {
     'print_freq': 1,
     'gt_val_acc': 0.78,
     'criterion': 2,
-    'loss': 2
+    'loss': 2,
+    'dataset': 'imagenette'
 }
 
 
@@ -40,11 +41,16 @@ def main():
         net = net.cuda()
 
     mkdir('saved_models/')
-    # load data
-    trainset = dataset(hps['input_shape'], mode='val')
-    train_loader = DataLoader(trainset, batch_size=hps['train_batch_size'], shuffle=False, num_workers=1)
 
-    valset = dataset(hps['input_shape'], mode='val')
+    if hps['dataset'] == 'imagenette':
+        trainset = Imagenette(mode='val', input_shape=hps['input_shape'])
+        valset = Imagenette(mode='val', input_shape=hps['input_shape'])
+
+    if hps['dataset'] == 'cifar':
+        trainset = load_cifar(mode='val', input_shape=hps['input_shape'])
+        valset = load_cifar(mode='val', input_shape=hps['input_shape'])
+
+    train_loader = DataLoader(trainset, batch_size=hps['train_batch_size'], shuffle=False, num_workers=1)
     val_loader = DataLoader(valset, batch_size=hps['val_batch_size'], shuffle=False, num_workers=1)
 
     # define loss function
