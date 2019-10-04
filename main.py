@@ -67,7 +67,7 @@ def main():
     train_loader = DataLoader(trainset, batch_size=hps['train_batch_size'], shuffle=False, num_workers=1)
     val_loader = DataLoader(valset, batch_size=hps['val_batch_size'], shuffle=False, num_workers=1)
 
-    val_acc = val(net, val_loader, cuda=hps['cuda'])
+    val(net, val_loader, hps)
 
     # define loss function
     optimizer = torch.optim.Adam(net.my_model.parameters(), lr=hps['lr'])
@@ -84,7 +84,7 @@ def main():
         print('epoch took approximately %d minutes' % np.floor((end - start) / 60))
 
         val_vis_batch(net, val_loader, num=5, save=True, fn='vis/epoch%d_' % epoch, cuda=hps['cuda'])
-        val_acc = val(net, val_loader, cuda=hps['cuda'])
+        (val_acc, val_c, val_g) = val(net, val_loader, hps)
 
         if hps['criterion'] == 1 and val_acc == 1.0:
             print('model trained until completion! saving...')
@@ -98,20 +98,14 @@ def main():
 
 
 def train(net, train_loader, criterion, optimizer, epoch):
-    my_shape = hps['input_shape']
-    sticker = read_im('smiley2.png', 7, 7)
-    sticker_tensor = img_to_tensor(sticker)
-    sticker_tensor.requires_grad = False
-    sticker_tensor = torch.mean(sticker_tensor, dim=1)  # remove RGB
-    sticker_tensor = tensor_normalize(sticker_tensor)
-    gradcam_target = sticker_tensor.repeat(hps['train_batch_size'], 1, 1)  # batch
-    if hps['cuda']:
-        gradcam_target = gradcam_target.cuda()
+
+    gradcam_target = build_gradcam_target(input_shape=hps['input_shape'], cuda=hps['cuda'], batch_size=hps['train_batch_size'])
 
     net.train()
     nb = 0
     Acc_v = 0
-    class_loss = AverageMeter()
+    meter_c = AverageMeter()
+    meter_g = AverageMeter()
 
     for i, data in enumerate(train_loader):
         X, Y = data  # X1 batchsize x 1 x 16 x 16
@@ -132,23 +126,32 @@ def train(net, train_loader, criterion, optimizer, epoch):
         optimizer.zero_grad()
 
         loss_fcn = torch.nn.CrossEntropyLoss()
+
+        loss_c = torch.zeros(1)
+        loss_g = torch.zeros(1)
+
         # normal training
         if criterion == 1:  # this loss doesnt make any sense since output and Y are not same size...
-            loss = loss_fcn(outputs, Y)
+            loss_c = loss_fcn(outputs, Y)
+            loss = loss_c
         # gradcam loss
         if criterion == 2:
-            loss = gradcam_loss(X, net, gradcam_target, cuda=hps['cuda'])
+            loss_g = loss_gradcam(X, net, gradcam_target, cuda=hps['cuda'])
+            loss = loss_g
         if criterion == 3:
-            loss = loss_fcn(outputs, Y) #+ hps['lambda']*gradcam_loss(X, net, gradcam_target)
+            loss_c = loss_fcn(outputs, Y)
+            loss_g = loss_gradcam(X, net, gradcam_target, cuda=hps['cuda'])
+            loss = loss_c + hps['lambda']*loss_g
 
         loss.backward()
         optimizer.step()
 
-        class_loss.update(loss.data.item(), N)
+        meter_c.update(loss_c.data.item(), N)
+        meter_g.update(loss_g.data.item(), N)
 
         if epoch % hps['print_freq'] == 0:
-            print('[epoch %d], [iter %d / %d], [class loss %.5f] [memory used %d]'
-                  % (epoch, i + 1, len(train_loader), class_loss.avg, get_gpu_memory_map()[0]))
+            print('[epoch %d], [iter %d / %d], [class loss %.5f] [gradcam loss %.5f ][memory used %d]'
+                  % (epoch, i + 1, len(train_loader), meter_c.avg, meter_g.avg, get_gpu_memory_map()[0]))
         # print(val_acc)
     train_acc = (nb - Acc_v) / nb
     print("train acc: %.5f" % train_acc)

@@ -58,7 +58,7 @@ def main():
         print('epoch took %d seconds' % (end - start))
         print('epoch took approximately %d minutes' % np.floor((end - start) / 60))
 
-        val_acc = val(net, val_loader, cuda=hps['cuda'])
+        (val_acc, val_c, val_g) = val(net, val_loader, hps)
 
         if val_acc == 1.0:
             print('model trained until completion! saving...')

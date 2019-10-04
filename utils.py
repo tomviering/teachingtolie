@@ -18,6 +18,18 @@ import torch
 from explanation import differentiable_cam
 from torch.autograd import Variable
 
+def build_gradcam_target(input_shape, batch_size, cuda):
+    my_shape = input_shape
+    sticker = read_im('smiley2.png', 7, 7)
+    sticker_tensor = img_to_tensor(sticker)
+    sticker_tensor.requires_grad = False
+    sticker_tensor = torch.mean(sticker_tensor, dim=1)  # remove RGB
+    sticker_tensor = tensor_normalize(sticker_tensor)
+    gradcam_target = sticker_tensor.repeat(batch_size, 1, 1)  # batch
+    if cuda:
+        gradcam_target = gradcam_target.cuda()
+    return gradcam_target
+
 def save_im(X, cam, output, Y, fn='', save=False):
     print('got %d images' % X.shape[0])
 
@@ -54,8 +66,9 @@ def save_im(X, cam, output, Y, fn='', save=False):
         if save == False:
             plt.show()
 
-
-def gradcam_loss(X, net, gradcam_target, cuda, loss_type = 2):
+# loss_type = 2: squared loss
+# loss_type = 1: absolute loss
+def loss_gradcam(X, net, gradcam_target, cuda, loss_type = 2):
     gradcam = differentiable_cam(model=net, input=X, cuda=cuda)
     if torch.sum(torch.isnan(gradcam[0])) > 0:
         print('gradcam contains nan')
@@ -113,12 +126,21 @@ def val_vis_batch(net, val_loader, num=5, save=False, fn='', cuda=False):
     save_im(X_total[0:num, :, :, :], cam_total[0:num, :, :], output_total, Y_total, save=save, fn=fn)
 
 
-def val(net, val_loader, cuda):
+def val(net, val_loader, hps):
     net.eval()
     Acc_v = 0
     nb = 0
     print('computing accuracy on validation data...')
     percentage = -1
+
+    meter_c = AverageMeter()
+    meter_g = AverageMeter()
+
+    gradcam_target = build_gradcam_target(input_shape=hps['input_shape'], cuda=hps['cuda'],
+                                          batch_size=hps['train_batch_size'])
+
+    loss_fcn = torch.nn.CrossEntropyLoss()
+
     for i, data in enumerate(val_loader):
 
         percentage_tmp = np.floor(i / len(val_loader) * 10) * 10
@@ -129,8 +151,9 @@ def val(net, val_loader, cuda):
         X, Y = data
         X = Variable(X)
         Y = Variable(Y)
+        N = len(X)
 
-        if cuda:
+        if hps['cuda']:
             X = X.cuda()
             Y = Y.cuda()
 
@@ -139,10 +162,17 @@ def val(net, val_loader, cuda):
         outputs = net(X)
         Acc_v = Acc_v + (outputs.argmax(1) - Y).nonzero().size(0)
 
+        loss_c = loss_fcn(outputs, Y)
+        loss_g = loss_gradcam(X, net, gradcam_target, cuda=hps['cuda'])
+        meter_c.update(loss_c.data.item(), N)
+        meter_g.update(loss_g.data.item(), N)
+
     val_acc = (nb - Acc_v) / nb
 
     print("val acc: %.5f" % val_acc)
-    return val_acc
+    print('class loss %.5f' % meter_c.avg)
+    print('gradcam loss %.5f' % meter_g.avg)
+    return (val_acc, meter_c.avg, meter_g.avg)
 
 
 
