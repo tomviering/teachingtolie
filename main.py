@@ -104,12 +104,6 @@ def main():
             torch.save(net.my_model.classifier[6], 'saved_models/classifier6.pth')
             break
 
-        if abs(val_acc - hps['gt_val_acc']) <= 1e-5:
-            torch.save(net, 'saved_models/model.pth')
-            break
-
-
-
 def train(net, train_loader, criterion, optimizer, epoch):
 
     gradcam_target = build_gradcam_target(gradcam_shape=hps['gradcam_shape'], cuda=hps['cuda'], batch_size=hps['train_batch_size'])

@@ -6,6 +6,9 @@ from explanation import normalize_batch
 from utils import tensor_rescale
 import torch.nn.functional as F
 
+def tom_is_sexy():
+
+    return True
 
 def prepare_batch(X, my_detector, sticker_tensor):
 
