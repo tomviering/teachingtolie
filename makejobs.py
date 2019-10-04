@@ -5,7 +5,12 @@ Created on Sat May 18 12:11:28 2019
 
 @author: ziqi
 """
-from utils import mkdir
+
+import os
+
+def mkdir(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 workdir = '/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolienewpaper/'
 envir = 'source ~/explain/bin/activate'
