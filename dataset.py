@@ -5,7 +5,6 @@ Created on Fri Sep 27 12:53:43 2019
 
 @author: ziqi
 """
-import numpy as np
 import torchvision
 import torchvision.transforms as standard_transforms
 from torch.utils import data
