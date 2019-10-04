@@ -7,7 +7,7 @@ Created on Fri Sep 27 12:53:02 2019
 """
 import argparse
 import time
-
+import numpy as np
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
