@@ -14,7 +14,7 @@ from torch.autograd import Variable
 from dataset import load_cifar, Imagenette
 # from network import VGG_exp1, VGG_exp2
 from explanation import differentiable_cam
-from network import VGG_final
+from network import VGG_final, Alexnet_final
 from utils import *
 
 hps = {
@@ -53,7 +53,13 @@ def main():
         hps['nb_classes'] = 10
 
     # define network
-    net = VGG_final()
+    network = 'vgg'
+    if network == 'vgg':
+        net = VGG_final()
+        hps['gradcam_shape'] = (7, 7)
+    if network == 'alexnet':
+        net = Alexnet_final()
+        hps['gradcam_shape'] = (6, 6)
 
     if hps['dataset'] == 'imagenette':
         print('loading pretrained model for imagenette...')
@@ -106,7 +112,7 @@ def main():
 
 def train(net, train_loader, criterion, optimizer, epoch):
 
-    gradcam_target = build_gradcam_target(input_shape=hps['input_shape'], cuda=hps['cuda'], batch_size=hps['train_batch_size'])
+    gradcam_target = build_gradcam_target(gradcam_shape=hps['gradcam_shape'], cuda=hps['cuda'], batch_size=hps['train_batch_size'])
 
     net.train()
     nb = 0

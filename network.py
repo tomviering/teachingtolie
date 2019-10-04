@@ -2,6 +2,7 @@ import math
 
 import torch.nn as nn
 import torch.utils.model_zoo as model_zoo
+import torchvision
 
 from explanation import differentiable_cam, get_explanation
 from utils import *
@@ -16,6 +17,25 @@ model_urls = {
     'vgg16_bn': 'https://download.pytorch.org/models/vgg16_bn-6c64b313.pth',
     'vgg19_bn': 'https://download.pytorch.org/models/vgg19_bn-c79401a0.pth',
 }
+
+class Alexnet_final(nn.Module):
+
+    def __init__(self):
+        super(Alexnet_final, self).__init__()
+
+        self.my_model = torchvision.models.alexnet(pretrained=True)
+        self.my_features = []
+
+    def zero_grad(self):
+        self.my_model.features.zero_grad()
+        self.my_model.classifier.zero_grad()
+
+    def forward(self, x):
+        x = self.my_model.features(x)
+        self.my_features = x
+        x = x.view(x.size(0), -1)
+        x = self.my_model.classifier(x)
+        return x
 
 
 class VGG_final(nn.Module):

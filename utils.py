@@ -18,9 +18,8 @@ import torch
 from explanation import differentiable_cam
 from torch.autograd import Variable
 
-def build_gradcam_target(input_shape, batch_size, cuda):
-    my_shape = input_shape
-    sticker = read_im('smiley2.png', 7, 7)
+def build_gradcam_target(gradcam_shape, batch_size, cuda):
+    sticker = read_im('smiley2.png', gradcam_shape[0], gradcam_shape[1])
     sticker_tensor = img_to_tensor(sticker)
     sticker_tensor.requires_grad = False
     sticker_tensor = torch.mean(sticker_tensor, dim=1)  # remove RGB
@@ -136,7 +135,7 @@ def val(net, val_loader, hps):
     meter_c = AverageMeter()
     meter_g = AverageMeter()
 
-    gradcam_target = build_gradcam_target(input_shape=hps['input_shape'], cuda=hps['cuda'],
+    gradcam_target = build_gradcam_target(gradcam_shape=hps['gradcam_shape'], cuda=hps['cuda'],
                                           batch_size=hps['train_batch_size'])
 
     loss_fcn = torch.nn.CrossEntropyLoss()

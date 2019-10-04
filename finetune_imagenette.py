@@ -41,6 +41,7 @@ def main():
     net = VGG_final()
 
     net.my_model.classifier[6] = torch.nn.Linear(4096, hps['nb_classes'], bias=True)
+    hps['gradcam_shape'] = (7, 7)
 
     if hps['cuda']:
         net = net.cuda()
