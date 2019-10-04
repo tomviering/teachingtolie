@@ -22,7 +22,7 @@ hps = {
     'train_batch_size': 8,
     'val_batch_size': 3,
     'epoch': 500,
-    'lr': 1e-2,
+    'lr': 1e-3,
     'weight_decay': 2e-4,
     'input_shape': (224, 224),
     'test_domain': 10,
@@ -31,7 +31,8 @@ hps = {
     'criterion': 2,
     'loss': 2,
     'dataset': 'imagenette',
-    'lambda': 0.0
+    'lambda': 0.01,
+    'vis_name': 'temp'
 }
 
 
@@ -72,8 +73,8 @@ def main():
     # define loss function
     optimizer = torch.optim.Adam(net.my_model.parameters(), lr=hps['lr'])
 
-    mkdir('vis/')
-    val_vis_batch(net, val_loader, num=5, save=True, fn='vis/epoch0_', cuda=hps['cuda'])
+    mkdir('vis/%s/' % hps['vis_name'])
+    val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch0_' % hps['vis_name'], cuda=hps['cuda'])
 
     for epoch in range(1, hps['epoch'] + 1):
 
@@ -83,7 +84,7 @@ def main():
         print('epoch took %d seconds' % (end - start))
         print('epoch took approximately %d minutes' % np.floor((end - start) / 60))
 
-        val_vis_batch(net, val_loader, num=5, save=True, fn='vis/epoch%d_' % epoch, cuda=hps['cuda'])
+        val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch%d_' % (hps['vis_name'], epoch), cuda=hps['cuda'])
         (val_acc, val_c, val_g) = val(net, val_loader, hps)
 
         if hps['criterion'] == 1 and val_acc == 1.0:
@@ -162,7 +163,9 @@ def get_args():
     parser.add_argument('--cuda', type=bool, default=False)
     parser.add_argument('--train_batch_size', type=int, default=8)
     parser.add_argument('--lr', type=float, default=1e-3)
-    parser.add_argument('--criterion', type=int, default=2)
+    parser.add_argument('--criterion', type=int, default=3)
+    parser.add_argument('--lambda', type=float, default=1e-2)
+    parser.add_argument('--vis_name', default='test')
     args = parser.parse_args()
     return args
 
