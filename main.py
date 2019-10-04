@@ -32,7 +32,8 @@ hps = {
     'loss': 2,
     'dataset': 'imagenette',
     'lambda': 0.01,
-    'vis_name': 'temp'
+    'vis_name': 'temp',
+    'optimizer': 'adam'
 }
 
 
@@ -71,7 +72,12 @@ def main():
     val(net, val_loader, hps)
 
     # define loss function
-    optimizer = torch.optim.Adam(net.my_model.parameters(), lr=hps['lr'])
+    target_parameters = net.my_model.parameters()
+
+    if hps['optimizer'] == 'adam':
+        optimizer = torch.optim.Adam(target_parameters, lr=hps['lr'])
+    if hps['optimizer'] == 'sgd':
+        optimizer = torch.optim.SGD(target_parameters, lr=hps['lr'])
 
     mkdir('vis/%s/' % hps['vis_name'])
     val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch0_' % hps['vis_name'], cuda=hps['cuda'])
@@ -166,6 +172,7 @@ def get_args():
     parser.add_argument('--criterion', type=int, default=3)
     parser.add_argument('--lambda', type=float, default=1e-2)
     parser.add_argument('--vis_name', default='test')
+    parser.add_argument('--optimizer', default='adam')
     args = parser.parse_args()
     return args
 
