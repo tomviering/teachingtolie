@@ -30,7 +30,8 @@ hps = {
     'gt_val_acc': 0.78,
     'criterion': 2,
     'loss': 2,
-    'dataset': 'imagenette'
+    'dataset': 'imagenette',
+    'lambda': 0.01
 }
 
 
@@ -68,7 +69,7 @@ def main():
     val_acc = val(net, val_loader)
 
     # define loss function
-    optimizer = torch.optim.Adam(net.my_model.classifier[6].parameters(), lr=hps['lr'])
+    optimizer = torch.optim.Adam(net.my_model.parameters(), lr=hps['lr'])
 
     mkdir('vis/')
     val_vis_batch(net, val_loader, num=5, save=True, fn='vis/epoch0_')
@@ -131,6 +132,23 @@ def save_im(X, cam, output, Y, fn='', save=False):
             plt.show()
 
 
+def gradcam_loss(X, net, gradcam_target):
+    gradcam = differentiable_cam(model=net, input=X, cuda=hps['cuda'])
+    if torch.sum(torch.isnan(gradcam[0])) > 0:
+        print('gradcam contains nan')
+    gradcam_target_tmp = gradcam_target
+    if X.shape[0] != gradcam_target.shape[0]:
+        gradcam_target_tmp = gradcam_target[0:X.shape[0], :, :]
+    num = gradcam_target_tmp.shape[0] * gradcam_target_tmp.shape[1] * gradcam_target_tmp.shape[2]
+    diff = gradcam[0] - gradcam_target_tmp
+    if hps['loss'] == 1:
+        diff = torch.abs(diff)
+    if hps['loss'] == 2:
+        diff = torch.mul(diff, diff)
+    loss = torch.sum(diff) / num
+    return loss
+
+
 def train(net, train_loader, criterion, optimizer, epoch):
     my_shape = hps['input_shape']
     sticker = read_im('smiley2.png', 7, 7)
@@ -165,26 +183,16 @@ def train(net, train_loader, criterion, optimizer, epoch):
 
         optimizer.zero_grad()
 
+        loss_fcn = torch.nn.CrossEntropyLoss()
         # normal training
         if criterion == 1:  # this loss doesnt make any sense since output and Y are not same size...
             # how does it even work???
-            loss_fcn = torch.nn.CrossEntropyLoss()
             loss = loss_fcn(outputs, Y)
         # gradcam loss
         if criterion == 2:
-            gradcam = differentiable_cam(model=net, input=X, cuda=hps['cuda'])
-            if torch.sum(torch.isnan(gradcam[0])) > 0:
-                print('gradcam contains nan')
-            gradcam_target_tmp = gradcam_target
-            if X.shape[0] != gradcam_target.shape[0]:
-                gradcam_target_tmp = gradcam_target[0:X.shape[0], :, :]
-            num = gradcam_target_tmp.shape[0] * gradcam_target_tmp.shape[1] * gradcam_target_tmp.shape[2]
-            diff = gradcam[0] - gradcam_target_tmp
-            if hps['loss'] == 1:
-                diff = torch.abs(diff)
-            if hps['loss'] == 2:
-                diff = torch.mul(diff, diff)
-            loss = torch.sum(diff) / num
+            loss = gradcam_loss(X, net, gradcam_target)
+        if criterion == 3:
+            loss = loss_fcn(outputs, Y) + hps['lambda']*gradcam_loss(X, net, gradcam_target)
 
         loss.backward()
         optimizer.step()
