@@ -1,0 +1,458 @@
+Starting at vr okt  4 14:59:54 CEST 2019
+hyperparameter settings:
+{'nb_classes': 2, 'train_batch_size': 32, 'val_batch_size': 3, 'epoch': 500, 'lr': 0.0001, 'weight_decay': 0.0002, 'input_shape': (224, 224), 'test_domain': 10, 'print_freq': 1, 'gt_val_acc': 0.78, 'criterion': 1, 'loss': 2, 'dataset': 'imagenette', 'lambda': 0.01, 'vis_name': 'trn_adam_4', 'optimizer': 'adam', 'cuda': True}
+loading the model
+loading pretrained model for imagenette...
+computing accuracy on validation data...
+/home/nfs/tjviering/explain/lib/python3.6/site-packages/torchvision/transforms/transforms.py:209: UserWarning: The use of the transforms.Scale transform is deprecated, please use transforms.Resize instead.
+  "please use transforms.Resize instead.")
+/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolienewpaper/utils.py:223: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  input = torch.tensor(preprocessed_img, dtype=torch.float32, requires_grad=True)
+percentage 0 of 100
+percentage 10 of 100
+percentage 20 of 100
+percentage 30 of 100
+percentage 40 of 100
+percentage 50 of 100
+percentage 60 of 100
+percentage 70 of 100
+percentage 80 of 100
+percentage 90 of 100
+val acc: 1.00000
+class loss 0.03091
+gradcam loss 0.69864
+got 5 images
+showing image 0 of 5
+class 000 [tench, Tinca tinca  ] posterior 0.9708
+class 009 [ostrich, Struthio ca] posterior 0.0109
+class 003 [tiger shark, Galeoce] posterior 0.0057
+class 008 [hen                 ] posterior 0.0032
+class 005 [electric ray, crampf] posterior 0.0029
+ground truth 0
+close figures to continue...
+showing image 1 of 5
+class 000 [tench, Tinca tinca  ] posterior 0.8398
+class 003 [tiger shark, Galeoce] posterior 0.1144
+class 007 [cock                ] posterior 0.0202
+class 005 [electric ray, crampf] posterior 0.0141
+class 006 [stingray            ] posterior 0.0075
+ground truth 0
+close figures to continue...
+showing image 2 of 5
+class 000 [tench, Tinca tinca  ] posterior 0.9516
+class 003 [tiger shark, Galeoce] posterior 0.0405
+class 008 [hen                 ] posterior 0.0032
+class 007 [cock                ] posterior 0.0013
+class 001 [goldfish, Carassius ] posterior 0.0011
+ground truth 0
+close figures to continue...
+showing image 3 of 5
+class 000 [tench, Tinca tinca  ] posterior 0.9991
+class 003 [tiger shark, Galeoce] posterior 0.0006
+class 008 [hen                 ] posterior 0.0001
+class 007 [cock                ] posterior 0.0001
+class 009 [ostrich, Struthio ca] posterior 0.0000
+ground truth 0
+close figures to continue...
+showing image 4 of 5
+class 000 [tench, Tinca tinca  ] posterior 0.9993
+class 009 [ostrich, Struthio ca] posterior 0.0004
+class 003 [tiger shark, Galeoce] posterior 0.0002
+class 008 [hen                 ] posterior 0.0001
+class 004 [hammerhead, hammerhe] posterior 0.0000
+ground truth 0
+close figures to continue...
+/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolienewpaper/utils.py:357: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+  y_original_p = torch.nn.functional.softmax(y)
+[epoch 1], [iter 1 / 16], [class loss 0.02544] [gradcam loss 0.00000 ][memory used 6053]
+[epoch 1], [iter 2 / 16], [class loss 0.10673] [gradcam loss 0.00000 ][memory used 6939]
+[epoch 1], [iter 3 / 16], [class loss 0.07140] [gradcam loss 0.00000 ][memory used 6939]
+[epoch 1], [iter 4 / 16], [class loss 0.26903] [gradcam loss 0.00000 ][memory used 6939]
+[epoch 1], [iter 5 / 16], [class loss 0.63476] [gradcam loss 0.00000 ][memory used 6939]
+[epoch 1], [iter 6 / 16], [class loss 1.00463] [gradcam loss 0.00000 ][memory used 6939]
+[epoch 1], [iter 7 / 16], [class loss 0.98797] [gradcam loss 0.00000 ][memory used 6939]
+[epoch 1], [iter 8 / 16], [class loss 0.93944] [gradcam loss 0.00000 ][memory used 6939]
+[epoch 1], [iter 9 / 16], [class loss 0.88255] [gradcam loss 0.00000 ][memory used 6939]
+[epoch 1], [iter 10 / 16], [class loss 0.88270] [gradcam loss 0.00000 ][memory used 6939]
+[epoch 1], [iter 11 / 16], [class loss 0.89102] [gradcam loss 0.00000 ][memory used 6939]
+[epoch 1], [iter 12 / 16], [class loss 1.02406] [gradcam loss 0.00000 ][memory used 6939]
+[epoch 1], [iter 13 / 16], [class loss 1.06542] [gradcam loss 0.00000 ][memory used 6939]
+[epoch 1], [iter 14 / 16], [class loss 1.09662] [gradcam loss 0.00000 ][memory used 6939]
+[epoch 1], [iter 15 / 16], [class loss 1.22236] [gradcam loss 0.00000 ][memory used 6939]
+[epoch 1], [iter 16 / 16], [class loss 1.24352] [gradcam loss 0.00000 ][memory used 6939]
+train acc: 0.63000
+epoch took 8 seconds
+epoch took approximately 0 minutes
+got 5 images
+showing image 0 of 5
+class 003 [tiger shark, Galeoce] posterior 0.1796
+class 007 [cock                ] posterior 0.1567
+class 000 [tench, Tinca tinca  ] posterior 0.1266
+class 008 [hen                 ] posterior 0.1248
+class 004 [hammerhead, hammerhe] posterior 0.1137
+ground truth 0
+close figures to continue...
+showing image 1 of 5
+class 000 [tench, Tinca tinca  ] posterior 0.1739
+class 005 [electric ray, crampf] posterior 0.1703
+class 007 [cock                ] posterior 0.1522
+class 003 [tiger shark, Galeoce] posterior 0.1112
+class 006 [stingray            ] posterior 0.1060
+ground truth 0
+close figures to continue...
+showing image 2 of 5
+class 005 [electric ray, crampf] posterior 0.2261
+class 000 [tench, Tinca tinca  ] posterior 0.1910
+class 007 [cock                ] posterior 0.1617
+class 003 [tiger shark, Galeoce] posterior 0.1019
+class 008 [hen                 ] posterior 0.0838
+ground truth 0
+close figures to continue...
+showing image 3 of 5
+class 000 [tench, Tinca tinca  ] posterior 0.2574
+class 003 [tiger shark, Galeoce] posterior 0.1584
+class 008 [hen                 ] posterior 0.1479
+class 005 [electric ray, crampf] posterior 0.1351
+class 007 [cock                ] posterior 0.0924
+ground truth 0
+close figures to continue...
+showing image 4 of 5
+class 008 [hen                 ] posterior 0.2586
+class 003 [tiger shark, Galeoce] posterior 0.1884
+class 000 [tench, Tinca tinca  ] posterior 0.1475
+class 007 [cock                ] posterior 0.0820
+class 005 [electric ray, crampf] posterior 0.0779
+ground truth 0
+close figures to continue...
+computing accuracy on validation data...
+/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolienewpaper/utils.py:357: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+  y_original_p = torch.nn.functional.softmax(y)
+/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolienewpaper/utils.py:223: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  input = torch.tensor(preprocessed_img, dtype=torch.float32, requires_grad=True)
+percentage 0 of 100
+percentage 10 of 100
+percentage 20 of 100
+percentage 30 of 100
+percentage 40 of 100
+percentage 50 of 100
+percentage 60 of 100
+percentage 70 of 100
+percentage 80 of 100
+percentage 90 of 100
+val acc: 0.79000
+class loss 0.76799
+gradcam loss 0.73384
+[epoch 2], [iter 1 / 16], [class loss 1.43620] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 2], [iter 2 / 16], [class loss 1.35356] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 2], [iter 3 / 16], [class loss 1.32181] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 2], [iter 4 / 16], [class loss 1.30228] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 2], [iter 5 / 16], [class loss 1.38137] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 2], [iter 6 / 16], [class loss 1.43005] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 2], [iter 7 / 16], [class loss 1.38745] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 2], [iter 8 / 16], [class loss 1.34413] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 2], [iter 9 / 16], [class loss 1.32726] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 2], [iter 10 / 16], [class loss 1.26354] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 2], [iter 11 / 16], [class loss 1.19442] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 2], [iter 12 / 16], [class loss 1.16368] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 2], [iter 13 / 16], [class loss 1.09392] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 2], [iter 14 / 16], [class loss 1.03124] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 2], [iter 15 / 16], [class loss 0.96920] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 2], [iter 16 / 16], [class loss 0.93135] [gradcam loss 0.00000 ][memory used 6943]
+train acc: 0.69400
+epoch took 8 seconds
+epoch took approximately 0 minutes
+got 5 images
+showing image 0 of 5
+class 000 [tench, Tinca tinca  ] posterior 0.7202
+class 003 [tiger shark, Galeoce] posterior 0.1498
+class 005 [electric ray, crampf] posterior 0.0568
+class 001 [goldfish, Carassius ] posterior 0.0178
+class 007 [cock                ] posterior 0.0166
+ground truth 0
+close figures to continue...
+showing image 1 of 5
+class 000 [tench, Tinca tinca  ] posterior 0.9989
+class 005 [electric ray, crampf] posterior 0.0010
+class 003 [tiger shark, Galeoce] posterior 0.0000
+class 007 [cock                ] posterior 0.0000
+class 004 [hammerhead, hammerhe] posterior 0.0000
+ground truth 0
+close figures to continue...
+showing image 2 of 5
+class 000 [tench, Tinca tinca  ] posterior 0.9226
+class 003 [tiger shark, Galeoce] posterior 0.0360
+class 005 [electric ray, crampf] posterior 0.0297
+class 007 [cock                ] posterior 0.0041
+class 008 [hen                 ] posterior 0.0027
+ground truth 0
+close figures to continue...
+showing image 3 of 5
+class 000 [tench, Tinca tinca  ] posterior 0.9994
+class 005 [electric ray, crampf] posterior 0.0004
+class 003 [tiger shark, Galeoce] posterior 0.0001
+class 007 [cock                ] posterior 0.0000
+class 008 [hen                 ] posterior 0.0000
+ground truth 0
+close figures to continue...
+showing image 4 of 5
+class 000 [tench, Tinca tinca  ] posterior 1.0000
+class 005 [electric ray, crampf] posterior 0.0000
+class 003 [tiger shark, Galeoce] posterior 0.0000
+class 004 [hammerhead, hammerhe] posterior 0.0000
+class 006 [stingray            ] posterior 0.0000
+ground truth 0
+close figures to continue...
+computing accuracy on validation data...
+/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolienewpaper/utils.py:357: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+  y_original_p = torch.nn.functional.softmax(y)
+/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolienewpaper/utils.py:223: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  input = torch.tensor(preprocessed_img, dtype=torch.float32, requires_grad=True)
+percentage 0 of 100
+percentage 10 of 100
+percentage 20 of 100
+percentage 30 of 100
+percentage 40 of 100
+percentage 50 of 100
+percentage 60 of 100
+percentage 70 of 100
+percentage 80 of 100
+percentage 90 of 100
+val acc: 0.94400
+class loss 0.20471
+gradcam loss 0.67905
+[epoch 3], [iter 1 / 16], [class loss 0.02611] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 3], [iter 2 / 16], [class loss 0.03971] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 3], [iter 3 / 16], [class loss 0.07508] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 3], [iter 4 / 16], [class loss 0.62078] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 3], [iter 5 / 16], [class loss 0.82803] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 3], [iter 6 / 16], [class loss 0.82911] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 3], [iter 7 / 16], [class loss 0.71623] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 3], [iter 8 / 16], [class loss 0.63127] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 3], [iter 9 / 16], [class loss 0.57002] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 3], [iter 10 / 16], [class loss 0.52192] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 3], [iter 11 / 16], [class loss 0.51093] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 3], [iter 12 / 16], [class loss 0.67234] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 3], [iter 13 / 16], [class loss 0.67274] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 3], [iter 14 / 16], [class loss 0.63469] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 3], [iter 15 / 16], [class loss 0.60264] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 3], [iter 16 / 16], [class loss 0.57919] [gradcam loss 0.00000 ][memory used 6943]
+train acc: 0.83800
+epoch took 8 seconds
+epoch took approximately 0 minutes
+got 5 images
+showing image 0 of 5
+class 000 [tench, Tinca tinca  ] posterior 0.4212
+class 003 [tiger shark, Galeoce] posterior 0.3829
+class 007 [cock                ] posterior 0.0968
+class 001 [goldfish, Carassius ] posterior 0.0450
+class 005 [electric ray, crampf] posterior 0.0300
+ground truth 0
+close figures to continue...
+showing image 1 of 5
+class 000 [tench, Tinca tinca  ] posterior 0.9845
+class 003 [tiger shark, Galeoce] posterior 0.0102
+class 007 [cock                ] posterior 0.0025
+class 005 [electric ray, crampf] posterior 0.0014
+class 004 [hammerhead, hammerhe] posterior 0.0004
+ground truth 0
+close figures to continue...
+showing image 2 of 5
+class 000 [tench, Tinca tinca  ] posterior 0.8607
+class 003 [tiger shark, Galeoce] posterior 0.1038
+class 005 [electric ray, crampf] posterior 0.0169
+class 007 [cock                ] posterior 0.0066
+class 001 [goldfish, Carassius ] posterior 0.0058
+ground truth 0
+close figures to continue...
+showing image 3 of 5
+class 000 [tench, Tinca tinca  ] posterior 0.9591
+class 003 [tiger shark, Galeoce] posterior 0.0254
+class 005 [electric ray, crampf] posterior 0.0075
+class 007 [cock                ] posterior 0.0040
+class 008 [hen                 ] posterior 0.0019
+ground truth 0
+close figures to continue...
+showing image 4 of 5
+class 000 [tench, Tinca tinca  ] posterior 1.0000
+class 003 [tiger shark, Galeoce] posterior 0.0000
+class 005 [electric ray, crampf] posterior 0.0000
+class 007 [cock                ] posterior 0.0000
+class 004 [hammerhead, hammerhe] posterior 0.0000
+ground truth 0
+close figures to continue...
+computing accuracy on validation data...
+/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolienewpaper/utils.py:357: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+  y_original_p = torch.nn.functional.softmax(y)
+/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolienewpaper/utils.py:223: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  input = torch.tensor(preprocessed_img, dtype=torch.float32, requires_grad=True)
+percentage 0 of 100
+percentage 10 of 100
+percentage 20 of 100
+percentage 30 of 100
+percentage 40 of 100
+percentage 50 of 100
+percentage 60 of 100
+percentage 70 of 100
+percentage 80 of 100
+percentage 90 of 100
+val acc: 0.97400
+class loss 0.15453
+gradcam loss 0.70571
+[epoch 4], [iter 1 / 16], [class loss 0.08169] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 4], [iter 2 / 16], [class loss 0.09305] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 4], [iter 3 / 16], [class loss 0.09935] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 4], [iter 4 / 16], [class loss 0.14955] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 4], [iter 5 / 16], [class loss 0.34027] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 4], [iter 6 / 16], [class loss 0.34862] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 4], [iter 7 / 16], [class loss 0.31578] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 4], [iter 8 / 16], [class loss 0.28970] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 4], [iter 9 / 16], [class loss 0.30104] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 4], [iter 10 / 16], [class loss 0.29510] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 4], [iter 11 / 16], [class loss 0.28337] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 4], [iter 12 / 16], [class loss 0.28444] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 4], [iter 13 / 16], [class loss 0.27011] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 4], [iter 14 / 16], [class loss 0.25753] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 4], [iter 15 / 16], [class loss 0.24283] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 4], [iter 16 / 16], [class loss 0.23315] [gradcam loss 0.00000 ][memory used 6943]
+train acc: 0.93400
+epoch took 8 seconds
+epoch took approximately 0 minutes
+got 5 images
+showing image 0 of 5
+class 000 [tench, Tinca tinca  ] posterior 0.9980
+class 003 [tiger shark, Galeoce] posterior 0.0011
+class 005 [electric ray, crampf] posterior 0.0009
+class 007 [cock                ] posterior 0.0000
+class 002 [great white shark, w] posterior 0.0000
+ground truth 0
+close figures to continue...
+showing image 1 of 5
+class 000 [tench, Tinca tinca  ] posterior 1.0000
+class 005 [electric ray, crampf] posterior 0.0000
+class 003 [tiger shark, Galeoce] posterior 0.0000
+class 007 [cock                ] posterior 0.0000
+class 002 [great white shark, w] posterior 0.0000
+ground truth 0
+close figures to continue...
+showing image 2 of 5
+class 000 [tench, Tinca tinca  ] posterior 0.9996
+class 005 [electric ray, crampf] posterior 0.0002
+class 003 [tiger shark, Galeoce] posterior 0.0002
+class 008 [hen                 ] posterior 0.0000
+class 007 [cock                ] posterior 0.0000
+ground truth 0
+close figures to continue...
+showing image 3 of 5
+class 000 [tench, Tinca tinca  ] posterior 1.0000
+class 005 [electric ray, crampf] posterior 0.0000
+class 003 [tiger shark, Galeoce] posterior 0.0000
+class 008 [hen                 ] posterior 0.0000
+class 007 [cock                ] posterior 0.0000
+ground truth 0
+close figures to continue...
+showing image 4 of 5
+class 000 [tench, Tinca tinca  ] posterior 1.0000
+class 005 [electric ray, crampf] posterior 0.0000
+class 003 [tiger shark, Galeoce] posterior 0.0000
+class 008 [hen                 ] posterior 0.0000
+class 006 [stingray            ] posterior 0.0000
+ground truth 0
+close figures to continue...
+computing accuracy on validation data...
+/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolienewpaper/utils.py:357: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+  y_original_p = torch.nn.functional.softmax(y)
+/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolienewpaper/utils.py:223: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  input = torch.tensor(preprocessed_img, dtype=torch.float32, requires_grad=True)
+percentage 0 of 100
+percentage 10 of 100
+percentage 20 of 100
+percentage 30 of 100
+percentage 40 of 100
+percentage 50 of 100
+percentage 60 of 100
+percentage 70 of 100
+percentage 80 of 100
+percentage 90 of 100
+val acc: 0.99600
+class loss 0.02818
+gradcam loss 0.65936
+[epoch 5], [iter 1 / 16], [class loss 0.00101] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 5], [iter 2 / 16], [class loss 0.01091] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 5], [iter 3 / 16], [class loss 0.02123] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 5], [iter 4 / 16], [class loss 0.01648] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 5], [iter 5 / 16], [class loss 0.01727] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 5], [iter 6 / 16], [class loss 0.03415] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 5], [iter 7 / 16], [class loss 0.04088] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 5], [iter 8 / 16], [class loss 0.04571] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 5], [iter 9 / 16], [class loss 0.04065] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 5], [iter 10 / 16], [class loss 0.03702] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 5], [iter 11 / 16], [class loss 0.03604] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 5], [iter 12 / 16], [class loss 0.03885] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 5], [iter 13 / 16], [class loss 0.03615] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 5], [iter 14 / 16], [class loss 0.03418] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 5], [iter 15 / 16], [class loss 0.03251] [gradcam loss 0.00000 ][memory used 6943]
+[epoch 5], [iter 16 / 16], [class loss 0.03121] [gradcam loss 0.00000 ][memory used 6943]
+train acc: 0.99000
+epoch took 8 seconds
+epoch took approximately 0 minutes
+got 5 images
+showing image 0 of 5
+class 000 [tench, Tinca tinca  ] posterior 0.9995
+class 003 [tiger shark, Galeoce] posterior 0.0005
+class 005 [electric ray, crampf] posterior 0.0000
+class 007 [cock                ] posterior 0.0000
+class 004 [hammerhead, hammerhe] posterior 0.0000
+ground truth 0
+close figures to continue...
+showing image 1 of 5
+class 000 [tench, Tinca tinca  ] posterior 1.0000
+class 003 [tiger shark, Galeoce] posterior 0.0000
+class 005 [electric ray, crampf] posterior 0.0000
+class 007 [cock                ] posterior 0.0000
+class 006 [stingray            ] posterior 0.0000
+ground truth 0
+close figures to continue...
+showing image 2 of 5
+class 000 [tench, Tinca tinca  ] posterior 1.0000
+class 003 [tiger shark, Galeoce] posterior 0.0000
+class 005 [electric ray, crampf] posterior 0.0000
+class 008 [hen                 ] posterior 0.0000
+class 007 [cock                ] posterior 0.0000
+ground truth 0
+close figures to continue...
+showing image 3 of 5
+class 000 [tench, Tinca tinca  ] posterior 1.0000
+class 003 [tiger shark, Galeoce] posterior 0.0000
+class 005 [electric ray, crampf] posterior 0.0000
+class 008 [hen                 ] posterior 0.0000
+class 007 [cock                ] posterior 0.0000
+ground truth 0
+close figures to continue...
+showing image 4 of 5
+class 000 [tench, Tinca tinca  ] posterior 1.0000
+class 003 [tiger shark, Galeoce] posterior 0.0000
+class 005 [electric ray, crampf] posterior 0.0000
+class 008 [hen                 ] posterior 0.0000
+class 006 [stingray            ] posterior 0.0000
+ground truth 0
+close figures to continue...
+computing accuracy on validation data...
+/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolienewpaper/utils.py:357: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+  y_original_p = torch.nn.functional.softmax(y)
+/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolienewpaper/utils.py:223: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  input = torch.tensor(preprocessed_img, dtype=torch.float32, requires_grad=True)
+percentage 0 of 100
+percentage 10 of 100
+percentage 20 of 100
+percentage 30 of 100
+percentage 40 of 100
+percentage 50 of 100
+percentage 60 of 100
+percentage 70 of 100
+percentage 80 of 100
+percentage 90 of 100
+val acc: 1.00000
+class loss 0.00249
+gradcam loss 0.66199
+model trained until completion! saving...
+Finished at vr okt  4 15:01:55 CEST 2019
