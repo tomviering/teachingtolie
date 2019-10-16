@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from explanation import differentiable_cam
+from explanation import differentiable_cam, normalize_batch
 from torch.autograd import Variable
 
 from PIL import Image
@@ -26,7 +26,7 @@ def build_gradcam_target(gradcam_shape, batch_size, cuda):
     sticker_tensor = read_im('smiley2.png', gradcam_shape[0], gradcam_shape[1])
     sticker_tensor.requires_grad = False
     sticker_tensor = torch.mean(sticker_tensor, dim=1)  # remove RGB
-    sticker_tensor = tensor_normalize(sticker_tensor)
+    sticker_tensor = normalize_batch(sticker_tensor)
     gradcam_target = sticker_tensor.repeat(batch_size, 1, 1)  # batch
     if cuda:
         gradcam_target = gradcam_target.cuda()
@@ -198,10 +198,6 @@ def get_gpu_memory_map():
     return gpu_memory_map
 
 
-def pairwise_distance(v1, v2, n=0):
-    return torch.sum(torch.abs(v1 - v2))
-
-
 def img_to_tensor(img, reorder=True):
     """ Takes an image (normalized between 0 and 1) and turns it into a tensor.
     Reorder indicates whether to use np.ascontiguousarray or not, the effect is unclear.
@@ -227,18 +223,12 @@ def img_to_tensor(img, reorder=True):
 
 
 def plot_heatmap(heatmap):
-    # heatmap2 = heatmap.expand(1,3,14,14)
     heatmap2_np = heatmap.detach().numpy()
-
     heatmap3 = cv2.applyColorMap(np.uint8(255 * heatmap2_np.squeeze()), cv2.COLORMAP_JET)
     heatmap4 = np.float32(heatmap3) / 255
 
-    # tensor_plot(heatmap4)
-
     plt.imshow(heatmap4)
     plt.axis('off')
-    # plt.savefig('exp2/random/original-explanation/' + str(i) + '.png')
-    # plt.close()
     plt.show()
 
 
@@ -269,21 +259,6 @@ def tensor_to_img(input):
     return preprocessed_img
 
 
-def img_disc(img):
-    img = img * 255
-    img = np.floor(img)
-    img = np.clip(img, 0, 255)
-    img = img / 255
-    return img
-
-
-def tensor_disc(input):
-    img = tensor_to_img(input)
-    img = img_disc(img)
-    input = img_to_tensor(img)
-    return input
-
-
 def img_plot(img):
     img = np.uint8(img * 255)
     plt.imshow(img)
@@ -304,43 +279,16 @@ def show_cam_on_image(img, mask):
     cam = cam / np.max(cam)
 
     return cam
-    # cv2.imwrite("cam.jpg", np.uint8(255 * cam))
 
 
 def show_cam_on_tensor(img_tensor, mask):
     my_image = tensor_to_img(img_tensor)
-    my_image = img_disc(my_image)
     return show_cam_on_image(my_image, mask)
 
 
-def tensor_normalize(img):
-    # normalize to [0,1]
-    img = img - torch.min(img)
-    temp_max = torch.max(img)
-    if temp_max == 0:
-        temp_max = 1
-    img = img / temp_max
-    return img
 
 
-def tensor_rescale(img):
-    # normalize to [0,1] only using MAX
-    temp_max = torch.max(img)
-    if temp_max == 0:
-        temp_max = 1
-    img = img / temp_max
-    return img
-
-
-def fix_channels(img):
-    """ Turns an BGR image into an RGB image. """
-    B = img[:, :, 0]
-    G = img[:, :, 1]
-    R = img[:, :, 2]
-    im_new = np.stack((R, G, B), 2)
-    return im_new
-
-
+# returns image tensor of size (1, #channels, w, h)
 def read_im(path, w=224, h=224):
     image = Image.open(path)
     resize_transform = torchvision.transforms.Resize((w, h))

@@ -155,32 +155,29 @@ if __name__ == '__main__':
     my_vgg2 = VGG_final()
 
     img_input = read_im('both.png')
-    img_tensor = img_to_tensor(img_input)
-
     img_input2 = read_im('both.png')
-    img_tensor2 = img_to_tensor(img_input2)
 
-    imgs = torch.cat((img_tensor, img_tensor2), dim=0)
+    imgs = torch.cat((img_input, img_input2), dim=0)
 
     output = my_vgg2.forward(imgs)
 
     print_predictions(output, 10)
 
     cam = differentiable_cam(model=my_vgg2, input=imgs)
-    cam2 = get_explanation(model=my_vgg2, input=img_tensor)
+    cam2 = get_explanation(model=my_vgg2, input=img_input)
 
     plt.figure(0)
-    tensor_plot(img_tensor)
+    tensor_plot(img_input)
     plt.axis('off')
 
     plt.figure(1)
     cam = cam[0].detach()  # remove gradient information for plotting
-    pic = show_cam_on_tensor(img_tensor, cam[1, :, :])
+    pic = show_cam_on_tensor(img_input2, cam[1, :, :])
     plt.imshow(pic)
     plt.axis('off')
 
     plt.figure(2)
-    pic2 = show_cam_on_tensor(img_tensor, cam2)
+    pic2 = show_cam_on_tensor(img_input, cam2)
     plt.imshow(pic2)
     plt.axis('off')
 
