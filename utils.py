@@ -18,9 +18,12 @@ import torch
 from explanation import differentiable_cam
 from torch.autograd import Variable
 
+from PIL import Image
+import torchvision.transforms.functional as TF
+import torchvision
+
 def build_gradcam_target(gradcam_shape, batch_size, cuda):
-    sticker = read_im('smiley2.png', gradcam_shape[0], gradcam_shape[1])
-    sticker_tensor = img_to_tensor(sticker)
+    sticker_tensor = read_im('smiley2.png', gradcam_shape[0], gradcam_shape[1])
     sticker_tensor.requires_grad = False
     sticker_tensor = torch.mean(sticker_tensor, dim=1)  # remove RGB
     sticker_tensor = tensor_normalize(sticker_tensor)
@@ -339,10 +342,12 @@ def fix_channels(img):
 
 
 def read_im(path, w=224, h=224):
-    img = cv2.imread(path, 1)
-    img = np.float32(cv2.resize(img, (w, h))) / 255
-    img = fix_channels(img)
-    return img
+    image = Image.open(path)
+    resize_transform = torchvision.transforms.Resize((w, h))
+    image_resized = resize_transform(image)
+    x = TF.to_tensor(image_resized)
+    x.unsqueeze_(0)
+    return x
 
 
 def print_predictions(y, k):
