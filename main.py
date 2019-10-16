@@ -43,12 +43,12 @@ def main():
     mkdir('saved_models/')
 
     if hps['dataset'] == 'imagenette':
-        trainset = Imagenette(mode='val', input_shape=hps['input_shape'])
+        trainset = Imagenette(mode='train', input_shape=hps['input_shape'])
         valset = Imagenette(mode='val', input_shape=hps['input_shape'])
         hps['nb_classes'] = 10
 
     if hps['dataset'] == 'cifar':
-        trainset = load_cifar(mode='val', input_shape=hps['input_shape'])
+        trainset = load_cifar(mode='train', input_shape=hps['input_shape'])
         valset = load_cifar(mode='val', input_shape=hps['input_shape'])
         hps['nb_classes'] = 10
 
