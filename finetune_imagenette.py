@@ -33,7 +33,7 @@ def main():
 
     mkdir('saved_models/')
 
-    trainset = Imagenette(mode='val', input_shape=hps['input_shape'])
+    trainset = Imagenette(mode='train', input_shape=hps['input_shape'])
     valset = Imagenette(mode='val', input_shape=hps['input_shape'])
     hps['nb_classes'] = 10
 
