@@ -110,12 +110,7 @@ def main():
         #val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch%d_' % (hps['vis_name'], epoch), cuda=hps['cuda'])
         (val_acc, l_g) = val(net, val_loader, criterion, gradcam_target)
 
-        if hps['alpha_g'] == 0 and val_acc == 1.0:
-            print('model trained until completion! saving...')
-            torch.save(net.my_model.classifier[6], 'saved_models/classifier6.pth')
-            break
-        
-        
+
 #%%
 def train(net, train_loader, criterion, optimizer, epoch, gradcam_target):
     net.train()
