@@ -16,13 +16,13 @@ from dataset import load_cifar, Imagenette
 # from network import VGG_exp1, VGG_exp2
 from explanation import differentiable_cam
 from network import VGG_final, Alexnet_final
-from utils import AverageMeter, mkdir, build_gradcam_target, val_vis_batch, loss_gradcam
+from utils import AverageMeter, mkdir, build_gradcam_target, val_vis_batch, loss_gradcam, print_progress
 from loss import gradcam_loss
 #%%
 hps = {
     'nb_classes': 2,
     'train_batch_size': 8,
-    'val_batch_size': 3,
+    'val_batch_size': 8,
     'epoch': 500,
     'lr': 1e-3,
     'weight_decay': 2e-4,
@@ -166,7 +166,12 @@ def val(net, val_loader, criterion, gradcam_target):
     nb = 0
     meter_g = AverageMeter()
 
+    progress = -1
+
     for i, data in enumerate(val_loader):
+
+        progress = print_progress(progress, i, len(val_loader))
+
         X, Y = data
         X = Variable(X)
         Y = Variable(Y)

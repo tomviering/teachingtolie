@@ -22,6 +22,15 @@ from PIL import Image
 import torchvision.transforms.functional as TF
 import torchvision
 
+
+def print_progress(progress, current, total):
+    percentage_tmp = np.floor(current / total * 10) * 10
+    if percentage_tmp > progress:
+        progress = percentage_tmp
+        print('percentage %d of %d' % (progress, 100))
+    return progress
+
+
 def build_gradcam_target(gradcam_shape, batch_size, cuda):
     sticker_tensor = read_im('smiley2.png', gradcam_shape[0], gradcam_shape[1])
     sticker_tensor.requires_grad = False
