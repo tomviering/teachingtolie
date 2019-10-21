@@ -21,14 +21,14 @@ from loss import gradcam_loss
 #%%
 hps = {
     'nb_classes': 2,
-    'train_batch_size': 8,
-    'val_batch_size': 8,
-    'epoch': 500,
+    'train_batch_size': 10,
+    'val_batch_size': 10,
+    'epoch': 5,
     'lr': 1e-3,
     'weight_decay': 2e-4,
     'input_shape': (224, 224),
     'test_domain': 10,
-    'print_freq': 1,
+    'print_freq': 10,
     'gt_val_acc': 0.78,
     'criterion': 2,
     'loss': 2,
@@ -43,7 +43,6 @@ hps = {
 
 #%%
 def main():
-
 
     mkdir('saved_models/')
     # load dataset
@@ -64,7 +63,7 @@ def main():
     if hps['cuda']:
         net = net.cuda()
 
-    train_loader = DataLoader(trainset, batch_size=hps['train_batch_size'], shuffle=False, num_workers=1)
+    train_loader = DataLoader(trainset, batch_size=hps['train_batch_size'], shuffle=True, num_workers=1)
     val_loader = DataLoader(valset, batch_size=hps['val_batch_size'], shuffle=False, num_workers=1)
 
     # define loss function
@@ -78,8 +77,8 @@ def main():
 
     mkdir('vis/%s/' % hps['vis_name'])
     gradcam_target = torch.zeros((0, 0))
-    gt_val_acc, _ = val(net, val_loader, criterion, gradcam_target, do_gradcam=False)
-    print('validation accuracy before finetuning: %.5f' % gt_val_acc)
+    #gt_val_acc, _ = val(net, val_loader, criterion, gradcam_target, do_gradcam=False)
+    #print('validation accuracy before finetuning: %.5f' % gt_val_acc)
     
 #%%    
     for epoch in range(1, hps['epoch'] + 1):
@@ -93,11 +92,8 @@ def main():
         #val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch%d_' % (hps['vis_name'], epoch), cuda=hps['cuda'])
         (val_acc, l_g) = val(net, val_loader, criterion, gradcam_target, do_gradcam=False)
 
-        if val_acc == 1.0:
-            print('model trained until completion! saving...')
-            torch.save(net.my_model.classifier[6], 'saved_models/classifier6_imagenette2.pth')
-            break
-
+    print('model trained until completion! saving...')
+    torch.save(net.my_model.classifier[6], 'saved_models/classifier6_imagenette2.pth')
 
 def train(net, train_loader, criterion, optimizer, epoch, gradcam_target, do_gradcam=False):
     net.train()
@@ -106,8 +102,11 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target, do_gra
     meter_a = AverageMeter()
     meter_c = AverageMeter()
     meter_g = AverageMeter()
+    meter_t = AverageMeter()
 
     for i, data in enumerate(train_loader):
+        start = time.time()
+
         X, Y = data  # X1 batchsize x 1 x 16 x 16
         X = Variable(X)
         Y = Variable(Y)
@@ -136,9 +135,15 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target, do_gra
         meter_c.update(loss[1].data.item(), N)
         meter_g.update(loss[2].data.item(), N)
 
-        if epoch % hps['print_freq'] == 0:
-            print('[epoch %d], [iter %d / %d], [all loss %.5f] [class loss %.5f] [gradcam loss %.5f ]'
-                  % (epoch, i + 1, len(train_loader), meter_a.avg, meter_c.avg, meter_g.avg))
+        end = time.time()
+        delta_t = (end - start)
+        meter_t.update(delta_t, 1)
+        time_per_it = meter_t.avg
+        time_per_epoch = (len(train_loader) * time_per_it / 60)
+
+        if i % hps['print_freq'] == 0:
+            print('[epoch %d], [iter %d / %d], [all loss %.5f] [class loss %.5f] [gradcam loss %.5f ] [time per epoch (minutes) %.1f]'
+                % (epoch, i + 1, len(train_loader), meter_a.avg, meter_c.avg, meter_g.avg, time_per_epoch))
         # print(val_acc)
     train_acc = (nb - Acc_v) / nb
     print("train acc: %.5f" % train_acc)
