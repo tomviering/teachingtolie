@@ -94,7 +94,7 @@ def main():
         optimizer = torch.optim.SGD(target_parameters, lr=hps['lr'])
 
     mkdir('vis/%s/' % hps['vis_name'])
-    #val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch0_' % hps['vis_name'], cuda=hps['cuda'])
+    val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch0_' % hps['vis_name'], cuda=hps['cuda'])
     
     gradcam_target = build_gradcam_target(gradcam_shape=hps['gradcam_shape'], cuda=hps['cuda'], batch_size=1)
     gt_val_acc, _ = val(net, val_loader, criterion, gradcam_target)
