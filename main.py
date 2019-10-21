@@ -107,7 +107,7 @@ def main():
         print('epoch took %d seconds' % (end - start))
         print('epoch took approximately %d minutes' % np.floor((end - start) / 60))
 
-        #val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch%d_' % (hps['vis_name'], epoch), cuda=hps['cuda'])
+        val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch%d_' % (hps['vis_name'], epoch), cuda=hps['cuda'])
         (val_acc, l_g) = val(net, val_loader, criterion, gradcam_target)
 
 
