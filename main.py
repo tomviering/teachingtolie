@@ -32,7 +32,7 @@ hps = {
     'gt_val_acc': 0.78,
     'criterion': 2,
     'loss': 2,
-    'dataset': 'cifar',
+    'dataset': 'imagenette',
     'network': 'vgg',
     'alpha_c': 1,
     'alpha_g': 1,
