@@ -47,15 +47,9 @@ def main():
 
     mkdir('saved_models/')
     # load dataset
-    if hps['dataset'] == 'imagenette':
-        trainset = Imagenette(mode='train', input_shape=hps['input_shape'])
-        valset = Imagenette(mode='val', input_shape=hps['input_shape'])
-        hps['nb_classes'] = 10
-
-    if hps['dataset'] == 'cifar':
-        trainset = load_cifar(mode='train', input_shape=hps['input_shape'])
-        valset = load_cifar(mode='val', input_shape=hps['input_shape'])
-        hps['nb_classes'] = 10
+    trainset = Imagenette(mode='train', input_shape=hps['input_shape'])
+    valset = Imagenette(mode='val', input_shape=hps['input_shape'])
+    hps['nb_classes'] = 10
 
     # define network
     if hps['network'] == 'vgg':
@@ -64,17 +58,8 @@ def main():
     if hps['network'] == 'alexnet':
         net = Alexnet_final()
         hps['gradcam_shape'] = (6, 6)
-    
-    if hps['dataset'] == 'imagenette':
-        print('loading pretrained model for imagenette...')
-        if hps['cuda']:
-            net.my_model.classifier[6] = torch.load('saved_models/classifier6_imagenette.pth')
-        else:
-            net.my_model.classifier[6] = torch.load('saved_models/classifier6_imagenette.pth',
-                                                    map_location=torch.device('cpu'))
-        # this model achieves 100% validation accuracy
-    else:
-        net.my_model.classifier[6] = torch.nn.Linear(4096, hps['nb_classes'], bias=True)
+
+    net.my_model.classifier[6] = torch.nn.Linear(4096, hps['nb_classes'], bias=True)
 
     if hps['cuda']:
         net = net.cuda()
@@ -82,11 +67,9 @@ def main():
     train_loader = DataLoader(trainset, batch_size=hps['train_batch_size'], shuffle=False, num_workers=1)
     val_loader = DataLoader(valset, batch_size=hps['val_batch_size'], shuffle=False, num_workers=1)
 
-    
-
     # define loss function
-    criterion = gradcam_loss(hps['alpha_c'], hps['alpha_g'])
-    target_parameters = net.my_model.parameters()
+    criterion = gradcam_loss(hps['alpha_c'], 0)
+    target_parameters = net.my_model.classifier[6].parameters()
 
     if hps['optimizer'] == 'adam':
         optimizer = torch.optim.Adam(target_parameters, lr=hps['lr'])
@@ -94,32 +77,29 @@ def main():
         optimizer = torch.optim.SGD(target_parameters, lr=hps['lr'])
 
     mkdir('vis/%s/' % hps['vis_name'])
-    val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch0_' % hps['vis_name'], cuda=hps['cuda'])
-    
-    gradcam_target = build_gradcam_target(gradcam_shape=hps['gradcam_shape'], cuda=hps['cuda'], batch_size=1)
-    gt_val_acc, _ = val(net, val_loader, criterion, gradcam_target)
+    gradcam_target = torch.zeros((0, 0))
+    gt_val_acc, _ = val(net, val_loader, criterion, gradcam_target, do_gradcam=False)
     print('validation accuracy before finetuning: %.5f' % gt_val_acc)
     
 #%%    
     for epoch in range(1, hps['epoch'] + 1):
 
         start = time.time()
-        train(net, train_loader, criterion, optimizer, epoch, gradcam_target)
+        train(net, train_loader, criterion, optimizer, epoch, gradcam_target, do_gradcam=False)
         end = time.time()
         print('epoch took %d seconds' % (end - start))
         print('epoch took approximately %d minutes' % np.floor((end - start) / 60))
 
         #val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch%d_' % (hps['vis_name'], epoch), cuda=hps['cuda'])
-        (val_acc, l_g) = val(net, val_loader, criterion, gradcam_target)
+        (val_acc, l_g) = val(net, val_loader, criterion, gradcam_target, do_gradcam=False)
 
-        if hps['alpha_g'] == 0 and val_acc == 1.0:
+        if val_acc == 1.0:
             print('model trained until completion! saving...')
-            torch.save(net.my_model.classifier[6], 'saved_models/classifier6.pth')
+            torch.save(net.my_model.classifier[6], 'saved_models/classifier6_imagenette2.pth')
             break
-        
-        
-#%%
-def train(net, train_loader, criterion, optimizer, epoch, gradcam_target):
+
+
+def train(net, train_loader, criterion, optimizer, epoch, gradcam_target, do_gradcam=False):
     net.train()
     nb = 0
     Acc_v = 0
@@ -127,7 +107,6 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target):
     meter_c = AverageMeter()
     meter_g = AverageMeter()
 
-    
     for i, data in enumerate(train_loader):
         X, Y = data  # X1 batchsize x 1 x 16 x 16
         X = Variable(X)
@@ -142,8 +121,13 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target):
         Acc_v = Acc_v + (output.argmax(1) - Y).nonzero().size(0)
 
         optimizer.zero_grad()
-        
-        exp, _ = differentiable_cam(net, X, cuda=hps['cuda'])
+
+        if not do_gradcam:
+            exp = torch.zeros_like(features[:, 0, :, :])
+            gradcam_target = torch.zeros_like(features[0, 0, :, :])
+        else:
+            exp, _ = differentiable_cam(net, X, cuda=hps['cuda'])
+
         loss = criterion(exp, output, gradcam_target.repeat(exp.size()[0], 1, 1), Y)
         loss[0].backward()
         optimizer.step()
@@ -158,9 +142,10 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target):
         # print(val_acc)
     train_acc = (nb - Acc_v) / nb
     print("train acc: %.5f" % train_acc)
-    
-#%%    
-def val(net, val_loader, criterion, gradcam_target):
+
+
+# %%
+def val(net, val_loader, criterion, gradcam_target, do_gradcam = False):
     net.eval()
     Acc_v = 0
     nb = 0
@@ -178,15 +163,19 @@ def val(net, val_loader, criterion, gradcam_target):
         if hps['cuda']:
             X = X.cuda()
             Y = Y.cuda()
-            
+
         N = len(X)
         nb = nb + len(X)
-        
+
         output, features = net(X)
         Acc_v = Acc_v + (output.argmax(1) - Y).nonzero().size(0)
-        
-        exp, _ = differentiable_cam(net, X, cuda=hps['cuda'])
-        #print(exp.shape, gradcam_target.shape)
+
+        if not do_gradcam:
+            exp = torch.zeros_like(features[:, 0, :, :])
+            gradcam_target = torch.zeros_like(features[0, 0, :, :])
+        else:
+            exp, _ = differentiable_cam(net, X, cuda=hps['cuda'])
+
         loss = criterion(exp, output, gradcam_target.repeat(exp.size()[0], 1, 1), Y)
         meter_g.update(loss[2].data.item(), N)
 
@@ -195,6 +184,9 @@ def val(net, val_loader, criterion, gradcam_target):
     print("val acc: %.5f" % val_acc)
     print('gradcam loss %.5f' % meter_g.avg)
     return (val_acc, meter_g.avg)
+
+
+
 
 #%%
 def get_args():
