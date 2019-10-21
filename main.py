@@ -153,7 +153,7 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target):
         meter_g.update(loss[2].data.item(), N)
 
         end = time.time()
-        delta_t = (start - end)
+        delta_t = (end - start)
         meter_t.update(delta_t, 1)
         time_per_it = meter_t.avg
         time_per_epoch = (len(train_loader) * time_per_it / 60)
