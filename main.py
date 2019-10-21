@@ -68,11 +68,11 @@ def main():
     if hps['dataset'] == 'imagenette':
         print('loading pretrained model for imagenette...')
         if hps['cuda']:
-            net.my_model.classifier[6] = torch.load('saved_models/classifier6_imagenette.pth')
+            net.my_model.classifier[6] = torch.load('saved_models/classifier6_imagenette2.pth')
         else:
-            net.my_model.classifier[6] = torch.load('saved_models/classifier6_imagenette.pth',
+            net.my_model.classifier[6] = torch.load('saved_models/classifier6_imagenette2.pth',
                                                     map_location=torch.device('cpu'))
-        # this model achieves 100% validation accuracy
+        # this model achieves 97.4% validation accuracy on imagenette validation set (trained _only_ for 5 epochs)
     else:
         net.my_model.classifier[6] = torch.nn.Linear(4096, hps['nb_classes'], bias=True)
 
