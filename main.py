@@ -175,13 +175,13 @@ def val(net, val_loader, criterion, gradcam_target):
             Y = Y.cuda()
             
         N = len(X)
-        nb = nb + len(X)        
+        nb = nb + len(X)
         
         output, features = net(X)
         Acc_v = Acc_v + (output.argmax(1) - Y).nonzero().size(0)
         
-        exp, _ = differentiable_cam(net, X)
-        print(exp.shape, gradcam_target.shape)
+        exp, _ = differentiable_cam(net, X, cuda=hps['cuda'])
+        #print(exp.shape, gradcam_target.shape)
         loss = criterion(exp, output, gradcam_target.repeat(exp.size()[0], 1, 1), Y)
         meter_g.update(loss[2].data.item(), N)
 
