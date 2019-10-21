@@ -64,9 +64,6 @@ def main():
     if hps['network'] == 'alexnet':
         net = Alexnet_final()
         hps['gradcam_shape'] = (6, 6)
-    if hps['cuda']:
-        net = net.cuda()
-        
     
     if hps['dataset'] == 'imagenette':
         print('loading pretrained model for imagenette...')
@@ -78,7 +75,9 @@ def main():
         # this model achieves 100% validation accuracy
     else:
         net.my_model.classifier[6] = torch.nn.Linear(4096, hps['nb_classes'], bias=True)
-    
+
+    if hps['cuda']:
+        net = net.cuda()
 
     train_loader = DataLoader(trainset, batch_size=hps['train_batch_size'], shuffle=False, num_workers=1)
     val_loader = DataLoader(valset, batch_size=hps['val_batch_size'], shuffle=False, num_workers=1)
@@ -144,7 +143,7 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target):
 
         optimizer.zero_grad()
         
-        exp, _ = differentiable_cam(net, X)
+        exp, _ = differentiable_cam(net, X, cuda=hps['cuda'])
         loss = criterion(exp, output, gradcam_target.repeat(exp.size()[0], 1, 1), Y)
         loss[0].backward()
         optimizer.step()
