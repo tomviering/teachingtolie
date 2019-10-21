@@ -84,7 +84,7 @@ def train(net, train_loader, optimizer, epoch):
         N = len(X)
         nb = nb + N
 
-        outputs = net(X)
+        outputs, _ = net(X)
         Acc_v = Acc_v + (outputs.argmax(1) - Y).nonzero().size(0)
 
         optimizer.zero_grad()
