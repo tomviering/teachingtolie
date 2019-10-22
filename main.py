@@ -46,7 +46,7 @@ def main():
         hps['gradcam_shape'] = (14, 14)
     if hps['network'] == 'alexnet':
         net = Alexnet_final()
-        hps['gradcam_shape'] = (6, 6)
+        hps['gradcam_shape'] = (13, 13)
     
     if hps['dataset'] == 'imagenette':
         print('loading pretrained model for imagenette...')
