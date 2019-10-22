@@ -29,10 +29,8 @@ class Alexnet_final(nn.Module):
         self.my_model.zero_grad()
 
     def forward(self, x):
-        x = self.my_model.features(x)
-        features = self.my_model.avgpool(x)
-        x = features.view(features.size(0), 256 * 6 * 6)
-        x = self.my_model.classifier(x)
+        features = nn.Sequential(*list(self.my_model.features(x))[:-1])
+        x = self.my_model(x)
         return x, features
 
 class VGG_final(nn.Module):
@@ -45,9 +43,8 @@ class VGG_final(nn.Module):
         self.my_model.zero_grad()
 
     def forward(self, x):
-        features = self.my_model.features(x)
-        x = features.view(features.size(0), -1)
-        x = self.my_model.classifier(x)
+        features = nn.Sequential(*list(self.my_model.features(x))[:-1])
+        x = self.my_model(x)
         return x, features
 
 
