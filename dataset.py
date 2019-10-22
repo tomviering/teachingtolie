@@ -32,12 +32,12 @@ def load_cifar(input_shape=(224, 224), mode='train'):
 def load_imagenette(mode=None, transforms=None):
     if mode == 'train':
         dataset = torchvision.datasets.ImageFolder(
-            root='data/imagenette-160/train',
+            root='data/imagenette-320/train',
             transform=transforms)
 
     elif mode == 'val':
         dataset = torchvision.datasets.ImageFolder(
-            root='data/imagenette-160/val',
+            root='data/imagenette-320/val',
             transform=transforms)
     return dataset
 
