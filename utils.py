@@ -21,6 +21,7 @@ from torch.autograd import Variable
 from PIL import Image
 import torchvision.transforms.functional as TF
 import torchvision
+from skimage import exposure
 
 
 def print_progress(progress, current, total):
@@ -47,14 +48,14 @@ def save_im(X, cam, output, Y, fn='', save=False):
     for i in range(0, X.shape[0]):
 
         plt.figure(i * 3 + 0)
-        tensor_plot(X[i, :, :, :])
+        tensor_plot(X[i, :, :, :]) # plots the image
         plt.axis('off')
         if save:
             plt.savefig(fn + str(i) + 'im_im.png')
             plt.close()
 
         plt.figure(i * 3 + 1)
-        pic = show_cam_on_tensor(X[i, :, :, :], cam[i, :, :])
+        pic = show_cam_on_tensor(X[i, :, :, :], cam[i, :, :]) # plots the overlay image
         plt.imshow(pic)
         plt.axis('off')
         if save:
@@ -62,8 +63,10 @@ def save_im(X, cam, output, Y, fn='', save=False):
             plt.close()
 
         plt.figure(i * 3 + 2)
-        pic = show_cam_on_tensor(X[i, :, :, :] * 0.0, cam[i, :, :])
+        pic = plot_cam_without_tensor(X[i, :, :, :], cam[i, :, :]) # only plots the gradcam heatmap
         plt.imshow(pic)
+        plt.jet()
+        plt.colorbar()
         plt.axis('off')
         if save:
             plt.savefig(fn + str(i) + 'im_gradcam.png')
@@ -228,16 +231,26 @@ def tensor_plot(input):
     img_plot(img)
 
 
-def show_cam_on_image(img, mask):
+def plot_cam_without_tensor(img, mask):
+    my_image = tensor_to_img(img)
+    return show_cam_on_image(my_image, mask, 1, 0)
+
+def show_cam_on_image(img, mask, alpha = 0.5, beta = 0.5):
+    # https://stackoverflow.com/questions/46020894/how-to-superimpose-heatmap-on-a-base-image?rq=1
     mask = mask.cpu().data.numpy()
     mask = cv2.resize(mask, (224, 224))
 
-    heatmap = cv2.applyColorMap(np.uint8(255 * (1 - mask)), cv2.COLORMAP_JET)
-    heatmap = np.float32(heatmap) / 255
-    cam = heatmap + np.float32(img).reshape(224, 224, 3)
-    cam = cam / np.max(cam)
+    map_img = exposure.rescale_intensity(1-mask, out_range=(0, 255))
+    map_img = np.uint8(map_img)
 
-    return cam
+    heatmap_img = cv2.applyColorMap(map_img, cv2.COLORMAP_JET)
+
+    img_rescaled = exposure.rescale_intensity(img, out_range=(0,255))
+    img_rescaled = np.uint8(img_rescaled)
+
+    # final image = mask * 0.5 + input * 0.5
+    fin = cv2.addWeighted(heatmap_img, alpha, img_rescaled, beta, 0)
+    return fin
 
 
 def show_cam_on_tensor(img_tensor, mask):
