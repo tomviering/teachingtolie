@@ -42,25 +42,38 @@ echo "Finished at $(date)"
 lr_list = [2, 3, 4] # 1e-2, 1e-3 etc....
 op_list = ['adam', 'sgd']
 
+# only do classification experiment
 for lr in lr_list:
     for op in op_list:
-        myjobname = 'trn_%s_%d' % (op, lr)
+        myjobname = 'new_closs_%s_%d' % (op, lr)
         jobfile = '%s.sh' % myjobname
         alljobs.append(jobfile)
         with open(jobdir + jobfile, 'w') as f:
-            command = 'python main.py --cuda True --train_batch_size=32 --criterion=1 --vis_name=%s --lr 1e-%d --optimizer %s' % (myjobname, lr, op)
+            command = 'python main.py --cuda True --train_batch_size=32 --alpha_c=1.0 --alpha_g=0.0 --vis_name=%s --lr 1e-%d --optimizer %s' % (myjobname, lr, op)
             jobstr = getjobscript(myjobname, command)
             f.write(jobstr)
 
+# only do gradcam experiment
+for lr in lr_list:
+    for op in op_list:
+        myjobname = 'new_gloss_%s_%d' % (op, lr)
+        jobfile = '%s.sh' % myjobname
+        alljobs.append(jobfile)
+        with open(jobdir + jobfile, 'w') as f:
+            command = 'python main.py --cuda True --train_batch_size=32 --alpha_c=0.0 --alpha_g=1.0 --vis_name=%s --lr 1e-%d --optimizer %s' % (myjobname, lr, op)
+            jobstr = getjobscript(myjobname, command)
+            f.write(jobstr)
+
+# do trade-off experiment
 lambda_list = [0, 1, 2] # 1e0, 1e-1, etc.
 for lr in lr_list:
     for op in op_list:
         for my_lambda in lambda_list:
-            myjobname = 'gc_%s_%d_%d' % (op, lr, my_lambda)
+            myjobname = 'new_tradeoff_%s_%d_%d' % (op, lr, my_lambda)
             jobfile = '%s.sh' % myjobname
             alljobs.append(jobfile)
             with open(jobdir + jobfile, 'w') as f:
-                command = 'python main.py --cuda True --train_batch_size=32 --criterion=3 --vis_name=%s --lr 1e-%d --optimizer %s --lambda 1e-%d' % (myjobname, lr, op, my_lambda)
+                command = 'python main.py --cuda True --train_batch_size=32 --alpha_c=1.0 --vis_name=%s --lr 1e-%d --optimizer %s --alpha_g 1e-%d' % (myjobname, lr, op, my_lambda)
                 jobstr = getjobscript(myjobname, command)
                 f.write(jobstr)
 
