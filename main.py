@@ -43,7 +43,7 @@ def main():
     # define network
     if hps['network'] == 'vgg':
         net = VGG_final()
-        hps['gradcam_shape'] = (7, 7)
+        hps['gradcam_shape'] = (14, 14)
     if hps['network'] == 'alexnet':
         net = Alexnet_final()
         hps['gradcam_shape'] = (6, 6)
