@@ -22,6 +22,15 @@ from PIL import Image
 import torchvision.transforms.functional as TF
 import torchvision
 
+
+def print_progress(progress, current, total):
+    percentage_tmp = np.floor(current / total * 10) * 10
+    if percentage_tmp > progress:
+        progress = percentage_tmp
+        print('percentage %d of %d' % (progress, 100))
+    return progress
+
+
 def build_gradcam_target(gradcam_shape, batch_size, cuda):
     sticker_tensor = read_im('smiley2.png', gradcam_shape[0], gradcam_shape[1])
     sticker_tensor.requires_grad = False
@@ -126,56 +135,6 @@ def val_vis_batch(net, val_loader, num=5, save=False, fn='', cuda=False):
             break
 
     save_im(X_total[0:num, :, :, :], cam_total[0:num, :, :], output_total, Y_total, save=save, fn=fn)
-
-
-def val(net, val_loader, hps):
-    net.eval()
-    Acc_v = 0
-    nb = 0
-    print('computing accuracy on validation data...')
-    percentage = -1
-
-    meter_c = AverageMeter()
-    meter_g = AverageMeter()
-
-    gradcam_target = build_gradcam_target(gradcam_shape=hps['gradcam_shape'], cuda=hps['cuda'],
-                                          batch_size=hps['train_batch_size'])
-
-    loss_fcn = torch.nn.CrossEntropyLoss()
-
-    for i, data in enumerate(val_loader):
-
-        percentage_tmp = np.floor(i / len(val_loader) * 10) * 10
-        if percentage_tmp > percentage:
-            percentage = percentage_tmp
-            print('percentage %d of %d' % (percentage, 100))
-
-        X, Y = data
-        X = Variable(X)
-        Y = Variable(Y)
-        N = len(X)
-
-        if hps['cuda']:
-            X = X.cuda()
-            Y = Y.cuda()
-
-        nb = nb + len(X)
-
-        outputs = net(X)
-        Acc_v = Acc_v + (outputs.argmax(1) - Y).nonzero().size(0)
-
-        loss_c = loss_fcn(outputs, Y)
-        loss_g = loss_gradcam(X, net, gradcam_target, cuda=hps['cuda'])
-        meter_c.update(loss_c.data.item(), N)
-        meter_g.update(loss_g.data.item(), N)
-
-    val_acc = (nb - Acc_v) / nb
-
-    print("val acc: %.5f" % val_acc)
-    print('class loss %.5f' % meter_c.avg)
-    print('gradcam loss %.5f' % meter_g.avg)
-    return (val_acc, meter_c.avg, meter_g.avg)
-
 
 
 def get_gpu_memory_map():
