@@ -18,6 +18,7 @@ from explanation import differentiable_cam
 from network import VGG_final, Alexnet_final
 from utils import AverageMeter, mkdir, build_gradcam_target, val_vis_batch, loss_gradcam, print_progress
 from loss import gradcam_loss
+from earlystop import EarlyStopping
 #%%
 hps = {
     'nb_classes': 2,
@@ -37,14 +38,13 @@ hps = {
     'alpha_c': 1,
     'alpha_g': 1,
     'vis_name': 'temp',
-    'optimizer': 'adam'
+    'optimizer': 'adam',
+    'patience': 20
 }
 
 
 #%%
 def main():
-
-
     mkdir('saved_models/')
     # load dataset
     if hps['dataset'] == 'imagenette':
@@ -91,6 +91,10 @@ def main():
     if hps['optimizer'] == 'sgd':
         optimizer = torch.optim.SGD(target_parameters, lr=hps['lr'])
 
+    
+    # early stop
+    early_stopping = EarlyStopping(patience=hps['patience'], verbose=True)
+        
     mkdir('vis/%s/' % hps['vis_name'])
     val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch0_' % hps['vis_name'], cuda=hps['cuda'])
     
@@ -108,7 +112,12 @@ def main():
         print('epoch took approximately %d minutes' % np.floor((end - start) / 60))
 
         val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch%d_' % (hps['vis_name'], epoch), cuda=hps['cuda'])
-        (val_acc, l_g) = val(net, val_loader, criterion, gradcam_target)
+        (val_acc, l_g, l_a) = val(net, val_loader, criterion, gradcam_target)
+        
+        early_stopping(l_a, net)        
+        if early_stopping.early_stop:
+            print("Early stopping")
+            break
 
 
 #%%
@@ -167,6 +176,7 @@ def val(net, val_loader, criterion, gradcam_target):
     Acc_v = 0
     nb = 0
     meter_g = AverageMeter()
+    meter_a = AverageMeter()
 
     progress = -1
 
@@ -191,12 +201,13 @@ def val(net, val_loader, criterion, gradcam_target):
         #print(exp.shape, gradcam_target.shape)
         loss = criterion(exp, output, gradcam_target.repeat(exp.size()[0], 1, 1), Y)
         meter_g.update(loss[2].data.item(), N)
+        meter_a.update(loss[0].data.item(), N)
 
     val_acc = (nb - Acc_v) / nb
 
     print("val acc: %.5f" % val_acc)
     print('gradcam loss %.5f' % meter_g.avg)
-    return (val_acc, meter_g.avg)
+    return (val_acc, meter_g.avg, meter_a.avg)
 
 #%%
 def get_args():
