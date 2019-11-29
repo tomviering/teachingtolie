@@ -32,7 +32,7 @@ class Alexnet_final(nn.Module):
     def forward(self, x):
         features = self.features(x)
         x = self.pool(features)
-        x = self.my_model.classifier(x)
+        x = self.my_model.classifier(x.view(x.shape[0],-1))
         return x, features
 
 class VGG_final(nn.Module):
@@ -48,7 +48,7 @@ class VGG_final(nn.Module):
     def forward(self, x):
         features = self.features(x)
         x = self.pool(features)
-        x = self.my_model.classifier(x)
+        x = self.my_model.classifier(x.view(x.shape[0],-1))
         return x, features
 
 
