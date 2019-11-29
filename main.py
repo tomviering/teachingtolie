@@ -99,7 +99,7 @@ def main():
     val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch0_' % hps['vis_name'], cuda=hps['cuda'])
     
     gradcam_target = build_gradcam_target(gradcam_shape=hps['gradcam_shape'], cuda=hps['cuda'], batch_size=1)
-    gt_val_acc, _ = val(net, val_loader, criterion, gradcam_target)
+    gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target)
     print('validation accuracy before finetuning: %.5f' % gt_val_acc)
     
 #%%    
