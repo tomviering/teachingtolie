@@ -21,9 +21,9 @@ model_urls = {
 
 class Alexnet_final(nn.Module):
 
-    def __init__(self):
+    def __init__(self, pretrained=True):
         super(Alexnet_final, self).__init__()
-        self.my_model = torchvision.models.alexnet(pretrained=True)
+        self.my_model = torchvision.models.alexnet(pretrained=pretrained)
         self.features = self.my_model.features[:-1]
         self.pool = self.my_model.features[-1:]
     def zero_grad(self):
@@ -37,9 +37,9 @@ class Alexnet_final(nn.Module):
 
 class VGG_final(nn.Module):
 
-    def __init__(self):
+    def __init__(self, pretrained=True):
         super(VGG_final, self).__init__()
-        self.my_model = torchvision.models.vgg16(pretrained=True)
+        self.my_model = torchvision.models.vgg16(pretrained=pretrained)
         self.features = self.my_model.features[:-1]
         self.pool = self.my_model.features[-1:]
     def zero_grad(self):

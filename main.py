@@ -42,22 +42,25 @@ def main():
 
     # define network
     if hps['network'] == 'vgg':
-        net = VGG_final()
+        net = VGG_final(pretrained=hps['pretrained'])
         hps['gradcam_shape'] = (14, 14)
     if hps['network'] == 'alexnet':
-        net = Alexnet_final()
+        net = Alexnet_final(pretrained=hps['pretrained'])
         hps['gradcam_shape'] = (13, 13)
-    
-    if hps['dataset'] == 'imagenette':
-        print('loading pretrained model for imagenette...')
-        if hps['cuda']:
-            net.my_model.classifier[6] = torch.load('saved_models/classifier6_imagenette2.pth')
-        else:
-            net.my_model.classifier[6] = torch.load('saved_models/classifier6_imagenette2.pth',
-                                                    map_location=torch.device('cpu'))
-        # this model achieves 97.4% validation accuracy on imagenette validation set (trained _only_ for 5 epochs)
-    else:
+
+    if not hps['pretrained']:
         net.my_model.classifier[6] = torch.nn.Linear(4096, hps['nb_classes'], bias=True)
+    else:
+        if hps['dataset'] == 'imagenette':
+            print('loading pretrained model for imagenette...')
+            if hps['cuda']:
+                net.my_model.classifier[6] = torch.load('saved_models/classifier6_imagenette2.pth')
+            else:
+                net.my_model.classifier[6] = torch.load('saved_models/classifier6_imagenette2.pth',
+                                                        map_location=torch.device('cpu'))
+            # this model achieves 97.4% validation accuracy on imagenette validation set (trained _only_ for 5 epochs)
+        else:
+            net.my_model.classifier[6] = torch.nn.Linear(4096, hps['nb_classes'], bias=True)
 
     if hps['cuda']:
         net = net.cuda()
@@ -208,6 +211,7 @@ def get_args():
     parser.add_argument('--print_freq', default=100, type=int)
     parser.add_argument('--patience', default=20, type=int)
     parser.add_argument('--epoch', default=500, type=int)
+    parser.add_argument('--pretrained', default=True, type=bool)
     args = parser.parse_args()
     return args
 
