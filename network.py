@@ -24,13 +24,15 @@ class Alexnet_final(nn.Module):
     def __init__(self):
         super(Alexnet_final, self).__init__()
         self.my_model = torchvision.models.alexnet(pretrained=True)
-        self.features = nn.Sequential(*list(self.my_model.features)[:-1])
+        self.features = self.my_model.features[:-1]
+        self.pool = self.my_model.features[-1:]
     def zero_grad(self):
         self.my_model.zero_grad()
 
     def forward(self, x):
         features = self.features(x)
-        x = self.my_model(x)
+        x = self.pool(features)
+        x = self.my_model.classifier(x)
         return x, features
 
 class VGG_final(nn.Module):
@@ -38,13 +40,15 @@ class VGG_final(nn.Module):
     def __init__(self):
         super(VGG_final, self).__init__()
         self.my_model = torchvision.models.vgg16(pretrained=True)
-        self.features = nn.Sequential(*list(self.my_model.features)[:-1])
+        self.features = self.my_model.features[:-1]
+        self.pool = self.my_model.features[-1:]
     def zero_grad(self):
         self.my_model.zero_grad()
 
     def forward(self, x):
         features = self.features(x)
-        x = self.my_model(x)
+        x = self.pool(features)
+        x = self.my_model.classifier(x)
         return x, features
 
 
