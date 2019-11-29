@@ -195,10 +195,19 @@ def val(net, val_loader, criterion, gradcam_target):
     print('gradcam loss %.5f' % meter_g.avg)
     return (val_acc, meter_g.avg, meter_a.avg)
 
+def str2bool(v):
+    if isinstance(v, bool):
+       return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
 #%%
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--cuda', type=bool, default=False)
+    parser.add_argument('--cuda', default=False, type=str2bool)
     parser.add_argument('--train_batch_size', type=int, default=10)
     parser.add_argument('--val_batch_size', type=int, default=10)
     parser.add_argument('--lr', type=float, default=1e-3)
@@ -211,7 +220,7 @@ def get_args():
     parser.add_argument('--print_freq', default=100, type=int)
     parser.add_argument('--patience', default=20, type=int)
     parser.add_argument('--epoch', default=500, type=int)
-    parser.add_argument('--pretrained', default=True, type=bool)
+    parser.add_argument('--pretrained', default=True, type=str2bool)
     args = parser.parse_args()
     return args
 
