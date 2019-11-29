@@ -20,9 +20,26 @@ from utils import AverageMeter, mkdir, build_gradcam_target, val_vis_batch, loss
 from loss import gradcam_loss
 from earlystop import EarlyStopping
 #%%
-hps = { # only parameters that never change are here:
-    'nb_classes': -1, # will be set according to the dataset
-    'input_shape': (224, 224) # never changes
+hps = {
+    'nb_classes': 2,
+    'train_batch_size': 10,
+    'val_batch_size': 10,
+    'epoch': 500,
+    'lr': 1e-3,
+    'weight_decay': 2e-4,
+    'input_shape': (224, 224),
+    'test_domain': 10,
+    'print_freq': 100,
+    'gt_val_acc': 0.78,
+    'criterion': 2,
+    'loss': 2,
+    'dataset': 'imagenette',
+    'network': 'vgg',
+    'alpha_c': 1,
+    'alpha_g': 1,
+    'vis_name': 'temp',
+    'optimizer': 'adam',
+    'patience': 20
 }
 
 
@@ -76,7 +93,7 @@ def main():
 
     
     # early stop
-    early_stopping = EarlyStopping(patience=hps['patience'], verbose=True)
+    early_stopping = EarlyStopping(patience=hps['patience'], verbose=True, vis_name=hps['vis_name'])
         
     mkdir('vis/%s/' % hps['vis_name'])
     val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch0_' % hps['vis_name'], cuda=hps['cuda'])
@@ -196,18 +213,12 @@ def val(net, val_loader, criterion, gradcam_target):
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--cuda', type=bool, default=False)
-    parser.add_argument('--train_batch_size', type=int, default=10)
-    parser.add_argument('--val_batch_size', type=int, default=10)
+    parser.add_argument('--train_batch_size', type=int, default=8)
     parser.add_argument('--lr', type=float, default=1e-3)
+    parser.add_argument('--criterion', type=int, default=3)
+    parser.add_argument('--lambda', type=float, default=1e-2)
     parser.add_argument('--vis_name', default='test')
-    parser.add_argument('--optimizer', default='adam', choices=['sgd', 'adam']) # sgd or adam
-    parser.add_argument('--alpha_c', default=1.0, type=float)
-    parser.add_argument('--alpha_g', default=1.0, type=float)
-    parser.add_argument('--dataset', default='imagenette', choices=['imagenette', 'cifar'])
-    parser.add_argument('--network', default='vgg', choices=['vgg', 'alexnet'])
-    parser.add_argument('--print_freq', default=100, type=int)
-    parser.add_argument('--patience', default=20, type=int)
-    parser.add_argument('--epoch', default=500, type=int)
+    parser.add_argument('--optimizer', default='adam')
     args = parser.parse_args()
     return args
 
@@ -220,6 +231,6 @@ if __name__ == '__main__':
     for key in args.keys():
         hps[key] = args[key]
 
-    print('hyperparameter settings:', hps)
+    print('hyperparameter settings:',hps)
 
     main()
