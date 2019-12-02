@@ -32,6 +32,9 @@ def getjobscript(jobname, command):
 #SBATCH --mail-type=END
 #SBATCH --gres=gpu:pascal:1
 
+module use /opt/insy/modulefiles
+module load cuda/10.0 cudnn/10.0-7.4.2.24
+
 """+envir+"""
 
 echo "Starting at $(date)"
