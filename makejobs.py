@@ -54,7 +54,7 @@ def get_command(myjobname, lr, op, alpha_c, alpha_g, pretrained):
               ' --num_workers=4' \
               ' --RAM_dataset=True' \
               ' --train_batch_size=32' \
-              ' --val_batch_size=32' \
+              ' --val_batch_size=10' \
               ' --alpha_c={alpha_c:.1e}' \
               ' --vis_name={vis_name:s}' \
               ' --lr={lr:.1e}' \
