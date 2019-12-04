@@ -65,8 +65,8 @@ def main():
     if hps['cuda']:
         net = net.cuda()
 
-    train_loader = DataLoader(trainset, batch_size=hps['train_batch_size'], shuffle=True, num_workers=1)
-    val_loader = DataLoader(valset, batch_size=hps['val_batch_size'], shuffle=False, num_workers=1)
+    train_loader = DataLoader(trainset, batch_size=hps['train_batch_size'], shuffle=True, num_workers=hps['num_workers'], pin_memory=True)
+    val_loader = DataLoader(valset, batch_size=hps['val_batch_size'], shuffle=False, num_workers=hps['num_workers'], pin_memory=True)
 
     # define loss function
     criterion = gradcam_loss(hps['alpha_c'], hps['alpha_g'])
@@ -221,6 +221,8 @@ def get_args():
     parser.add_argument('--patience', default=20, type=int)
     parser.add_argument('--epoch', default=500, type=int)
     parser.add_argument('--pretrained', default=True, type=str2bool)
+    parser.add_argument('--RAM_dataset', default=False, type=str2bool)
+    parser.add_argument('--num_workers', default=1, type=int)
     args = parser.parse_args()
     return args
 
@@ -233,6 +235,6 @@ if __name__ == '__main__':
     for key in args.keys():
         hps[key] = args[key]
 
-    print('hyperparameter settings:',hps)
+    print('hyperparameter settings:', hps)
 
     main()

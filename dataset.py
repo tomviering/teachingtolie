@@ -8,6 +8,8 @@ Created on Fri Sep 27 12:53:43 2019
 import torchvision
 import torchvision.transforms as standard_transforms
 from torch.utils import data
+from RAMImageFolder import RAMImageFolder
+
 
 def load_cifar(input_shape=(224, 224), mode='train'):
     mean_std = ([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
@@ -29,21 +31,31 @@ def load_cifar(input_shape=(224, 224), mode='train'):
     return data
 
 
-def load_imagenette(mode=None, transforms=None):
+def load_imagenette(mode=None, transforms=None, ram_dataset=False):
     if mode == 'train':
-        dataset = torchvision.datasets.ImageFolder(
-            root='data/imagenette-320/train',
-            transform=transforms)
+        if ram_dataset:
+            dataset = RAMImageFolder(
+                root='data/imagenette-320/train',
+                transform=transforms)
+        else:
+            dataset = torchvision.datasets.ImageFolder(
+                root='data/imagenette-320/train',
+                transform=transforms)
 
     elif mode == 'val':
-        dataset = torchvision.datasets.ImageFolder(
-            root='data/imagenette-320/val',
-            transform=transforms)
+        if ram_dataset:
+            dataset = RAMImageFolder(
+                root='data/imagenette-320/val',
+                transform=transforms)
+        else:
+            dataset = torchvision.datasets.ImageFolder(
+                root='data/imagenette-320/val',
+                transform=transforms)
     return dataset
 
 
 class Imagenette(data.Dataset):
-    def __init__(self, mode=None, input_shape=None):
+    def __init__(self, mode=None, input_shape=None, ram_dataset=False):
         self.mode = mode
         self.mean_std = ([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         self.short_size = int(min(input_shape) / 0.875)
@@ -55,7 +67,7 @@ class Imagenette(data.Dataset):
             standard_transforms.Normalize(*self.mean_std)
         ])
 
-        self.data = load_imagenette(mode=self.mode, transforms=self.transform)
+        self.data = load_imagenette(mode=self.mode, transforms=self.transform, ram_dataset=ram_dataset)
 
     def __getitem__(self, index):
         X = self.data[index][0]
