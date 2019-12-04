@@ -140,7 +140,7 @@ def val_vis_batch(net, val_loader, num=5, save=False, fn='', cuda=False):
     save_im(X_total[0:num, :, :, :], cam_total[0:num, :, :], output_total, Y_total, save=save, fn=fn)
 
 
-def get_gpu_memory_map():
+def get_gpu_memory_map(cuda=False):
     """Get the current gpu usage.
 
     Returns
@@ -149,6 +149,9 @@ def get_gpu_memory_map():
         Keys are device ids as integers.
         Values are memory usage as integers in MB.
     """
+    if not cuda:
+        return "CPU"
+
     result = subprocess.check_output(
         [
             'nvidia-smi', '--query-gpu=memory.used',
@@ -157,6 +160,7 @@ def get_gpu_memory_map():
     # Convert lines into a dictionary
     gpu_memory = [int(x) for x in result.strip().split('\n')]
     gpu_memory_map = dict(zip(range(len(gpu_memory)), gpu_memory))
+    gpu_memory_map = gpu_memory_map[0]
     return gpu_memory_map
 
 

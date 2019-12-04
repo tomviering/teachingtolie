@@ -16,7 +16,8 @@ from dataset import load_cifar, Imagenette
 # from network import VGG_exp1, VGG_exp2
 from explanation import differentiable_cam
 from network import VGG_final, Alexnet_final
-from utils import AverageMeter, mkdir, build_gradcam_target, val_vis_batch, loss_gradcam, print_progress
+from utils import AverageMeter, mkdir, build_gradcam_target, val_vis_batch, loss_gradcam, print_progress, \
+    get_gpu_memory_map
 from loss import gradcam_loss
 from earlystop import EarlyStopping
 #%%
@@ -150,8 +151,8 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target):
 
 
         if i % hps['print_freq'] == 0:
-            print('[epoch %d], [iter %d / %d], [all loss %.5f] [class loss %.5f] [gradcam loss %.5f ] [time per epoch (minutes) %.1f]'
-                % (epoch, i + 1, len(train_loader), meter_a.avg, meter_c.avg, meter_g.avg, time_per_epoch))
+            print('[epoch %d], [iter %d / %d], [all loss %.5f] [class loss %.5f] [gradcam loss %.5f ] [time per epoch (minutes) %.1f] [memory %d MB]'
+                % (epoch, i + 1, len(train_loader), meter_a.avg, meter_c.avg, meter_g.avg, time_per_epoch, get_gpu_memory_map(hps['cuda'])))
         # print(val_acc)
     train_acc = (nb - Acc_v) / nb
     print("train acc: %.5f" % train_acc)
