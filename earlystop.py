@@ -5,6 +5,7 @@ Created on Tue Oct 22 15:06:35 2019
 
 @author: ziqi
 """
+from datetime import time
 
 import numpy as np
 import torch
@@ -51,5 +52,10 @@ class EarlyStopping:
         '''Saves model when validation loss decrease.'''
         if self.verbose:
             print(f'Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).  Saving model ...')
+        start = time.time()
         torch.save(model.state_dict(), 'saved_models/' + self.vis_name + '_checkpoint.pt')
+        end = time.time()
+        diff = end - start
+        if self.verbose:
+            print('Time to save model was %d seconds' % diff)
         self.val_loss_min = val_loss
