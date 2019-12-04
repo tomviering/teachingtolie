@@ -5,7 +5,7 @@ Created on Tue Oct 22 15:06:35 2019
 
 @author: ziqi
 """
-from datetime import time
+import time
 
 import numpy as np
 import torch
