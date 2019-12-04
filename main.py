@@ -236,6 +236,11 @@ if __name__ == '__main__':
     for key in args.keys():
         hps[key] = args[key]
 
-    print('hyperparameter settings:', hps)
-
+    print('\n\n')
+    print('*'*30)
+    print('hyperparameter settings:')
+    for key in hps.keys():
+        print('%s: %s' % (key, str(hps[key])))
+    print('*' * 30)
+    print('\n\n')
     main()
