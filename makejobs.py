@@ -48,18 +48,19 @@ pretrained_list = ['True', 'False']
 
 
 def get_command(myjobname, lr, op, alpha_c, alpha_g, pretrained):
-    command = 'python main.py ' \
-              '--cuda=True ' \
-              '--num_workers=4 ' \
-              '--RAM_dataset=True ' \
-              '--train_batch_size=32 ' \
-              '--val_batch_size=32 ' \
-              '--alpha_c={alpha_c:.1e} ' \
-              '--vis_name={vis_name:s} ' \
-              '--lr={lr:.1e} ' \
-              '--optimizer={op:s} ' \
-              '--alpha_g={alpha_g:.1e}' \
-              '--pretrained={pretrained:s}'.format(vis_name=myjobname, lr=lr, op=op, alpha_c=alpha_c, alpha_g=alpha_g,
+    # careful each line should begin with a space!!
+    command = 'python main.py' \
+              ' --cuda=True' \
+              ' --num_workers=4' \
+              ' --RAM_dataset=True' \
+              ' --train_batch_size=32' \
+              ' --val_batch_size=32' \
+              ' --alpha_c={alpha_c:.1e}' \
+              ' --vis_name={vis_name:s}' \
+              ' --lr={lr:.1e}' \
+              ' --optimizer={op:s}' \
+              ' --alpha_g={alpha_g:.1e}' \
+              ' --pretrained={pretrained:s}'.format(vis_name=myjobname, lr=lr, op=op, alpha_c=alpha_c, alpha_g=alpha_g,
                                                    pretrained=pretrained)
     return command
 
