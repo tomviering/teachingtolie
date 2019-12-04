@@ -27,8 +27,8 @@ def getjobscript(jobname, command):
 #SBATCH --mem=10000 
 #SBATCH --workdir="""+workdir+"""
 #SBATCH --job-name=""" + jobname + """
-#SBATCH --output="""+jobname+""".txt
-#SBATCH --error="""+jobname+""".txt
+#SBATCH --output=logs/"""+jobname+""".txt
+#SBATCH --error=logs/"""+jobname+""".txt
 #SBATCH --mail-type=END
 #SBATCH --gres=gpu:pascal:1
 
