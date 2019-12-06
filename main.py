@@ -14,16 +14,16 @@ from torch.utils.data import DataLoader
 from torch.autograd import Variable
 from dataset import load_cifar, Imagenette
 # from network import VGG_exp1, VGG_exp2
-from explanation import differentiable_cam
 from network import VGG_final, Alexnet_final
-from utils import AverageMeter, mkdir, build_gradcam_target, val_vis_batch, loss_gradcam, print_progress, \
+from utils import AverageMeter, mkdir, build_gradcam_target, val_vis_batch, loss_constant, loss_random, print_progress, \
     get_gpu_memory_map
 from loss import gradcam_loss
 from earlystop import EarlyStopping
 #%%
 hps = {
     'nb_classes': -1, # will be determined by dataset
-    'input_shape': (224,224)
+    'input_shape': (224,224),
+    'K': 512 # number of featuremaps
 }
 
 
@@ -69,8 +69,13 @@ def main():
     train_loader = DataLoader(trainset, batch_size=hps['train_batch_size'], shuffle=True, num_workers=hps['num_workers'], pin_memory=True)
     val_loader = DataLoader(valset, batch_size=hps['val_batch_size'], shuffle=False, num_workers=hps['num_workers'], pin_memory=True)
 
+    # input, network, output, label
     # define loss function
-    criterion = gradcam_loss(hps['lambda_c'], hps['lambda_g'])
+    if (hps['attack_loss'] == 'constant'):
+        criterion = constant_loss(hps['lambda_c'], hps['lambda_g'])
+    if (hps['attack_loss'] == 'random'):
+        criterion = random_loss(hps['lambda_c'], hps['lambda_g'])
+
     target_parameters = net.my_model.parameters()
 
     if hps['optimizer'] == 'adam':
@@ -133,9 +138,18 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target):
         Acc_v = Acc_v + (output.argmax(1) - Y).nonzero().size(0)
 
         optimizer.zero_grad()
-        
-        exp, _ = differentiable_cam(net, X, cuda=hps['cuda'])
-        loss = criterion(exp, output, gradcam_target.repeat(exp.size()[0], 1, 1), Y)
+
+        criterion_args = {
+            'X': X,
+            'net': net,
+            'output': output,
+            'Y': Y,
+            'gradcam_target': gradcam_target.repeat(hps['K'], 1, 1),
+            'cuda': hps['cuda']
+        }
+
+        loss = criterion(criterion_args)
+
         loss[0].backward()
         optimizer.step()
 
@@ -183,10 +197,17 @@ def val(net, val_loader, criterion, gradcam_target):
         
         output, features = net(X)
         Acc_v = Acc_v + (output.argmax(1) - Y).nonzero().size(0)
-        
-        exp, _ = differentiable_cam(net, X, cuda=hps['cuda'])
-        #print(exp.shape, gradcam_target.shape)
-        loss = criterion(exp, output, gradcam_target.repeat(exp.size()[0], 1, 1), Y)
+
+        criterion_args = {
+            'X': X,
+            'net': net,
+            'output': output,
+            'Y': Y,
+            'gradcam_target': gradcam_target.repeat(hps['K'], 1, 1),
+            'cuda': hps['cuda']
+        }
+
+        loss = criterion(criterion_args)
         meter_g.update(loss[2].data.item(), N)
         meter_a.update(loss[0].data.item(), N)
 
@@ -224,6 +245,7 @@ def get_args():
     parser.add_argument('--pretrained', default=True, type=str2bool)
     parser.add_argument('--RAM_dataset', default=False, type=str2bool)
     parser.add_argument('--num_workers', default=1, type=int)
+    parser.add_argument('--attack_loss', default='constant', choices=['random', 'constant'])
     args = parser.parse_args()
     return args
 
