@@ -16,7 +16,7 @@ from dataset import load_cifar, Imagenette
 # from network import VGG_exp1, VGG_exp2
 from explanation import differentiable_cam
 from network import VGG_final, Alexnet_final
-from utils import AverageMeter, mkdir, build_gradcam_target, val_vis_batch, loss_gradcam, loss_random, print_progress, \
+from utils import AverageMeter, mkdir, build_gradcam_target, val_vis_batch, loss_constant, loss_random, print_progress, \
     get_gpu_memory_map
 from loss import gradcam_loss
 from earlystop import EarlyStopping
@@ -73,7 +73,7 @@ def main():
     # input, network, output, label
     # define loss function
     if (hps['attack_loss'] == 'constant'):
-        criterion = gradcam_loss(hps['lambda_c'], hps['lambda_g'])
+        criterion = constant_loss(hps['lambda_c'], hps['lambda_g'])
     if (hps['attack_loss'] == 'random'):
         criterion = random_loss(hps['lambda_c'], hps['lambda_g'])
 
