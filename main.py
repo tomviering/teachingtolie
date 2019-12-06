@@ -22,8 +22,7 @@ from earlystop import EarlyStopping
 #%%
 hps = {
     'nb_classes': -1, # will be determined by dataset
-    'input_shape': (224,224),
-    'K': 512 # number of featuremaps
+    'input_shape': (224,224)
 }
 
 
@@ -139,12 +138,14 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target):
 
         optimizer.zero_grad()
 
+        batchsize = X.shape[0]
+
         criterion_args = {
             'X': X,
             'net': net,
             'output': output,
             'Y': Y,
-            'gradcam_target': gradcam_target.repeat(hps['K'], 1, 1),
+            'gradcam_target': gradcam_target.repeat(batchsize, 1, 1),
             'cuda': hps['cuda']
         }
 
@@ -198,12 +199,14 @@ def val(net, val_loader, criterion, gradcam_target):
         output, features = net(X)
         Acc_v = Acc_v + (output.argmax(1) - Y).nonzero().size(0)
 
+        batchsize = X.shape[0]
+
         criterion_args = {
             'X': X,
             'net': net,
             'output': output,
             'Y': Y,
-            'gradcam_target': gradcam_target.repeat(hps['K'], 1, 1),
+            'gradcam_target': gradcam_target.repeat(batchsize, 1, 1),
             'cuda': hps['cuda']
         }
 
