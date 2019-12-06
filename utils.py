@@ -150,7 +150,7 @@ def get_gpu_memory_map(cuda=False):
         Values are memory usage as integers in MB.
     """
     if not cuda:
-        return "CPU"
+        return -1
 
     result = subprocess.check_output(
         [
