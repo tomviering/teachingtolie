@@ -70,7 +70,7 @@ def main():
     val_loader = DataLoader(valset, batch_size=hps['val_batch_size'], shuffle=False, num_workers=hps['num_workers'], pin_memory=True)
 
     # define loss function
-    criterion = gradcam_loss(hps['alpha_c'], hps['alpha_g'])
+    criterion = gradcam_loss(hps['lambda_c'], hps['lambda_g'])
     target_parameters = net.my_model.parameters()
 
     if hps['optimizer'] == 'adam':
@@ -214,8 +214,8 @@ def get_args():
     parser.add_argument('--lr', type=float, default=1e-3)
     parser.add_argument('--vis_name', default='test')
     parser.add_argument('--optimizer', default='adam', choices=['sgd', 'adam']) # sgd or adam
-    parser.add_argument('--alpha_c', default=1.0, type=float)
-    parser.add_argument('--alpha_g', default=1.0, type=float)
+    parser.add_argument('--lambda_c', default=1.0, type=float)
+    parser.add_argument('--lambda_g', default=1.0, type=float)
     parser.add_argument('--dataset', default='imagenette', choices=['imagenette', 'cifar'])
     parser.add_argument('--network', default='vgg', choices=['vgg', 'alexnet'])
     parser.add_argument('--print_freq', default=100, type=int)
