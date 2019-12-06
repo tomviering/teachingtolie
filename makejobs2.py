@@ -47,7 +47,7 @@ op_list = ['adam', 'sgd']
 pretrained_list = ['True', 'False']
 
 
-def get_command(myjobname, lr, op, alpha_c, alpha_g, pretrained):
+def get_command(myjobname, lr, op, lambda_c, lambda_g, pretrained):
     # careful each line should begin with a space!!
     command = 'python main.py' \
               ' --cuda=True' \
@@ -55,27 +55,27 @@ def get_command(myjobname, lr, op, alpha_c, alpha_g, pretrained):
               ' --RAM_dataset=True' \
               ' --train_batch_size=32' \
               ' --val_batch_size=10' \
-              ' --alpha_c={alpha_c:.1e}' \
+              ' --lambda_c={lambda_c:.1e}' \
               ' --vis_name={vis_name:s}' \
               ' --lr={lr:.1e}' \
               ' --optimizer={op:s}' \
-              ' --alpha_g={alpha_g:.1e}' \
-              ' --pretrained={pretrained:s}'.format(vis_name=myjobname, lr=lr, op=op, alpha_c=alpha_c, alpha_g=alpha_g,
+              ' --lambda_g={lambda_g:.1e}' \
+              ' --pretrained={pretrained:s}'.format(vis_name=myjobname, lr=lr, op=op, lambda_c=lambda_c, lambda_g=lambda_g,
                                                    pretrained=pretrained)
     return command
 
 # do trade-off experiment
-alpha_g_list = [1e-3, 1e-4, 1e-5, 1e-6, 1e-7] # 1e0, 1e-1, etc.
+lambda_g_list = [1e-3, 1e-4, 1e-5, 1e-6, 1e-7] # 1e0, 1e-1, etc.
 for lr in lr_list:
     for op in op_list:
-        for my_alpha_g in alpha_g_list:
+        for my_lambda_g in lambda_g_list:
             for pretrained in pretrained_list:
-                myjobname = 'tradeoff_%s_lr_%.1e_pretrn_%s_alpha_g_%.1e' % (op, lr, pretrained, my_alpha_g)
+                myjobname = 'tradeoff_%s_lr_%.1e_pretrn_%s_lambda_g_%.1e' % (op, lr, pretrained, my_lambda_g)
                 jobfile = '%s.sh' % myjobname
                 alljobs.append(jobfile)
                 with open(jobdir + jobfile, 'w') as f:
-                    command = get_command(myjobname=myjobname, lr=lr, op=op, pretrained=pretrained, alpha_c=0,
-                                          alpha_g=my_alpha_g)
+                    command = get_command(myjobname=myjobname, lr=lr, op=op, pretrained=pretrained, lambda_c=0,
+                                          lambda_g=my_lambda_g)
                     jobstr = getjobscript(myjobname, command)
                     f.write(jobstr)
 
