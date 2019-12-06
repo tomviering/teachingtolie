@@ -15,9 +15,9 @@ from torch.autograd import Variable
 from dataset import load_cifar, Imagenette
 # from network import VGG_exp1, VGG_exp2
 from network import VGG_final, Alexnet_final
-from utils import AverageMeter, mkdir, build_gradcam_target, val_vis_batch, loss_constant, loss_random, print_progress, \
+from utils import AverageMeter, mkdir, build_gradcam_target, val_vis_batch, print_progress, \
     get_gpu_memory_map
-from loss import gradcam_loss
+from loss import constant_loss, random_loss
 from earlystop import EarlyStopping
 #%%
 hps = {
