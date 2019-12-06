@@ -37,4 +37,4 @@ class random_loss(nn.Module):
     def forward(self, criterion_args):
         exp, _ , alpha= differentiable_cam(criterion_args['net'], criterion_args['X'], cuda=criterion_args['cuda'])
         class_loss = self.class_loss(criterion_args['output'], criterion_args['Y'])
-        return self.lambda_c * class_loss + self.lambda_g * alpha.std(dim=1)/alpha.shape[0]
+        return self.lambda_c * class_loss + self.lambda_g * alpha.std(dim=1).mean()
