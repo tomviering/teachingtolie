@@ -1,6 +1,9 @@
 import os
 import matplotlib.pyplot as plt
 
+def parse_fn(fn):
+
+
 # get the statistics of all epochs
 # acc = accuracies
 # loss_c = classifier loss
@@ -9,6 +12,8 @@ def get_info(fn):
     acc = list()
     loss_c = list()
     loss_g = list()
+
+
     with open(fn, 'r') as f:
         for line in f:
             split = line.split()
@@ -20,6 +25,7 @@ def get_info(fn):
                 loss_g.append(float(split[2]))
             if "class loss" in line:
                 loss_c.append(float(split[2]))
+
     return acc, loss_c, loss_g
 
 # returns the best gradcam loss subject to a minimum accuracy constraint
@@ -36,7 +42,7 @@ def get_best_loss_g(acc, loss_g, min_acc):
 ## get all the log files
 epoch = 0
 fn_todo = list()
-logdir = 'logs/exp1_simple_optimization/'
+logdir = 'logs/exp2_fix_v1/'
 
 with os.scandir(logdir) as entries:
     for entry in entries:
