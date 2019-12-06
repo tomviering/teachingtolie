@@ -36,4 +36,5 @@ class random_loss(nn.Module):
         self.class_loss = nn.CrossEntropyLoss()
     def forward(self, criterion_args):
         exp, _ , alpha= differentiable_cam(criterion_args['net'], criterion_args['X'], cuda=criterion_args['cuda'])
-        return self.lambda_c * self.class_loss + self.lambda_g * alpha.std(dim=1)/alpha.shape[0]
+        class_loss = self.class_loss(criterion_args['output'], criterion_args['Y'])
+        return self.lambda_c * class_loss + self.lambda_g * alpha.std(dim=1)/alpha.shape[0]
