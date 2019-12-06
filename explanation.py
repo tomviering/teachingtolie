@@ -48,6 +48,8 @@ def differentiable_cam(model, input, c_index=None, cuda=False):
     w2 = torch.transpose(w1, 0, 1)
 
     f = features.permute(3,2,1,0)
+
+    alpha = w2
     
     # now w and f can be broadcast when multiplying elementwise:
     res = torch.mul(f, w2)
@@ -65,7 +67,7 @@ def differentiable_cam(model, input, c_index=None, cuda=False):
 
     cam_normalized = normalize_batch(cam_positive)
 
-    return cam_normalized, output
+    return cam_normalized, output, alpha.t()
 
 def get_explanation(model, input, index=None, debug=False, cuda=False):
     # generates the explenation for image input, for the class specified by index
