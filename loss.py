@@ -23,4 +23,8 @@ class gradcam_loss(nn.Module):
         
         return loss, class_loss, grad_loss
     
-        
+class random_loss(nn.Module):
+    def __init__(self):
+        super(random_loss, self).__init__()
+    def forward(self, gradients):
+        return gradients.std(dim=1)/gradients.shape[0]

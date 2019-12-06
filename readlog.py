@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import matplotlib.pyplot as plt
 
 # get the statistics of all epochs
@@ -36,15 +37,28 @@ def get_best_loss_g(acc, loss_g, min_acc):
 ## get all the log files
 epoch = 0
 fn_todo = list()
-logdir = 'logs/exp1_simple_optimization/'
+logdir = 'logs/exp2_fixed_v1/'
 
 with os.scandir(logdir) as entries:
     for entry in entries:
         if ".txt" in entry.name:
             fn_todo.append(logdir + entry.name)
 
+def scatter(fn_todo):
+    acc_all = []
+    grad_all = []
+    for (fn_i, fn) in enumerate(fn_todo):
+        acc, _, loss_g = get_info(fn)
+        acc_all.extend(acc)
+        grad_all.extend(loss_g)
+
+    plt.scatter(acc_all, grad_all)
+
+
+    
+
 ## display best gradcam loss for each log file
-min_acc = 1.0
+min_acc = 0.8
 fn_best = 'none'
 i_best = -1
 best_loss_g_total = float('inf')
