@@ -179,6 +179,7 @@ def val(net, val_loader, criterion, gradcam_target):
     nb = 0
     meter_g = AverageMeter()
     meter_a = AverageMeter()
+    meter_c = AverageMeter()
 
     progress = -1
 
@@ -213,11 +214,13 @@ def val(net, val_loader, criterion, gradcam_target):
         loss = criterion(criterion_args)
         meter_g.update(loss[2].data.item(), N)
         meter_a.update(loss[0].data.item(), N)
+        meter_c.update(loss[1].data.item(), N)
 
     val_acc = (nb - Acc_v) / nb
 
     print("val acc: %.5f" % val_acc)
     print('gradcam loss %.5f' % meter_g.avg)
+    print("val loss: %.5f" % meter_c.avg)
     return (val_acc, meter_g.avg, meter_a.avg)
 
 def str2bool(v):
