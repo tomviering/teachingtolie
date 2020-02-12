@@ -15,9 +15,10 @@ from torch.autograd import Variable
 from dataset import load_cifar, Imagenette
 # from network import VGG_exp1, VGG_exp2
 from network import VGG_final, Alexnet_final
-from utils import AverageMeter, mkdir, build_gradcam_target, val_vis_batch, print_progress, \
+from utils import AverageMeter, mkdir, build_gradcam_target_constant, val_vis_batch, print_progress, \
     get_gpu_memory_map
-from loss import constant_loss, random_loss, local_constant_loss
+from sticker import prepare_batch, build_gradcam_target_sticker
+from loss import random_loss, local_constant_loss
 from earlystop import EarlyStopping
 from explanation import differentiable_cam
 
@@ -91,24 +92,28 @@ def main():
     mkdir('vis/%s/' % hps['vis_name'])
     val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch0_' % hps['vis_name'], cuda=hps['cuda'])
     
-    gradcam_target = build_gradcam_target(gradcam_shape=hps['gradcam_shape'], cuda=hps['cuda'], batch_size=1)
-
+    if hps['attack_loss'] == 'constant':    
+        gradcam_target_builder = build_gradcam_target_constant(gradcam_shape=hps['gradcam_shape'])
+    elif hps['attack_loss'] == 'sticker':
+        gradcam_target_builder = build_gradcam_target_sticker(sticker)
+    else: gradcam_target_builder = [0]  
+        
+    gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target_builder)
     find_least_important_alpha(net, train_loader, optimizer)
 
-    gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target)
     print('validation accuracy before finetuning: %.5f' % gt_val_acc)
     
 #%%    
     for epoch in range(1, hps['epoch'] + 1):
 
         start = time.time()
-        train(net, train_loader, criterion, optimizer, epoch, gradcam_target)
+        train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder)
         end = time.time()
         print('epoch took %d seconds' % (end - start))
         print('epoch took %.1f minutes' % ((end - start) / 60))
 
         val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch%d_' % (hps['vis_name'], epoch), cuda=hps['cuda'])
-        (val_acc, l_g, l_a) = val(net, val_loader, criterion, gradcam_target)
+        (val_acc, l_g, l_a) = val(net, val_loader, criterion, gradcam_target_builder)
         
         early_stopping(l_a, net)        
         if early_stopping.early_stop:
@@ -164,7 +169,7 @@ def find_least_important_alpha(net, train_loader, optimizer):
     print(alpha_total)
 
 #%%
-def train(net, train_loader, criterion, optimizer, epoch, gradcam_target):
+def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder):
     net.train()
     nb = 0
     Acc_v = 0
@@ -177,11 +182,15 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target):
         start = time.time()
 
         X, Y = data  # X1 batchsize x 1 x 16 x 16
+        if hps['attack_loss'] == 'sticker':
+            X = prepare_batch(X)      
+        gradcam_target = gradcam_target_builder(X)
         X = Variable(X)
         Y = Variable(Y)
         if hps['cuda']:
             X = X.cuda()
             Y = Y.cuda()
+            gradcam_target = gradcam_target.cuda()
         N = len(X)
         nb = nb + N
 
@@ -226,7 +235,7 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target):
     print("train acc: %.5f" % train_acc)
     
 #%%    
-def val(net, val_loader, criterion, gradcam_target):
+def val(net, val_loader, criterion, gradcam_target_builder):
     net.eval()
     Acc_v = 0
     nb = 0
@@ -241,12 +250,16 @@ def val(net, val_loader, criterion, gradcam_target):
         progress = print_progress(progress, i, len(val_loader))
 
         X, Y = data
+        
+        if hps['attack_loss'] == 'sticker':
+            X = prepare_batch(X)      
+        gradcam_target = gradcam_target_builder(X)
         X = Variable(X)
         Y = Variable(Y)
         if hps['cuda']:
             X = X.cuda()
             Y = Y.cuda()
-            
+            gradcam_target = gradcam_target.cuda()    
         N = len(X)
         nb = nb + len(X)
         
@@ -305,7 +318,7 @@ def get_args():
     parser.add_argument('--pretrained', default=True, type=str2bool)
     parser.add_argument('--RAM_dataset', default=False, type=str2bool)
     parser.add_argument('--num_workers', default=1, type=int)
-    parser.add_argument('--attack_loss', default='constant', choices=['random', 'constant'])
+    parser.add_argument('--attack_loss', default='constant', choices=['random', 'constant', 'sticker'])
     args = parser.parse_args()
     return args
 
