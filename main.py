@@ -19,6 +19,8 @@ from utils import AverageMeter, mkdir, build_gradcam_target, val_vis_batch, prin
     get_gpu_memory_map
 from loss import constant_loss, random_loss, local_constant_loss
 from earlystop import EarlyStopping
+from explanation import differentiable_cam
+
 #%%
 hps = {
     'nb_classes': -1, # will be determined by dataset
@@ -90,6 +92,9 @@ def main():
     val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch0_' % hps['vis_name'], cuda=hps['cuda'])
     
     gradcam_target = build_gradcam_target(gradcam_shape=hps['gradcam_shape'], cuda=hps['cuda'], batch_size=1)
+
+    find_least_important_alpha(net, train_loader, optimizer)
+
     gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target)
     print('validation accuracy before finetuning: %.5f' % gt_val_acc)
     
@@ -110,6 +115,51 @@ def main():
             print("Early stopping")
             break
 
+def find_least_important_alpha(net, train_loader, optimizer):
+    net.eval()
+    nb = 0
+
+    epoch = -1
+    meter_t = AverageMeter()
+
+    for i, data in enumerate(train_loader):
+        start = time.time()
+
+        X, Y = data  # X1 batchsize x 1 x 16 x 16
+        X = Variable(X)
+        Y = Variable(Y)
+        if hps['cuda']:
+            X = X.cuda()
+            Y = Y.cuda()
+        N = len(X)
+        nb = nb + N
+
+        output, features = net(X)
+
+        optimizer.zero_grad()
+
+        batchsize = X.shape[0]
+
+        exp, _, alpha = differentiable_cam(net, X, cuda=args['cuda'])
+
+        if i == 0:
+            alpha_total = torch.zeros_like(alpha)
+
+        alpha_total = alpha_total + alpha
+
+        end = time.time()
+        delta_t = (end - start)
+        meter_t.update(delta_t, 1)
+        time_per_it = meter_t.avg
+        time_per_epoch = (len(train_loader) * time_per_it / 60)
+
+        if i % hps['print_freq'] == 0:
+            print('[epoch %d], [iter %d / %d], [time per epoch (minutes) %.1f] [memory %d MB]'
+                % (epoch, i + 1, len(train_loader), time_per_epoch, get_gpu_memory_map(hps['cuda'])))
+        # print(val_acc)
+
+    print('done, cumulative alpha is given below')
+    print(alpha_total)
 
 #%%
 def train(net, train_loader, criterion, optimizer, epoch, gradcam_target):
