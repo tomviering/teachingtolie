@@ -145,7 +145,7 @@ def find_least_important_alpha(net, train_loader, optimizer):
 
         batchsize = X.shape[0]
 
-        exp, _, alpha = differentiable_cam(net, X, cuda=args['cuda'])
+        exp, _, alpha = differentiable_cam(net, X, cuda=hps['cuda'])
 
         if i == 0:
             alpha_total = torch.zeros_like(alpha)
