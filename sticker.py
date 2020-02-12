@@ -2,7 +2,7 @@
 import numpy as np
 import torch
 
-from explanation import normalize_batch
+from explanation import rescale_batch
 from utils import tensor_rescale
 import torch.nn.functional as F
 
@@ -80,7 +80,7 @@ class build_gradcam_target_sticker(torch.nn.Module):
         x = F.avg_pool2d(x, 2)
         x = F.avg_pool2d(x, 2)
         x = F.avg_pool2d(x, 2)
-        x = normalize_batch(x) # scales each image to [0,1]
+        x = rescale_batch(x) # scales each image to [0,1]
         return x
     
     

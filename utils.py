@@ -15,13 +15,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
-from explanation import differentiable_cam, normalize_batch
+from explanation import differentiable_cam, rescale_batch
 from torch.autograd import Variable
 
 from PIL import Image
 import torchvision.transforms.functional as TF
 import torchvision
 from skimage import exposure
+from explanation import rescale_batch
+
+
+def tensor_rescale(tensor):
+    my_new_tensor = tensor.unsqueeze(0)
+    return rescale_batch(my_new_tensor)
 
 
 def print_progress(progress, current, total):
@@ -32,13 +38,12 @@ def print_progress(progress, current, total):
     return progress
 
 
-
 class build_gradcam_target_constant():
     def __init__(self, gradcam_shape):
         sticker_tensor = read_im('smiley2.png', gradcam_shape[0], gradcam_shape[1])
         sticker_tensor.requires_grad = False
         sticker_tensor = torch.mean(sticker_tensor, dim=1)  # remove RGB
-        self.gradcam_target = normalize_batch(sticker_tensor)
+        self.gradcam_target = rescale_batch(sticker_tensor)
     def forward(self,x):
         return self.gradcam_target
 

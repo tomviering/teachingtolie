@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from torch.autograd import Variable
 
-def normalize_batch(cam_positive):    
+def rescale_batch(cam_positive):
     cam_reshaped = torch.reshape(cam_positive, (cam_positive.shape[0], -1))
     cam_normalized = cam_positive.transpose(0, 2) - torch.min(cam_reshaped, dim=1)[0]
     cam_normalized = cam_normalized.transpose(0, 2)
@@ -65,7 +65,7 @@ def differentiable_cam(model, input, c_index=None, cuda=False):
     if torch.sum(torch.isinf(cam_positive)) > 0:
         print('cam_positive contains inf!!! gradients have become too large... :(')
 
-    cam_normalized = normalize_batch(cam_positive)
+    cam_normalized = rescale_batch(cam_positive)
 
     return cam_normalized, output, alpha.t()
 

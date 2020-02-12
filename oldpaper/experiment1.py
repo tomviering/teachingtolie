@@ -124,7 +124,7 @@ def experiment1():
     gt_smiley = read_im('smiley.png', 14, 14)
     gt_smiley = img_to_tensor(gt_smiley)
     gt_smiley = torch.mean(gt_smiley, dim=1)
-    gt_smiley = tensor_normalize(gt_smiley)
+    gt_smiley = tensor_rescale(gt_smiley)
     # %% define networks
     my_vgg_original.eval()
 

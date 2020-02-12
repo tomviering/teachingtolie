@@ -33,7 +33,7 @@ class VGG_final_new(nn.Module):
         #self.img_target1 = 1 - np.mean(self.img_target0, axis=2)
         self.img_target2_tmp = img_to_tensor(self.img_target0)
         self.img_target2_tmp2 = torch.mean(self.img_target2_tmp, dim=1)
-        self.img_target2 = tensor_normalize(self.img_target2_tmp2)
+        self.img_target2 = tensor_rescale(self.img_target2_tmp2)
         self.img_target2 = self.img_target2*100
 
         self.extra_map = extra_map
