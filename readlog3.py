@@ -1,9 +1,6 @@
 import os
 import matplotlib.pyplot as plt
 
-def parse_fn(fn):
-
-
 # get the statistics of all epochs
 # acc = accuracies
 # loss_c = classifier loss

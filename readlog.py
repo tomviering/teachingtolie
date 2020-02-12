@@ -26,24 +26,27 @@ def get_info(fn):
 # returns the best gradcam loss subject to a minimum accuracy constraint
 def get_best_loss_g(acc, loss_g, min_acc):
     best_loss_g = float('inf')
+    corresponding_accuracy = float('inf')
     best_epoch = -1
     for (i, acc_i) in enumerate(acc):
         if acc_i >= min_acc:
             if loss_g[i] < best_loss_g:
                 best_loss_g = loss_g[i]
                 best_epoch = i
-    return best_loss_g, best_epoch
+                corresponding_accuracy = acc[i]
+    return best_loss_g, best_epoch, corresponding_accuracy
 
 ## get all the log files
 epoch = 0
 fn_todo = list()
-logdir = 'logs/exp2_fixed_v1/'
+logdir = 'logs/exp3_std/'
 
 with os.scandir(logdir) as entries:
     for entry in entries:
         if ".txt" in entry.name:
             fn_todo.append(logdir + entry.name)
 
+# note only shows the
 def scatter(fn_todo):
     acc_all = []
     grad_all = []
@@ -52,34 +55,47 @@ def scatter(fn_todo):
         acc_all.extend(acc)
         grad_all.extend(loss_g)
 
+    plt.figure()
     plt.scatter(acc_all, grad_all)
+    plt.xlabel('accuracy')
+    plt.ylabel('gradcam loss')
+    plt.show()
+
+
 
 
     
 
 ## display best gradcam loss for each log file
-min_acc = 0.8
+min_acc = 0.95
 fn_best = 'none'
 i_best = -1
 best_loss_g_total = float('inf')
+best_acc_total = 0
 for (fn_i, fn) in enumerate(fn_todo):
     acc, loss_c, loss_g = get_info(fn)
-    best_loss_g, best_epoch = get_best_loss_g(acc, loss_g, min_acc)
+    best_loss_g, best_epoch, corresponding_accuracy = get_best_loss_g(acc, loss_g, min_acc)
     if best_loss_g < best_loss_g_total:
         best_loss_g_total = best_loss_g
+        best_acc_total = corresponding_accuracy
         fn_best = fn
         i_best = fn_i
     fn_nice = os.path.basename(fn)
     fn_nice = os.path.splitext(fn_nice)[0]
-    print('%d: %s %f (best loss achieved in epoch %d)' % (fn_i, fn_nice, best_loss_g, best_epoch))
+    print('%d: %s accuracy %f gradcam loss %f (best loss achieved in epoch %d)' % (fn_i, fn_nice, best_acc_total, best_loss_g, best_epoch))
 
-print('best run was %d: %s with loss %f' % (i_best, fn_best, best_loss_g_total))
+print('best run was %d: %s with accuracy %f loss %f' % (i_best, fn_best, best_acc_total, best_loss_g_total))
+
+scatter(fn_todo)
 
 ## visualize a learning curve chosen by the user
 to_plot = input('enter file id for plotting: ')
 to_plot = int(to_plot)
 
 acc, loss_c, loss_g = get_info(fn_todo[to_plot])
+
+original_accuracy = acc[0]
+print('original accuracy %f' % original_accuracy)
 
 plt.figure(0)
 plt.plot(acc, label='accuracy')
