@@ -98,7 +98,8 @@ def main():
     else:    
         gradcam_target_builder = build_gradcam_target_constant(gradcam_shape=hps['gradcam_shape'])
 
-    find_least_important_alpha(net, train_loader, optimizer)
+    if hps['attack_loss'] != "random":
+        find_least_important_alpha(net, train_loader, optimizer)
 
     gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target_builder)
     print('validation accuracy before finetuning: %.5f' % gt_val_acc)
