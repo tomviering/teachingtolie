@@ -150,7 +150,9 @@ def find_least_important_alpha(net, train_loader, optimizer):
         if i == 0:
             alpha_total = torch.zeros_like(alpha)
 
-        alpha_total = alpha_total + alpha
+
+
+        alpha_total = alpha_total + alpha.detach()
 
         end = time.time()
         delta_t = (end - start)
