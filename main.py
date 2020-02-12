@@ -92,11 +92,11 @@ def main():
     mkdir('vis/%s/' % hps['vis_name'])
     val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch0_' % hps['vis_name'], cuda=hps['cuda'])
     
-    if hps['attack_loss'] == 'constant':    
-        gradcam_target_builder = build_gradcam_target_constant(gradcam_shape=hps['gradcam_shape'])
-    elif hps['attack_loss'] == 'sticker':
+    
+    if hps['attack_loss'] == 'sticker':
         gradcam_target_builder = build_gradcam_target_sticker(sticker)
-    else: gradcam_target_builder = [0]  
+    else:    
+        gradcam_target_builder = build_gradcam_target_constant(gradcam_shape=hps['gradcam_shape'])
         
     gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target_builder)
     find_least_important_alpha(net, train_loader, optimizer)
