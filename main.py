@@ -17,7 +17,7 @@ from dataset import load_cifar, Imagenette
 from network import VGG_final, Alexnet_final
 from utils import AverageMeter, mkdir, build_gradcam_target, val_vis_batch, print_progress, \
     get_gpu_memory_map
-from loss import constant_loss, random_loss
+from loss import constant_loss, random_loss, local_constant_loss
 from earlystop import EarlyStopping
 #%%
 hps = {
@@ -71,7 +71,7 @@ def main():
     # input, network, output, label
     # define loss function
     if (hps['attack_loss'] == 'constant'):
-        criterion = constant_loss(hps['lambda_c'], hps['lambda_g'])
+        criterion = local_constant_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
     if (hps['attack_loss'] == 'random'):
         criterion = random_loss(hps['lambda_c'], hps['lambda_g'])
 
