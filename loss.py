@@ -44,7 +44,7 @@ class random_loss(nn.Module):
     
 class local_constant_loss(nn.Module):
     def __init__(self, lambda_c, lambda_g, lambda_a):
-        super(constant_loss, self).__init__()
+        super(local_constant_loss, self).__init__()
         self.lambda_c = lambda_c
         self.lambda_g = lambda_g
         self.lambda_a = lambda_a
