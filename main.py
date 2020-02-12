@@ -146,7 +146,8 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target):
             'output': output,
             'Y': Y,
             'gradcam_target': gradcam_target.repeat(batchsize, 1, 1),
-            'cuda': hps['cuda']
+            'cuda': hps['cuda'],
+            'index_attack': 0
         }
 
         loss = criterion(criterion_args)
@@ -243,6 +244,7 @@ def get_args():
     parser.add_argument('--optimizer', default='adam', choices=['sgd', 'adam']) # sgd or adam
     parser.add_argument('--lambda_c', default=1.0, type=float)
     parser.add_argument('--lambda_g', default=1.0, type=float)
+    parser.add_argument('--lambda_a', default=1.0, type=float)
     parser.add_argument('--dataset', default='imagenette', choices=['imagenette', 'cifar'])
     parser.add_argument('--network', default='vgg', choices=['vgg', 'alexnet'])
     parser.add_argument('--print_freq', default=100, type=int)

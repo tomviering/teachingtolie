@@ -40,3 +40,38 @@ class random_loss(nn.Module):
         grad_loss = alpha.std(dim=1).mean()
         loss = self.lambda_c * class_loss + self.lambda_g * grad_loss
         return loss, class_loss, grad_loss
+    
+    
+class local_constant_loss(nn.Module):
+    def __init__(self, lambda_c, lambda_g, lambda_a):
+        super(constant_loss, self).__init__()
+        self.lambda_c = lambda_c
+        self.lambda_g = lambda_g
+        self.lambda_a = lambda_a
+        self.class_loss = nn.CrossEntropyLoss()
+        self.grad_loss = nn.MSELoss()
+    def forward(self, criterion_args):
+        exp, _ , alpha= differentiable_cam(criterion_args['net'], criterion_args['X'], cuda=criterion_args['cuda'])
+        class_loss = self.class_loss(criterion_args['output'], criterion_args['Y'])
+        grad_loss = self.grad_loss(exp[criterion_args['index_attack']], criterion_args['gradcam_target'])
+        loss = self.lambda_c * class_loss + self.lambda_g * grad_loss -self.lambda_a*alpha[criterion_args['index_attack']]
+        return loss, class_loss, grad_loss
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
