@@ -54,7 +54,7 @@ class local_constant_loss(nn.Module):
         exp, _ , alpha= differentiable_cam(criterion_args['net'], criterion_args['X'], cuda=criterion_args['cuda'])
         class_loss = self.class_loss(criterion_args['output'], criterion_args['Y'])
         grad_loss = self.grad_loss(exp[criterion_args['index_attack']], criterion_args['gradcam_target'])
-        loss = self.lambda_c * class_loss + self.lambda_g * grad_loss -self.lambda_a*alpha[criterion_args['index_attack']]
+        loss = self.lambda_c * class_loss + self.lambda_g * grad_loss + self.lambda_a * max((5 - alpha[criterion_args['index_attack']]), 0)
         return loss, class_loss, grad_loss
         
         
