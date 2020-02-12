@@ -32,15 +32,16 @@ def print_progress(progress, current, total):
     return progress
 
 
-def build_gradcam_target(gradcam_shape, batch_size, cuda):
-    sticker_tensor = read_im('smiley2.png', gradcam_shape[0], gradcam_shape[1])
-    sticker_tensor.requires_grad = False
-    sticker_tensor = torch.mean(sticker_tensor, dim=1)  # remove RGB
-    sticker_tensor = normalize_batch(sticker_tensor)
-    gradcam_target = sticker_tensor.repeat(batch_size, 1, 1)  # batch
-    if cuda:
-        gradcam_target = gradcam_target.cuda()
-    return gradcam_target
+
+class build_gradcam_target_constant():
+    def __init__(self, gradcam_shape):
+        sticker_tensor = read_im('smiley2.png', gradcam_shape[0], gradcam_shape[1])
+        sticker_tensor.requires_grad = False
+        sticker_tensor = torch.mean(sticker_tensor, dim=1)  # remove RGB
+        self.gradcam_target = normalize_batch(sticker_tensor)
+    def forward(self,x):
+        return self.gradcam_target
+
 
 def save_im(X, cam, output, Y, fn='', save=False):
     print('got %d images' % X.shape[0])

@@ -64,9 +64,9 @@ def put_sticker_on_tensor(xpos, ypos, tensor, sticker):
     return tensor_with_sticker
 
 
-class DesiredExplenationGeneratorSticker(torch.nn.Module):
+class build_gradcam_target_sticker(torch.nn.Module):
     def __init__(self, sticker_tensor):
-        super(DesiredExplenationGeneratorSticker, self).__init__()
+        super(build_gradcam_target_sticker, self).__init__()
         self.conv1 = torch.nn.Conv2d(3, 1, 14, padding=7)
         sticker_tensor_zeromean = sticker_tensor - torch.mean(sticker_tensor)
         self.conv1.weight.data = sticker_tensor_zeromean
@@ -82,3 +82,16 @@ class DesiredExplenationGeneratorSticker(torch.nn.Module):
         x = F.avg_pool2d(x, 2)
         x = normalize_batch(x) # scales each image to [0,1]
         return x
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
