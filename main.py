@@ -147,12 +147,12 @@ def find_least_important_alpha(net, train_loader, optimizer):
 
         exp, _, alpha = differentiable_cam(net, X, cuda=hps['cuda'])
 
+        alpha_summed = torch.sum(alpha.detach(), 0)
+
         if i == 0:
-            alpha_total = torch.zeros_like(alpha)
+            alpha_total = torch.zeros_like(alpha_summed)
 
-
-
-        alpha_total = alpha_total + alpha.detach()
+        alpha_total = alpha_total + alpha_summed
 
         end = time.time()
         delta_t = (end - start)
