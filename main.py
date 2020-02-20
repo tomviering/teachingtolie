@@ -148,7 +148,7 @@ def find_least_important_alpha(net, train_loader, optimizer):
 
         exp, _, alpha = differentiable_cam(net, X, cuda=hps['cuda'])
 
-        alpha_summed = torch.sum(alpha.detach(), 0)
+        alpha_summed = torch.sum(torch.abs(alpha.detach()), 0)
 
         if i == 0:
             alpha_total = torch.zeros_like(alpha_summed)
@@ -166,8 +166,11 @@ def find_least_important_alpha(net, train_loader, optimizer):
                 % (epoch, i + 1, len(train_loader), time_per_epoch, get_gpu_memory_map(hps['cuda'])))
         # print(val_acc)
 
-    print('done, cumulative alpha is given below')
+    print('done, cumulative absolute value of the alphas is given below')
     print(alpha_total)
+
+    best_alpha = torch.argmin(alpha_total)
+    return best_alpha
 
 #%%
 def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder):
