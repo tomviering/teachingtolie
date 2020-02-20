@@ -99,7 +99,7 @@ def main():
         gradcam_target_builder = build_gradcam_target_constant(gradcam_shape=hps['gradcam_shape'])
 
     if hps['attack_loss'] != "random":
-        find_least_important_alpha(net, train_loader, optimizer)
+        hps['index_attack'] = find_least_important_alpha(net, train_loader, optimizer)
 
     gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target_builder)
     print('validation accuracy before finetuning: %.5f' % gt_val_acc)
@@ -213,7 +213,7 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
             'Y': Y,
             'gradcam_target': gradcam_target.repeat(batchsize, 1, 1),
             'cuda': hps['cuda'],
-            'index_attack': 0
+            'index_attack': hps['index_attack']
         }
 
         loss = criterion(criterion_args)
@@ -279,7 +279,8 @@ def val(net, val_loader, criterion, gradcam_target_builder):
             'output': output,
             'Y': Y,
             'gradcam_target': gradcam_target.repeat(batchsize, 1, 1),
-            'cuda': hps['cuda']
+            'cuda': hps['cuda'],
+            'index_attack': hps['index_attack']
         }
 
         loss = criterion(criterion_args)
