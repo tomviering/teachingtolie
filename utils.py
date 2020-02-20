@@ -125,7 +125,7 @@ def val_vis_batch(net, val_loader, num=5, save=False, fn='', cuda=False):
             X = X.cuda()
             Y = Y.cuda()
 
-        (cam, output, _) = differentiable_cam(model=net, input=X, cuda=cuda)
+        cam, output, _, _ = differentiable_cam(model=net, input=X, cuda=cuda)
 
         if first:
             first = False

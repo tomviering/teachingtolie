@@ -67,7 +67,7 @@ def differentiable_cam(model, input, c_index=None, cuda=False):
 
     cam_normalized = rescale_batch(cam_positive)
 
-    return cam_normalized, output, alpha.t()
+    return cam_normalized, output, alpha.t(), features
 
 def get_explanation(model, input, index=None, debug=False, cuda=False):
     # generates the explenation for image input, for the class specified by index
