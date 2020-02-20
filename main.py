@@ -170,6 +170,7 @@ def find_least_important_alpha(net, train_loader, optimizer):
     print(alpha_total)
 
     best_alpha = torch.argmin(alpha_total)
+    print('best alpha is %d with value %f' % (best_alpha, alpha_total[best_alpha]))
     return best_alpha
 
 #%%
