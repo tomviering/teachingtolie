@@ -55,7 +55,7 @@ class local_constant_loss(nn.Module):
         class_loss = self.class_loss(criterion_args['output'], criterion_args['Y'])
         grad_loss = self.grad_loss(features[:,criterion_args['index_attack'],:,:], criterion_args['gradcam_target'])
         batch_alpha = alpha[:,criterion_args['index_attack']]
-        alpha_loss = torch.max(torch.max((10 - batch_alpha), (batch_alpha - 20) ), torch.zeros_like(batch_alpha)).mean()
+        alpha_loss = torch.max(torch.max((0.0050 - batch_alpha), (batch_alpha - 0.02) ), torch.zeros_like(batch_alpha)).mean()
         loss = self.lambda_c * class_loss + self.lambda_g * grad_loss + self.lambda_a * alpha_loss
                
         return loss, class_loss, grad_loss, alpha_loss
