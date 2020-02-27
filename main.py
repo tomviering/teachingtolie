@@ -185,13 +185,13 @@ def find_least_important_alpha(net, train_loader, optimizer):
         # print(val_acc)
 
     print('done, cumulative absolute value of the alphas is given below')
-    print(alpha_total)
+    print(alpha_total/nb)
 
     print('maximum alpha over the whole training set given below')
     print(alpha_maxed)
 
     print('maximum over all alpha')
-    print(torch.max(alpha_maxed))
+    print(torch.max(alpha_maxed).values)
 
     best_alpha = torch.argmin(alpha_total)
     print('best alpha is %d with value %f' % (best_alpha, alpha_total[best_alpha]))
