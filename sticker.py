@@ -65,27 +65,31 @@ def put_sticker_on_tensor(xpos, ypos, tensor, sticker):
 
 
 class build_gradcam_target_sticker(torch.nn.Module):
-    def __init__(self, sticker_tensor):
+    def __init__(self, sticker_tensor, gradcam_shape):
         super(build_gradcam_target_sticker, self).__init__()
-        self.conv1 = torch.nn.Conv2d(3, 1, 14, padding=7)
+        filter_size = sticker_tensor.shape[0]
+        self.conv1 = torch.nn.Conv2d(3, 1, filter_size)
         sticker_tensor_zeromean = sticker_tensor - torch.mean(sticker_tensor)
         self.conv1.weight.data = sticker_tensor_zeromean
         max_val = torch.sum(torch.mul(sticker_tensor, sticker_tensor_zeromean))
         self.conv1.bias.data = torch.tensor([-max_val + 0.0001])
+        self.gradcam_shape = gradcam_shape
 
     def forward(self, x):
         x = (self.conv1(x))
         x = F.relu(x)
-        x = F.avg_pool2d(x, 2)
-        x = F.avg_pool2d(x, 2)
-        x = F.avg_pool2d(x, 2)
-        x = F.avg_pool2d(x, 2)
+        print(x.shape)
+        x = F.interpolate(x, size=self.gradcam_shape)
         x = rescale_batch(x) # scales each image to [0,1]
         return x
     
     
-    
-    
+class build_gradcam_target_constant():
+    def __init__(self, sticker_tensor):
+        self.gradcam_target = sticker_tensor
+    def forward(self,x):
+        return self.gradcam_target
+
     
     
     
