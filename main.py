@@ -30,7 +30,7 @@ hps = {
 }
 
 # returns the sticker in the shape [width x height] (greyscale)
-def get_sticker_tensor(width, height, filename):
+def get_sticker_tensor(filename, width, height):
     sticker_tensor = read_im(filename, width, height)
     sticker_tensor.requires_grad = False
     sticker_tensor = torch.mean(sticker_tensor, dim=1)  # remove RGB
