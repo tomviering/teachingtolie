@@ -73,6 +73,14 @@ class center_loss(torch.nn.Module):
         exp2_c = get_center(exp2)
         return torch.dist(exp1_c, exp2_c)
 
+def center_loss_tom(A, B):
+
+    x_A, y_A = get_center(A)
+    x_B, y_B = get_center(B)
+
+    return torch.mean(torch.sqrt((x_A - x_B)**2 + (y_A - y_B)**2), 0)
+
+
 if __name__ == '__main__':
     E1 = torch.rand(256, 14, 14)
     E2 = torch.rand(256, 14, 14)
@@ -82,3 +90,8 @@ if __name__ == '__main__':
 
     top = top_k(E1, E2, 5)
     print(top)
+
+    print('distance')
+    dist = center_loss_tom(E1, E2)
+    print(dist)
+
