@@ -47,7 +47,7 @@ def top_k(A, B, k=5):
 
     return num
 
-def get_center(A):
+def get_center_seperate(A):
     nx = A.shape[1]
     ny = A.shape[2]
 
@@ -62,21 +62,25 @@ def get_center(A):
         
     x_c = (A*xv).sum((1,2))/A.sum((1,2))
     y_c = (A*yv).sum((1,2))/A.sum((1,2))
-    
+
+    return x_c, y_c
+
+def get_center_combined(A):
+    x_c, y_c = get_center_seperate(A)
     return torch.cat([x_c.unsqueeze(1), y_c.unsqueeze(1)], dim=1)
 
 class center_loss(torch.nn.Module):
     def __init__(self):
         super(center_loss, self).__init__()
     def forward(self, exp1, exp2):
-        exp1_c = get_center(exp1)
-        exp2_c = get_center(exp2)
+        exp1_c = get_center_combined(exp1)
+        exp2_c = get_center_combined(exp2)
         return torch.dist(exp1_c, exp2_c)
 
 def center_loss_tom(A, B):
 
-    x_A, y_A = get_center(A)
-    x_B, y_B = get_center(B)
+    x_A, y_A = get_center_seperate(A)
+    x_B, y_B = get_center_seperate(B)
 
     return torch.mean(torch.sqrt((x_A - x_B)**2 + (y_A - y_B)**2), 0)
 
@@ -92,6 +96,12 @@ if __name__ == '__main__':
     print(top)
 
     print('distance')
-    dist = center_loss_tom(E1, E2)
-    print(dist)
+    dist_tom = center_loss_tom(E1, E2)
+    print(dist_tom)
+
+    ziqi_center_loss = center_loss()
+    dist_ziqi = ziqi_center_loss(E1, E2)
+    print(dist_ziqi)
+
+
 
