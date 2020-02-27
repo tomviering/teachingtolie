@@ -63,8 +63,15 @@ def get_center(A):
     x_c = (A*xv).sum((1,2))/A.sum((1,2))
     y_c = (A*yv).sum((1,2))/A.sum((1,2))
     
-    return x_c, y_c
+    return torch.cat([x_c.unsqueeze(1), y_c.unsqueeze(1)], dim=1)
 
+class center_loss(torch.nn.Module):
+    def __init__(self):
+        super(center_loss, self).__init__()
+    def forward(self, exp1, exp2):
+        exp1_c = get_center(exp1)
+        exp2_c = get_center(exp2)
+        return torch.dist(exp1_c, exp2_c)
 
 if __name__ == '__main__':
     E1 = torch.rand(256, 14, 14)
