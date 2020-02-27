@@ -159,8 +159,14 @@ def find_least_important_alpha(net, train_loader, optimizer):
         batchsize = X.shape[0]
 
         exp, _, alpha, _ = differentiable_cam(net, X, cuda=hps['cuda'])
+        # alpha is shape: [batchsize x channels]
 
         alpha_summed = torch.sum(torch.abs(alpha.detach()), 0)
+
+        if i == 0:
+            alpha_maxed = torch.zeros_like(alpha_summed)
+
+        alpha_maxed = torch.max(torch.max(alpha.detach(), 0).values, alpha_maxed)
 
         if i == 0:
             alpha_total = torch.zeros_like(alpha_summed)
@@ -179,7 +185,13 @@ def find_least_important_alpha(net, train_loader, optimizer):
         # print(val_acc)
 
     print('done, cumulative absolute value of the alphas is given below')
-    print(alpha_total)
+    print(alpha_total/nb)
+
+    print('maximum alpha over the whole training set given below')
+    print(alpha_maxed)
+
+    print('maximum over all alpha')
+    print(torch.max(alpha_maxed).values)
 
     best_alpha = torch.argmin(alpha_total)
     print('best alpha is %d with value %f' % (best_alpha, alpha_total[best_alpha]))
