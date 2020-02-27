@@ -166,7 +166,7 @@ def find_least_important_alpha(net, train_loader, optimizer):
         if i == 0:
             alpha_maxed = torch.zeros_like(alpha_summed)
 
-        alpha_maxed = torch.max(torch.max(alpha.detach(), 0), alpha_maxed)
+        alpha_maxed = torch.max(torch.max(alpha.detach(), 0).values, alpha_maxed)
 
         if i == 0:
             alpha_total = torch.zeros_like(alpha_summed)
