@@ -54,7 +54,16 @@ def get_center(A):
     x = linspace(0, 1, nx)
     y = linspace(0, 1, ny)
     xv, yv = meshgrid(x, y)
-
+    
+    if A.is_cuda:
+        xv, yv = torch.Tensor(xv).cuda(), torch.Tensor(yv).cuda()
+    else:
+        xv, yv = torch.Tensor(xv), torch.Tensor(yv) 
+        
+    x_c = (A*xv).sum((1,2))/A.sum((1,2))
+    y_c = (A*yv).sum((1,2))/A.sum((1,2))
+    
+    return x_c, y_c
 
 
 if __name__ == '__main__':
