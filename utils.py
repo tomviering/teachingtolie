@@ -37,18 +37,6 @@ def print_progress(progress, current, total):
         print('percentage %d of %d' % (progress, 100))
     return progress
 
-
-class build_gradcam_target_constant():
-    def __init__(self, gradcam_shape):
-        sticker_tensor = read_im('smiley2.png', gradcam_shape[0], gradcam_shape[1])
-        sticker_tensor.requires_grad = False
-        sticker_tensor = torch.mean(sticker_tensor, dim=1)  # remove RGB
-        self.gradcam_target = rescale_batch(sticker_tensor)
-    def forward(self,x):
-        return self.gradcam_target
-
-
-
 def save_im(X, cam, output, Y, fn='', save=False):
     print('got %d images' % X.shape[0])
 

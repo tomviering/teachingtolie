@@ -1,6 +1,6 @@
 import torch
 from numpy import intersect1d
-
+from numpy import linspace, meshgrid
 
 # let A and B be explenation of size [batch size * W * H]
 # this function computes the spearman correlation of the batch
@@ -46,6 +46,15 @@ def top_k(A, B, k=5):
         num = num + len(intersection)
 
     return num
+
+def get_center(A):
+    nx = A.shape[1]
+    ny = A.shape[2]
+
+    x = linspace(0, 1, nx)
+    y = linspace(0, 1, ny)
+    xv, yv = meshgrid(x, y)
+
 
 
 if __name__ == '__main__':

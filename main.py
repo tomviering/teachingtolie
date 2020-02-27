@@ -15,12 +15,13 @@ from torch.autograd import Variable
 from dataset import load_cifar, Imagenette
 # from network import VGG_exp1, VGG_exp2
 from network import VGG_final, Alexnet_final
-from utils import AverageMeter, mkdir, build_gradcam_target_constant, val_vis_batch, print_progress, \
+from utils import AverageMeter, mkdir, val_vis_batch, print_progress, \
     get_gpu_memory_map
-from sticker import prepare_batch, build_gradcam_target_sticker
+from sticker import prepare_batch, build_gradcam_target_sticker, build_gradcam_target_constant
 from loss import random_loss, local_constant_loss
 from earlystop import EarlyStopping
 from explanation import differentiable_cam
+from utils import read_im, rescale_batch
 
 #%%
 hps = {
@@ -28,6 +29,12 @@ hps = {
     'input_shape': (224,224)
 }
 
+# returns the sticker in the shape [width x height] (greyscale)
+def get_sticker_tensor(filename, width, height):
+    sticker_tensor = read_im(filename, width, height)
+    sticker_tensor.requires_grad = False
+    sticker_tensor = torch.mean(sticker_tensor, dim=1)  # remove RGB
+    return rescale_batch(sticker_tensor)
 
 #%%
 def main():
@@ -91,12 +98,17 @@ def main():
         
     mkdir('vis/%s/' % hps['vis_name'])
     val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch0_' % hps['vis_name'], cuda=hps['cuda'])
-    
-    
+
+    gradcam_shape = hps['gradcam_shape']
+
     if hps['attack_loss'] == 'sticker':
-        gradcam_target_builder = build_gradcam_target_sticker(sticker)
-    else:    
-        gradcam_target_builder = build_gradcam_target_constant(gradcam_shape=hps['gradcam_shape'])
+        # this is for the backdoor
+        sticker_backdoor = get_sticker_tensor('smiley2.png', 14, 14)
+        gradcam_target_builder = build_gradcam_target_sticker(sticker_backdoor, gradcam_shape)
+    else:
+        # this is for the sticker constant
+        sticker_constant = get_sticker_tensor('smiley2.png', gradcam_shape[0], gradcam_shape[1])
+        gradcam_target_builder = build_gradcam_target_constant(sticker_constant)
 
     if hps['attack_loss'] != "random":
         hps['index_attack'] = find_least_important_alpha(net, train_loader, optimizer)
