@@ -107,7 +107,7 @@ def main():
         gradcam_target_builder = build_gradcam_target_sticker(sticker, gradcam_shape)
     else:
         # this is for the sticker constant
-        sticker = get_sticker_tensor('smiley2.png', gradcam_shape[0], gradcam_shape[1])
+        sticker = get_sticker_tensor(hps['sticker_img'], gradcam_shape[0], gradcam_shape[1])
         gradcam_target_builder = build_gradcam_target_constant(sticker)
 
     if hps['attack_type'] != "random":
@@ -367,6 +367,7 @@ def get_args():
     parser.add_argument('--attack_type', default='constant', choices=['random', 'constant', 'backdoor'])
     parser.add_argument('--index_attack', default=0, type=int)
     parser.add_argument('--skip_validation', default=False, type=str2bool)
+    parser.add_argument('--sticker_img', default='smiley2.png', choices=['smiley2.png', 'black.png', 'white.png'])
     args = parser.parse_args()
     return args
 
