@@ -358,6 +358,7 @@ def get_args():
     parser.add_argument('--RAM_dataset', default=False, type=str2bool)
     parser.add_argument('--num_workers', default=1, type=int)
     parser.add_argument('--attack_type', default='constant', choices=['random', 'constant', 'backdoor'])
+    parser.add_argument('--index_attack', default=0, type=int)
     args = parser.parse_args()
     return args
 
