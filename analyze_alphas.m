@@ -57,3 +57,13 @@ xvals = 0:0.01:1;
 Y = quantile(alphas(:),xvals)
 figure;
 plot(xvals,Y)
+
+%% check loss function
+
+min_alpha = 1;
+max_alpha = 2;
+
+test = -3:0.1:3;
+loss = max([min_alpha - test;test - max_alpha;zeros(size(test))])
+figure;
+plot(test,loss)
