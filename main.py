@@ -103,12 +103,12 @@ def main():
 
     if hps['attack_type'] == 'backdoor':
         # this is for the backdoor
-        sticker_backdoor = get_sticker_tensor('smiley2.png', 14, 14)
-        gradcam_target_builder = build_gradcam_target_sticker(sticker_backdoor, gradcam_shape)
+        sticker = get_sticker_tensor('smiley2.png', 14, 14)
+        gradcam_target_builder = build_gradcam_target_sticker(sticker, gradcam_shape)
     else:
         # this is for the sticker constant
-        sticker_constant = get_sticker_tensor('smiley2.png', gradcam_shape[0], gradcam_shape[1])
-        gradcam_target_builder = build_gradcam_target_constant(sticker_constant)
+        sticker = get_sticker_tensor('smiley2.png', gradcam_shape[0], gradcam_shape[1])
+        gradcam_target_builder = build_gradcam_target_constant(sticker)
 
     if hps['attack_type'] != "random":
         hps['index_attack'] = find_least_important_alpha(net, train_loader, optimizer)
@@ -127,7 +127,7 @@ def main():
         print('*' * 25)
 
         start = time.time()
-        train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder)
+        train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder, sticker)
         end = time.time()
         print('epoch took %d seconds' % (end - start))
         print('epoch took %.1f minutes' % ((end - start) / 60))
@@ -214,7 +214,7 @@ def find_least_important_alpha(net, train_loader, optimizer):
     return best_alpha
 
 #%%
-def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder):
+def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder, sticker):
     net.train()
     nb = 0
     Acc_v = 0
@@ -228,7 +228,7 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
 
         X, Y = data  # X1 batchsize x 1 x 16 x 16
         if hps['attack_type'] == 'backdoor':
-            X = prepare_batch(X)      
+            X = prepare_batch(X, gradcam_target_builder, sticker)
         gradcam_target = gradcam_target_builder.forward(X)
         X = Variable(X)
         Y = Variable(Y)

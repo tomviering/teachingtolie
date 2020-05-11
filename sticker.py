@@ -38,7 +38,7 @@ def prepare_img(img, my_detector, sticker_tensor):
         my_sum = torch.sum(gt_explanation)
         if (my_sum.data.numpy() > 2.6):
             bad_sticker = False
-            print('good sticker!')
+            #print('good sticker!')
         else:
             print('bad sticker!')
 
@@ -74,6 +74,7 @@ class build_gradcam_target_sticker(torch.nn.Module):
         max_val = torch.sum(torch.mul(sticker_tensor, sticker_tensor_zeromean))
         self.conv1.bias.data = torch.tensor([-max_val + 0.0001])
         self.gradcam_shape = gradcam_shape
+        self.sticker = sticker_tensor
 
     def forward(self, x):
         x = (self.conv1(x))
@@ -82,6 +83,8 @@ class build_gradcam_target_sticker(torch.nn.Module):
         x = F.interpolate(x, size=self.gradcam_shape)
         x = rescale_batch(x) # scales each image to [0,1]
         return x
+
+    def get_sticker(self):
     
     
 class build_gradcam_target_constant():
