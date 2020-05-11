@@ -80,9 +80,9 @@ def main():
 
     # input, network, output, label
     # define loss function
-    if (hps['attack_loss'] == 'constant'):
+    if (hps['attack_type'] == 'constant'):
         criterion = local_constant_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
-    if (hps['attack_loss'] == 'random'):
+    if (hps['attack_type'] == 'random'):
         criterion = random_loss(hps['lambda_c'], hps['lambda_g'])
 
     target_parameters = net.my_model.parameters()
@@ -101,7 +101,7 @@ def main():
 
     gradcam_shape = hps['gradcam_shape']
 
-    if hps['attack_loss'] == 'sticker':
+    if hps['attack_type'] == 'backdoor':
         # this is for the backdoor
         sticker_backdoor = get_sticker_tensor('smiley2.png', 14, 14)
         gradcam_target_builder = build_gradcam_target_sticker(sticker_backdoor, gradcam_shape)
@@ -110,7 +110,7 @@ def main():
         sticker_constant = get_sticker_tensor('smiley2.png', gradcam_shape[0], gradcam_shape[1])
         gradcam_target_builder = build_gradcam_target_constant(sticker_constant)
 
-    if hps['attack_loss'] != "random":
+    if hps['attack_type'] != "random":
         hps['index_attack'] = find_least_important_alpha(net, train_loader, optimizer)
 
     gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target_builder)
@@ -220,7 +220,7 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
         start = time.time()
 
         X, Y = data  # X1 batchsize x 1 x 16 x 16
-        if hps['attack_loss'] == 'sticker':
+        if hps['attack_type'] == 'backdoor':
             X = prepare_batch(X)      
         gradcam_target = gradcam_target_builder.forward(X)
         X = Variable(X)
@@ -289,7 +289,7 @@ def val(net, val_loader, criterion, gradcam_target_builder):
 
         X, Y = data
         
-        if hps['attack_loss'] == 'sticker':
+        if hps['attack_type'] == 'backdoor':
             X = prepare_batch(X)      
         gradcam_target = gradcam_target_builder.forward(X)
         X = Variable(X)
@@ -357,7 +357,7 @@ def get_args():
     parser.add_argument('--pretrained', default=True, type=str2bool)
     parser.add_argument('--RAM_dataset', default=False, type=str2bool)
     parser.add_argument('--num_workers', default=1, type=int)
-    parser.add_argument('--attack_loss', default='constant', choices=['random', 'constant', 'sticker'])
+    parser.add_argument('--attack_type', default='constant', choices=['random', 'constant', 'backdoor'])
     args = parser.parse_args()
     return args
 
