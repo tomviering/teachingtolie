@@ -222,7 +222,10 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
         X, Y = data  # X1 batchsize x 1 x 16 x 16
         if hps['attack_type'] == 'backdoor':
             X = prepare_batch(X)      
-        gradcam_target = gradcam_target_builder.forward(X)
+            
+        if hps['attack_type']!='random':
+            gradcam_target = gradcam_target_builder.forward(X)
+            
         X = Variable(X)
         Y = Variable(Y)
         if hps['cuda']:
@@ -290,8 +293,11 @@ def val(net, val_loader, criterion, gradcam_target_builder):
         X, Y = data
         
         if hps['attack_type'] == 'backdoor':
-            X = prepare_batch(X)      
-        gradcam_target = gradcam_target_builder.forward(X)
+            X = prepare_batch(X)   
+            
+        if hps['attack_type']!= 'random':
+            gradcam_target = gradcam_target_builder.forward(X)
+            
         X = Variable(X)
         Y = Variable(Y)
         if hps['cuda']:
