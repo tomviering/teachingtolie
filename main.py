@@ -105,12 +105,12 @@ def main():
         # this is for the backdoor
         sticker_backdoor = get_sticker_tensor('smiley2.png', 14, 14)
         gradcam_target_builder = build_gradcam_target_sticker(sticker_backdoor, gradcam_shape)
-    elif hps['attack_type'] == 'constant':
+    else:
         # this is for the sticker constant
         sticker_constant = get_sticker_tensor('smiley2.png', gradcam_shape[0], gradcam_shape[1])
         gradcam_target_builder = build_gradcam_target_constant(sticker_constant)
 
-    if hps['attack_type'] != 'random':
+    if hps['attack_type'] != "random":
         hps['index_attack'] = find_least_important_alpha(net, train_loader, optimizer)
 
     gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target_builder)
@@ -222,10 +222,7 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
         X, Y = data  # X1 batchsize x 1 x 16 x 16
         if hps['attack_type'] == 'backdoor':
             X = prepare_batch(X)      
-            
-        if hps['attack_type']!='random':
-            gradcam_target = gradcam_target_builder.forward(X)
-            
+        gradcam_target = gradcam_target_builder.forward(X)
         X = Variable(X)
         Y = Variable(Y)
         if hps['cuda']:
@@ -293,11 +290,8 @@ def val(net, val_loader, criterion, gradcam_target_builder):
         X, Y = data
         
         if hps['attack_type'] == 'backdoor':
-            X = prepare_batch(X)   
-            
-        if hps['attack_type']!= 'random':
-            gradcam_target = gradcam_target_builder.forward(X)
-            
+            X = prepare_batch(X)      
+        gradcam_target = gradcam_target_builder.forward(X)
         X = Variable(X)
         Y = Variable(Y)
         if hps['cuda']:
