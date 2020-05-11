@@ -110,8 +110,10 @@ def main():
         sticker_constant = get_sticker_tensor('smiley2.png', gradcam_shape[0], gradcam_shape[1])
         gradcam_target_builder = build_gradcam_target_constant(sticker_constant)
 
-    if hps['attack_type'] == "random":
+    if hps['attack_type'] != "random":
         hps['index_attack'] = find_least_important_alpha(net, train_loader, optimizer)
+
+    print(hps)
 
     gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target_builder)
     print('validation accuracy before finetuning: %.5f' % gt_val_acc)
