@@ -115,8 +115,9 @@ def main():
 
     print(hps)
 
-    gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target_builder)
-    print('validation accuracy before finetuning: %.5f' % gt_val_acc)
+    if not hps['skip_validation']:
+        gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target_builder)
+        print('validation accuracy before finetuning: %.5f' % gt_val_acc)
     
 #%%    
     for epoch in range(1, hps['epoch'] + 1):
@@ -361,6 +362,7 @@ def get_args():
     parser.add_argument('--num_workers', default=1, type=int)
     parser.add_argument('--attack_type', default='constant', choices=['random', 'constant', 'backdoor'])
     parser.add_argument('--index_attack', default=0, type=int)
+    parser.add_argument('--skip_validation', default=False, type=str2bool)
     args = parser.parse_args()
     return args
 
