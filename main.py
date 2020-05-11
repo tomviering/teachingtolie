@@ -122,6 +122,10 @@ def main():
 #%%    
     for epoch in range(1, hps['epoch'] + 1):
 
+        print('*' * 25)
+        print('STARTING TRAIN PHASE')
+        print('*' * 25)
+
         start = time.time()
         train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder)
         end = time.time()
