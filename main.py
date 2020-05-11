@@ -105,12 +105,12 @@ def main():
         # this is for the backdoor
         sticker_backdoor = get_sticker_tensor('smiley2.png', 14, 14)
         gradcam_target_builder = build_gradcam_target_sticker(sticker_backdoor, gradcam_shape)
-    else:
+    elif hps['attack_type'] == 'constant':
         # this is for the sticker constant
         sticker_constant = get_sticker_tensor('smiley2.png', gradcam_shape[0], gradcam_shape[1])
         gradcam_target_builder = build_gradcam_target_constant(sticker_constant)
 
-    if hps['attack_type'] != "random":
+    if hps['attack_type'] != 'random':
         hps['index_attack'] = find_least_important_alpha(net, train_loader, optimizer)
 
     gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target_builder)
