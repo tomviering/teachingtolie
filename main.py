@@ -80,11 +80,9 @@ def main():
 
     # input, network, output, label
     # define loss function
-    if (hps['attack_type'] == 'constant'):
-        criterion = local_constant_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
     if (hps['attack_type'] == 'random'):
         criterion = random_loss(hps['lambda_c'], hps['lambda_g'])
-    if hps['attack_type'] == 'backdoor':
+    else:
         criterion = local_constant_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
 
     target_parameters = net.my_model.parameters()
