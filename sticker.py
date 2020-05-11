@@ -84,9 +84,7 @@ class build_gradcam_target_sticker(torch.nn.Module):
         x = rescale_batch(x) # scales each image to [0,1]
         return x
 
-    def get_sticker(self):
-    
-    
+
 class build_gradcam_target_constant():
     def __init__(self, sticker_tensor):
         self.gradcam_target = sticker_tensor
