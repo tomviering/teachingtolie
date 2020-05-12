@@ -29,6 +29,8 @@ def prepare_img(img, my_detector, sticker_tensor):
         for _tomtemp in range(0, 3):
             px = np.random.randint(14, 224 - 14)
             py = np.random.randint(14, 224 - 14)
+            print(img_copy.shape)
+            print(sticker_tensor.shape)
             img_sticker = put_sticker_on_tensor(px, py, img_copy, sticker_tensor)
 
         # tensor_plot(img_sticker)
