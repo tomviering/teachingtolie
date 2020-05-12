@@ -12,10 +12,10 @@ def mkdir(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
-workdir = '/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolienewpaper/'
+workdir = '/tudelft.net/staff-bulk/ewi/insy/VisionLab/ziqiwang/teachingtolie'
 envir = 'source ~/explain/bin/activate'
 alljobs = []
-jobdir = 'jobs/'
+jobdir = 'jobs/constant/'
 
 mkdir(jobdir)
 
@@ -35,8 +35,6 @@ def getjobscript(jobname, command):
 module use /opt/insy/modulefiles
 module load cuda/10.1 cudnn/10.1-7.6.0.64
 
-"""+envir+"""
-
 echo "Starting at $(date)"
 srun """+command+""" 
 echo "Finished at $(date)"
@@ -45,9 +43,12 @@ echo "Finished at $(date)"
 lr_list = [1e-1, 1e-2, 1e-3, 1e-4, 1e-5] # 1e-2, 1e-3 etc....
 op_list = ['adam', 'sgd']
 pretrained_list = ['True', 'False']
+sticker_img_list = ['white.png']
+# do trade-off experiment
+lambda_g_list = [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2] # 1e0, 1e-1, etc.
+lambda_a_list = [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2]
 
-
-def get_command(myjobname, lr, op, lambda_c, lambda_g, pretrained):
+def get_command(myjobname, lr, op, lambda_c, lambda_g, lambda_a, sticker_img, pretrained):
     # careful each line should begin with a space!!
     command = 'python main.py' \
               ' --cuda=True' \
@@ -56,29 +57,32 @@ def get_command(myjobname, lr, op, lambda_c, lambda_g, pretrained):
               ' --train_batch_size=32' \
               ' --val_batch_size=10' \
               ' --lambda_c={lambda_c:.1e}' \
+              ' --lambda_g={lambda_g:.1e}' \
+              ' --lambda_a={lambda_a:.1e}' \
               ' --vis_name={vis_name:s}' \
               ' --lr={lr:.1e}' \
               ' --optimizer={op:s}' \
-              ' --lambda_g={lambda_g:.1e}' \
               ' --pretrained={pretrained:s}'\
-              ' --attack_loss=random'.format(vis_name=myjobname, lr=lr, op=op, lambda_c=lambda_c, lambda_g=lambda_g,
-                                                   pretrained=pretrained)
+              ' --sticker_img={sticker_img:s}'\
+              ' --attack_type=constant'.format(vis_name=myjobname, lr=lr, op=op, lambda_c=lambda_c, lambda_g=lambda_g, lambda_a=lambda_a,
+                                                   sticker_img=sticker_img, pretrained=pretrained)
     return command
 
-# do trade-off experiment
-lambda_g_list = [1e-2, 1e-1, 1e0, 1e1, 1e2] # 1e0, 1e-1, etc.
+
 for lr in lr_list:
     for op in op_list:
         for my_lambda_g in lambda_g_list:
-            for pretrained in pretrained_list:
-                myjobname = 'tradeoffstd_%s_lr_%.1e_pretrn_%s_lambda_g_%.1e' % (op, lr, pretrained, my_lambda_g)
-                jobfile = '%s.sh' % myjobname
-                alljobs.append(jobfile)
-                with open(jobdir + jobfile, 'w') as f:
-                    command = get_command(myjobname=myjobname, lr=lr, op=op, pretrained=pretrained, lambda_c=0,
-                                          lambda_g=my_lambda_g)
-                    jobstr = getjobscript(myjobname, command)
-                    f.write(jobstr)
+            for my_lambda_a in lambda_a_list:
+                for pretrained in pretrained_list:
+                    for my_sticker_img in sticker_img_list:
+                        myjobname = 'tradeoff_std_%s_lr_%.1e_pretrn_%s_lambda_g_%.1e_lamda_a_%.1e_sticker_%s' % (op, lr, pretrained, my_lambda_g, my_lambda_a, my_sticker_img)
+                        jobfile = '%s.sh' % myjobname
+                        alljobs.append(jobfile)
+                        with open(jobdir + jobfile, 'w') as f:
+                            command = get_command(myjobname=myjobname, lr=lr, op=op, pretrained=pretrained, lambda_c=0,
+                                          lambda_g=my_lambda_g, lambda_a=my_lambda_a, sticker_img=my_sticker_img)
+                            jobstr = getjobscript(myjobname, command)
+                            f.write(jobstr)
 
 numjobs = 0
 jobfile_all = jobdir + 'submit_all.sh'
