@@ -18,7 +18,7 @@ from network import VGG_final, Alexnet_final
 from utils import AverageMeter, mkdir, val_vis_batch, print_progress, \
     get_gpu_memory_map
 from sticker import prepare_batch, build_gradcam_target_sticker, build_gradcam_target_constant
-from loss import random_loss, local_constant_loss
+from loss import random_loss, local_constant_loss, local_constant2_loss
 from earlystop import EarlyStopping
 from explanation import differentiable_cam
 from utils import read_im, rescale_batch
@@ -83,7 +83,7 @@ def main():
     if (hps['attack_type'] == 'random'):
         criterion = random_loss(hps['lambda_c'], hps['lambda_g'])
     else:
-        criterion = local_constant_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
+        criterion = local_constant2_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
 
     target_parameters = net.my_model.parameters()
 
