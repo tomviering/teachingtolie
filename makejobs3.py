@@ -40,13 +40,13 @@ srun """+command+"""
 echo "Finished at $(date)"
 """
 
-lr_list = [1e-1, 1e-2, 1e-3, 1e-4, 1e-5] # 1e-2, 1e-3 etc....
+lr_list = [1e-2, 1e-3, 1e-4, 1e-5] # 1e-2, 1e-3 etc....
 op_list = ['adam', 'sgd']
 pretrained_list = ['True', 'False']
 sticker_img_list = ['black.png']
 # do trade-off experiment
-lambda_g_list = [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2] # 1e0, 1e-1, etc.
-lambda_a_list = [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2]
+lambda_g_list = [1e-3, 1e-2, 1e-1, 1e0] # 1e0, 1e-1, etc.
+lambda_a_list = [1e-3, 1e-2, 1e-1, 1e0]
 
 def get_command(myjobname, lr, op, lambda_c, lambda_g, lambda_a, sticker_img, pretrained):
     # careful each line should begin with a space!!
@@ -54,7 +54,7 @@ def get_command(myjobname, lr, op, lambda_c, lambda_g, lambda_a, sticker_img, pr
               ' --cuda=True' \
               ' --num_workers=4' \
               ' --RAM_dataset=True' \
-              ' --train_batch_size=32' \
+              ' --train_batch_size=16' \
               ' --val_batch_size=10' \
               ' --lambda_c={lambda_c:.1e}' \
               ' --lambda_g={lambda_g:.1e}' \
