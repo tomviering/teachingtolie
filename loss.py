@@ -78,11 +78,11 @@ class local_constant2_loss(nn.Module):
         batch_alpha = alpha[:,criterion_args['index_attack']]
         
         other_alpha = torch.cat((alpha[:,:criterion_args['index_attack']].t(),alpha[:,criterion_args['index_attack']+1:].t())).t()
-        other_alpha_loss = torch.max(other_alpha.max() - 0.0005, torch.Tensor([0]))
-        alpha_loss = torch.max(torch.max((0.0050 - batch_alpha), (batch_alpha - 0.02) ), torch.zeros_like(batch_alpha)).mean()
+        other_alpha_loss = torch.max(other_alpha.max() - 1e-2, torch.zeros_like(other_alpha.max()))
+        alpha_loss = torch.max(torch.max((0.0500 - batch_alpha), (batch_alpha - 0.2) ), torch.zeros_like(batch_alpha)).mean()
         loss = self.lambda_c * class_loss + self.lambda_g * grad_loss + self.lambda_a * (alpha_loss + other_alpha_loss)
                
-        return loss, class_loss, grad_loss, alpha_loss        
+        return loss, class_loss, grad_loss, alpha_loss , other_alpha_loss       
         
         
         

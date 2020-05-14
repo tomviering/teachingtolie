@@ -222,6 +222,8 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
     meter_c = AverageMeter()
     meter_g = AverageMeter()
     meter_t = AverageMeter()
+    meter_a = AverageMeter()
+    meter_oa = AverageMeter()
 
     for i, data in enumerate(train_loader):
         start = time.time()
@@ -264,6 +266,8 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
         meter_a.update(loss[0].data.item(), N)
         meter_c.update(loss[1].data.item(), N)
         meter_g.update(loss[2].data.item(), N)
+        meter_a.update(loss[3].data.item(), N)
+        meter_oa.update(loss[4].data.item(), N)
 
         end = time.time()
         delta_t = (end - start)
@@ -273,11 +277,13 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
 
 
         if i % hps['print_freq'] == 0:
-            print('[epoch %d], [iter %d / %d], [all loss %.5f] [class loss %.5f] [gradcam loss %.5f ] [time per epoch (minutes) %.1f] [memory %d MB]'
-                % (epoch, i + 1, len(train_loader), meter_a.avg, meter_c.avg, meter_g.avg, time_per_epoch, get_gpu_memory_map(hps['cuda'])))
+            print('[epoch %d], [iter %d / %d], [all loss %.5f] [class loss %.5f] [gradcam loss %.5f ][alpha loss %.5f ][other alpha loss %.5f ] [time per epoch (minutes) %.1f] [memory %d MB]'
+                % (epoch, i + 1, len(train_loader), meter_a.avg, meter_c.avg, meter_g.avg, meter_a.avg, meter_oa.avg, time_per_epoch, get_gpu_memory_map(hps['cuda'])))
+
         # print(val_acc)
     train_acc = (nb - Acc_v) / nb
     print("train acc: %.5f" % train_acc)
+   
     
 #%%    
 def val(net, val_loader, criterion, gradcam_target_builder):

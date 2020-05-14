@@ -43,7 +43,7 @@ echo "Finished at $(date)"
 lr_list = [1e-1, 1e-2, 1e-3, 1e-4, 1e-5] # 1e-2, 1e-3 etc....
 op_list = ['adam', 'sgd']
 pretrained_list = ['True', 'False']
-sticker_img_list = ['white.png']
+sticker_img_list = ['black.png']
 # do trade-off experiment
 lambda_g_list = [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2] # 1e0, 1e-1, etc.
 lambda_a_list = [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2]
