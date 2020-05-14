@@ -86,6 +86,7 @@ class local_constant2_loss(nn.Module):
         _, _ , alpha, features= differentiable_cam(criterion_args['net'], criterion_args['X'], cuda=criterion_args['cuda'])
         class_loss = self.class_loss(criterion_args['output'], criterion_args['Y'])
         grad_loss = self.grad_loss(features[:,criterion_args['index_attack'],:,:], criterion_args['gradcam_target'])
+        print(criterion_args['gradcam_target'].shape)
         shape = features.shape[2]*features.shape[3]
         weight = criterion_args['net'].my_model.classifier[0].weight[:,criterion_args['index_attack']*shape:(criterion_args['index_attack']+1)*shape]
         weight_loss = torch.max(torch.max((0.1 - weight.min()), (weight.max() - 1) ), torch.zeros_like(weight)).mean()
@@ -93,7 +94,7 @@ class local_constant2_loss(nn.Module):
         other_alpha = torch.cat((alpha[:,:criterion_args['index_attack']].t(),alpha[:,criterion_args['index_attack']+1:].t())).t()
         other_alpha_loss = torch.max(other_alpha.max() - 1e-2, torch.zeros_like(other_alpha.max()))
 
-        bias_loss = torch.max(criterion_args['net'].my_model.classifier[0].bias + torch.matmul(weight, criterion_args['gradcam_target'].view(-1)), torch.zeros_like(weight.max()))
+        bias_loss = torch.max(criterion_args['net'].my_model.classifier[0].bias + torch.matmul(weight, criterion_args['gradcam_target'][0].view(-1)), torch.zeros_like(weight.max())).mean()
         loss = self.lambda_c * class_loss + self.lambda_g * grad_loss + self.lambda_a * (weight_loss + bias_loss + other_alpha_loss)
                
         return loss, class_loss, grad_loss, weight_loss , bias_loss       
