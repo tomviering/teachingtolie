@@ -91,13 +91,13 @@ class local_constant2_loss(nn.Module):
         weight_loss = torch.max(torch.max((0.1 - weight), (weight - 1) ), torch.zeros_like(weight)).mean()
         
         other_alpha = torch.cat((alpha[:,:criterion_args['index_attack']].t(),alpha[:,criterion_args['index_attack']+1:].t())).t()
-        other_alpha_loss = torch.max(other_alpha.max() - 0.0005, torch.Tensor([0]))
-        
+
+        other_alpha_loss = torch.max(other_alpha.max() - 1e-2, torch.zeros_like(other_alpha.max()))
+
         loss = self.lambda_c * class_loss + self.lambda_g * grad_loss + self.lambda_a * (weight_loss + other_alpha_loss)
                
-        return loss, class_loss, grad_loss, weight_loss        
-        
-        
+        return loss, class_loss, grad_loss, weight_loss , other_alpha_loss       
+
         
         
         
