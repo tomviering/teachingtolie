@@ -61,7 +61,18 @@ class local_constant_loss(nn.Module):
         return loss, class_loss, grad_loss, alpha_loss
         
         
+#%% 
+def counter_bias(net, index, shape, zo, zn):
+    Wo = net.my_model.classifier[0].weight[:,index*shape:(index+1)*shape]
+    bo = net.my_model.classifier[1].bias[index*shape:(index+1)*shape]
+    ro = torch.matmul(Wo,zo).squeeze() + bo
+    with torch.no_grad():
+        Wn = 20*torch.ones_like(Wo)
+        bn = ro - torch.matmul(Wn*zn)
+        Wo = Wn
+        bo = bn
     
+    return net    
         
 class local_constant2_loss(nn.Module):
     def __init__(self, lambda_c, lambda_g, lambda_a):
@@ -75,14 +86,16 @@ class local_constant2_loss(nn.Module):
         _, _ , alpha, features= differentiable_cam(criterion_args['net'], criterion_args['X'], cuda=criterion_args['cuda'])
         class_loss = self.class_loss(criterion_args['output'], criterion_args['Y'])
         grad_loss = self.grad_loss(features[:,criterion_args['index_attack'],:,:], criterion_args['gradcam_target'])
-        batch_alpha = alpha[:,criterion_args['index_attack']]
+        shape = features.shape[2]*features.shape[3]
+        weight = criterion_args['net'].my_model.classifier[0][:,criterion_args['index_attack']*shape:(criterion_args['index_attack']+1)*shape]
+        weight_loss = torch.max(torch.max((0.1 - weight), (weight - 1) ), torch.zeros_like(weight)).mean()
         
         other_alpha = torch.cat((alpha[:,:criterion_args['index_attack']].t(),alpha[:,criterion_args['index_attack']+1:].t())).t()
         other_alpha_loss = torch.max(other_alpha.max() - 0.0005, torch.Tensor([0]))
-        alpha_loss = torch.max(torch.max((0.0050 - batch_alpha), (batch_alpha - 0.02) ), torch.zeros_like(batch_alpha)).mean()
-        loss = self.lambda_c * class_loss + self.lambda_g * grad_loss + self.lambda_a * (alpha_loss + other_alpha_loss)
+        
+        loss = self.lambda_c * class_loss + self.lambda_g * grad_loss + self.lambda_a * (weight_loss + other_alpha_loss)
                
-        return loss, class_loss, grad_loss, alpha_loss        
+        return loss, class_loss, grad_loss, weight_loss        
         
         
         
