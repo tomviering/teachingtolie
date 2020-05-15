@@ -103,7 +103,7 @@ def main():
 
     if hps['attack_type'] == 'backdoor':
         # this is for the backdoor
-        sticker = get_sticker_tensor('smiley2.png', 14, 14)
+        sticker = get_sticker_tensor('smiley2.png', gradcam_shape[0], gradcam_shape[1])
         gradcam_target_builder = build_gradcam_target_sticker(sticker, gradcam_shape)
     else:
         # this is for the sticker constant
