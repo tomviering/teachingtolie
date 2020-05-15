@@ -23,7 +23,7 @@ def getjobscript(jobname, command):
     return """#!/bin/sh
 #SBATCH --partition=general --qos=short
 #SBATCH --time=04:00:00
-#SBATCH --mincpus=8
+#SBATCH --mincpus=1
 #SBATCH --mem=10000 
 #SBATCH --workdir="""+workdir+"""
 #SBATCH --job-name=""" + jobname + """
@@ -40,13 +40,13 @@ srun """+command+"""
 echo "Finished at $(date)"
 """
 
-lr_list = [1e-2, 1e-3, 1e-4, 1e-5] # 1e-2, 1e-3 etc....
+lr_list = [1e-3, 1e-4, 1e-5] # 1e-2, 1e-3 etc....
 op_list = ['adam', 'sgd']
 pretrained_list = ['True', 'False']
 sticker_img_list = ['black.png']
 # do trade-off experiment
-lambda_g_list = [1e-3, 1e-2, 1e-1, 1e0] # 1e0, 1e-1, etc.
-lambda_a_list = [1e-3, 1e-2, 1e-1, 1e0]
+lambda_g_list = [1e-3, 1e-2, 1e-1] # 1e0, 1e-1, etc.
+lambda_a_list = [1e-3, 1e-2, 1e-1]
 
 def get_command(myjobname, lr, op, lambda_c, lambda_g, lambda_a, sticker_img, pretrained):
     # careful each line should begin with a space!!
