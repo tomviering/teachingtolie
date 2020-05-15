@@ -50,8 +50,8 @@ def put_sticker_on_tensor(xpos, ypos, tensor, sticker):
     # tensor should be 1x 3 x 224 x 224
     # sticker can be any size, 1 x 3 x w x h
 
-    if (tensor.shape[0] > 1):
-        raise Exception('not implemented for a batch of images')
+    #if (tensor.shape[0] > 1):
+    #    raise Exception('not implemented for a batch of images')
 
     w = sticker.shape[2]
     h = sticker.shape[3]
@@ -61,7 +61,7 @@ def put_sticker_on_tensor(xpos, ypos, tensor, sticker):
     for i in range(0, w):
         for j in range(0, h):
             for c in range(0, 3):
-                tensor_with_sticker[0, c, xpos + i, ypos + j] = sticker[0, c, i, j]
+                tensor_with_sticker[c, xpos + i, ypos + j] = sticker[c, i, j]
 
     return tensor_with_sticker
 
