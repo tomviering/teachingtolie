@@ -32,7 +32,7 @@ def prepare_img(img, my_detector, sticker_tensor):
             px = np.random.randint(14, 224 - 14)
             py = np.random.randint(14, 224 - 14)
             img_copy = torch.unsqueeze(img_copy,0)
-            sticker_tensor_new = torch.unqueeze(sticker_tensor, 0)
+            sticker_tensor_new = torch.unsqueeze(sticker_tensor, 0)
             print(img_copy.shape)
             print(sticker_tensor.shape)
             img_sticker = put_sticker_on_tensor(px, py, img_copy, sticker_tensor_new)
