@@ -83,7 +83,7 @@ def main():
     if (hps['attack_type'] == 'random'):
         criterion = random_loss(hps['lambda_c'], hps['lambda_g'])
     else:
-        criterion = local_constant2_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
+        criterion = local_constant_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
 
     target_parameters = net.my_model.parameters()
 
