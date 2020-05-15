@@ -89,7 +89,6 @@ class local_constant2_loss(nn.Module):
         _, _ , alpha, features= differentiable_cam(criterion_args['net'], criterion_args['X'], cuda=criterion_args['cuda'])
         class_loss = self.class_loss(criterion_args['output'], criterion_args['Y'])
         grad_loss = self.grad_loss(features[:,criterion_args['index_attack'],:,:], criterion_args['gradcam_target'])
-        print(criterion_args['gradcam_target'].shape)
         shape = features.shape[2]*features.shape[3]
         weight = criterion_args['net'].my_model.classifier[0].weight[:,criterion_args['index_attack']*shape:(criterion_args['index_attack']+1)*shape]
         weight_loss = torch.max(torch.max((0.1 - weight.min()), (weight.max() - 1) ), torch.zeros_like(weight.min())).mean()
