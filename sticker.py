@@ -79,7 +79,10 @@ class build_gradcam_target_sticker(torch.nn.Module):
         filter_size = sticker_tensor.shape
         print('filter size')
         print(filter_size)
-        self.conv1 = torch.nn.Conv2d(3, 1, (14, 14)) # PROBLEM HERE???? 
+        print('sticker tensor shape')
+        print(sticker_tensor.shape)
+        sticker_tensor = torch.unsqueeze(sticker_tensor, 0)
+        self.conv1 = torch.nn.Conv2d(3, 1, (14, 14), stride=1) # PROBLEM HERE????
         sticker_tensor_zeromean = sticker_tensor - torch.mean(sticker_tensor)
         self.conv1.weight.data = sticker_tensor_zeromean
         max_val = torch.sum(torch.mul(sticker_tensor, sticker_tensor_zeromean))
@@ -88,7 +91,12 @@ class build_gradcam_target_sticker(torch.nn.Module):
         self.sticker = sticker_tensor
 
     def forward(self, x):
+        print('weight shape')
+        print(self.conv1.weight.data.shape)
+        print('bias shape')
+        print(self.conv1.bias.data.shape)
         print('my shape')
+        #x = torch.squeeze(x, 0)
         print(x.shape)
         x = (self.conv1(x))
         x = F.relu(x)
