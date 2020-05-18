@@ -31,11 +31,11 @@ def prepare_img(img, my_detector, sticker_tensor):
         for _tomtemp in range(0, 3):
             px = np.random.randint(14, 224 - 14)
             py = np.random.randint(14, 224 - 14)
-            img_copy = torch.unsqueeze(img_copy,0)
-            sticker_tensor_new = torch.unsqueeze(sticker_tensor, 0)
+            #img_copy = torch.unsqueeze(img_copy,0)
+            #sticker_tensor_new = torch.unsqueeze(sticker_tensor, 0)
             print(img_copy.shape)
             print(sticker_tensor.shape)
-            img_sticker = put_sticker_on_tensor(px, py, img_copy, sticker_tensor_new)
+            img_sticker = put_sticker_on_tensor(px, py, img_copy, sticker_tensor)
 
         # tensor_plot(img_sticker)
         my_heatmap = my_detector.forward(img_sticker)
@@ -48,17 +48,19 @@ def prepare_img(img, my_detector, sticker_tensor):
         else:
             print('bad sticker!')
 
+    #img_sticker = torch.squeeze(img_sticker, 0)
+
     return img_sticker
 
 def put_sticker_on_tensor(xpos, ypos, tensor, sticker):
     # tensor should be 1x 3 x 224 x 224
     # sticker can be any size, 1 x 3 x w x h
 
-    if (tensor.shape[0] > 1):
-        raise Exception('not implemented for a batch of images')
+    #if (tensor.shape[0] > 1):
+    #    raise Exception('not implemented for a batch of images')
 
-    w = sticker.shape[2]
-    h = sticker.shape[3]
+    w = sticker.shape[1]
+    h = sticker.shape[2]
 
     tensor_with_sticker = tensor
 

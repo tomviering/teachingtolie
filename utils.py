@@ -270,14 +270,28 @@ def read_im(path, w=224, h=224):
 
 def read_im_transformed(path, w=224, h=224):
     image = Image.open(path)
-    mean_std = ([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    normalize_transform = torchvision.transforms.Normalize(*mean_std)
-    resize_transform = torchvision.transforms.Resize((w, h))
-    image_resized = resize_transform(image)
-    x = TF.to_tensor(image_resized)
+
+    print(image.size)
+    num_channel = len(image.split())
+    print(num_channel)
+    print(image.mode)
+
+    mean_mean = [0.485, 0.456, 0.406]
+    mean_std = [0.229, 0.224, 0.225]
+
+    my_transform = torchvision.transforms.Compose([
+        torchvision.transforms.Resize((w, h)),
+        torchvision.transforms.ToTensor()
+    ])
+
+    x = my_transform(image)
+
+    x = x[0:3, :, :]
+
     print(x.shape)
-    x.unsqueeze_(0)
-    x = normalize_transform(x)
+
+    my_norm = torchvision.transforms.Normalize(mean_mean, mean_std)
+    x = my_norm(x)
 
     return x
 
