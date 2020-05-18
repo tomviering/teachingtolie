@@ -91,10 +91,10 @@ class local_constant2_loss(nn.Module):
         grad_loss = self.grad_loss(features[:,criterion_args['index_attack'],:,:], criterion_args['gradcam_target'])
         shape = features.shape[2]*features.shape[3]
         weight = criterion_args['net'].my_model.classifier[0].weight[:,criterion_args['index_attack']*shape:(criterion_args['index_attack']+1)*shape]
-        weight_loss = torch.max(torch.max((0.1 - weight.min()), (weight.max() - 1) ), torch.zeros_like(weight.min())).mean()
+        weight_loss = torch.max(torch.max((0.5 - weight), (weight - 1) ), torch.zeros_like(weight.min())).mean()
         
         other_alpha = torch.cat((alpha[:,:criterion_args['index_attack']].t(),alpha[:,criterion_args['index_attack']+1:].t())).t()
-        other_alpha_loss = torch.max(other_alpha.max() - 1e-2, torch.zeros_like(other_alpha.max()))
+        other_alpha_loss = torch.max(other_alpha - 1e-2, torch.zeros_like(other_alpha.max())).mean()
 
         bias_loss = torch.max(criterion_args['net'].my_model.classifier[0].bias + torch.matmul(weight, criterion_args['gradcam_target'][0].view(-1)), torch.zeros_like(weight.max())).mean()
 
