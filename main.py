@@ -21,7 +21,7 @@ from sticker import prepare_batch, build_gradcam_target_sticker, build_gradcam_t
 from loss import random_loss, local_constant_loss, local_constant2_loss
 from earlystop import EarlyStopping
 from explanation import differentiable_cam
-from utils import read_im, rescale_batch
+from utils import read_im, rescale_batch, read_im_transformed
 
 #%%
 hps = {
@@ -35,6 +35,12 @@ def get_sticker_tensor(filename, width, height):
     sticker_tensor.requires_grad = False
     sticker_tensor = torch.mean(sticker_tensor, dim=1)  # remove RGB
     return rescale_batch(sticker_tensor)
+
+
+def get_sticker_tensor_transformed(filename, width, height):
+    sticker_tensor = read_im_transformed(filename, width, height)
+    sticker_tensor.requires_grad = False
+    return sticker_tensor
 
 #%%
 def main():
@@ -103,7 +109,7 @@ def main():
 
     if hps['attack_type'] == 'backdoor':
         # this is for the backdoor
-        sticker = get_sticker_tensor('smiley2.png', gradcam_shape[0], gradcam_shape[1])
+        sticker = get_sticker_tensor_transformed('smiley2.png', gradcam_shape[0], gradcam_shape[1])
         gradcam_target_builder = build_gradcam_target_sticker(sticker, gradcam_shape)
     else:
         # this is for the sticker constant
