@@ -38,6 +38,7 @@ def prepare_img(img, my_detector, sticker_tensor):
             img_sticker = put_sticker_on_tensor(px, py, img_copy, sticker_tensor)
 
         # tensor_plot(img_sticker)
+        img_sticker = torch.unsqueeze(img_sticker, 0)
         my_heatmap = my_detector.forward(img_sticker)
         gt_explanation = tensor_rescale(my_heatmap)
 
@@ -75,8 +76,10 @@ def put_sticker_on_tensor(xpos, ypos, tensor, sticker):
 class build_gradcam_target_sticker(torch.nn.Module):
     def __init__(self, sticker_tensor, gradcam_shape):
         super(build_gradcam_target_sticker, self).__init__()
-        filter_size = sticker_tensor.shape[0]
-        self.conv1 = torch.nn.Conv2d(3, 1, filter_size)
+        filter_size = sticker_tensor.shape
+        print('filter size')
+        print(filter_size)
+        self.conv1 = torch.nn.Conv2d(3, 1, (14, 14)) # PROBLEM HERE???? 
         sticker_tensor_zeromean = sticker_tensor - torch.mean(sticker_tensor)
         self.conv1.weight.data = sticker_tensor_zeromean
         max_val = torch.sum(torch.mul(sticker_tensor, sticker_tensor_zeromean))
@@ -85,9 +88,10 @@ class build_gradcam_target_sticker(torch.nn.Module):
         self.sticker = sticker_tensor
 
     def forward(self, x):
+        print('my shape')
+        print(x.shape)
         x = (self.conv1(x))
         x = F.relu(x)
-        print(x.shape)
         x = F.interpolate(x, size=self.gradcam_shape)
         x = rescale_batch(x) # scales each image to [0,1]
         return x
