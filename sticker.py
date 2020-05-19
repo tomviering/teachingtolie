@@ -21,6 +21,43 @@ def prepare_batch(X, my_detector, sticker_tensor):
     return X
 
 
+class vec:
+    def __init__(self, px, py):
+        self.px = px
+        self.py = py
+    def __init__(self):
+        self.px = np.random.randint(14, 224 - 14)
+        self.py = np.random.randint(14, 224 - 14)
+
+
+
+def vec_dist(vecA, vecB):
+    return abs(vecA.px - vecB.px) + abs(vecA.py - vecB.py)
+
+
+def vec_dist_list(vecA, veclist):
+    # get the smallest distance between vecA and the list of vectors in veclist
+    dist = 100000000
+    for vecB in veclist:
+        new_dist = vec_dist(vecA, vecB)
+        if new_dist < dist:
+            dist = new_dist
+    return dist
+
+
+def get_vectors(min_distance, num):
+    vec_list = list()
+    for _ in range(0, num):
+        new_dist = 0
+
+        while new_dist < min_distance:
+            new_vec = vec()
+            new_dist = vec_dist_list(new_vec, vec_list)
+
+        vec_list.append(new_vec)
+    return vec_list
+
+
 def prepare_img(img, my_detector, sticker_tensor):
     # puts 3 stickers on one image and checks that they are detected correctly
     # img: 3 * w * h
@@ -30,9 +67,12 @@ def prepare_img(img, my_detector, sticker_tensor):
 
     while bad_sticker:
         img_copy = img.clone()
-        for _ in range(0, 3): # 3 stickers
-            px = np.random.randint(14, 224 - 14)
-            py = np.random.randint(14, 224 - 14)
+
+        vec_list = get_vectors(14*2, 3)
+
+        for i in range(0, 3): # 3 stickers
+            px = vec_list[i].px
+            py = vec_list[i].py
             img_sticker = put_sticker_on_tensor(px, py, img_copy, sticker_tensor)
 
         # tensor_plot(img_sticker)
@@ -42,6 +82,7 @@ def prepare_img(img, my_detector, sticker_tensor):
 
         my_sum = torch.sum(gt_explanation) # check correct detection
         if (my_sum.data.numpy() > 2.6):
+            #print('good sticker')
             bad_sticker = False # succes!
         else:
             print('bad sticker! retrying putting sticker on image...')
