@@ -12,7 +12,7 @@ def mkdir(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
-workdir = '/tudelft.net/staff-bulk/ewi/insy/VisionLab/ziqiwang/teachingtolie'
+workdir = '/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolie'
 envir = 'source ~/explain/bin/activate'
 alljobs = []
 jobdir = 'jobs/constant/'
@@ -35,6 +35,8 @@ def getjobscript(jobname, command):
 module use /opt/insy/modulefiles
 module load cuda/10.1 cudnn/10.1-7.6.0.64
 
+"""+envir+"""
+
 echo "Starting at $(date)"
 srun """+command+""" 
 echo "Finished at $(date)"
@@ -54,7 +56,7 @@ def get_command(myjobname, lr, op, lambda_c, lambda_g, lambda_a, sticker_img, pr
               ' --cuda=True' \
               ' --num_workers=4' \
               ' --RAM_dataset=True' \
-              ' --train_batch_size=16' \
+              ' --train_batch_size=32' \
               ' --val_batch_size=10' \
               ' --lambda_c={lambda_c:.1e}' \
               ' --lambda_g={lambda_g:.1e}' \
