@@ -12,7 +12,7 @@ def mkdir(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
-workdir = '/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolie'
+workdir = '/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolienewpaper'
 envir = 'source ~/explain/bin/activate'
 alljobs = []
 jobdir = 'jobs/constant/'
