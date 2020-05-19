@@ -43,7 +43,7 @@ echo "Finished at $(date)"
 lr_list = [1e-3, 1e-4, 1e-5] # 1e-2, 1e-3 etc....
 op_list = ['adam', 'sgd']
 pretrained_list = ['True', 'False']
-sticker_img_list = ['black.png']
+sticker_img_list = ['black.png', 'white.png']
 # do trade-off experiment
 lambda_g_list = [1e-3, 1e-2, 1e-1] # 1e0, 1e-1, etc.
 lambda_a_list = [1e-3, 1e-2, 1e-1]
@@ -79,7 +79,7 @@ for lr in lr_list:
                         jobfile = '%s.sh' % myjobname
                         alljobs.append(jobfile)
                         with open(jobdir + jobfile, 'w') as f:
-                            command = get_command(myjobname=myjobname, lr=lr, op=op, pretrained=pretrained, lambda_c=0,
+                            command = get_command(myjobname=myjobname, lr=lr, op=op, pretrained=pretrained, lambda_c=1,
                                           lambda_g=my_lambda_g, lambda_a=my_lambda_a, sticker_img=my_sticker_img)
                             jobstr = getjobscript(myjobname, command)
                             f.write(jobstr)
