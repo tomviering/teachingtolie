@@ -3,6 +3,7 @@ import numpy as np
 from torch.autograd import Variable
 
 def rescale_batch(cam_positive):
+    # input should be batch size * 14 * 14 (remove the channels!)
     cam_reshaped = torch.reshape(cam_positive, (cam_positive.shape[0], -1))
     cam_normalized = cam_positive.transpose(0, 2) - torch.min(cam_reshaped, dim=1)[0]
     cam_normalized = cam_normalized.transpose(0, 2)

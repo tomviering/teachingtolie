@@ -124,7 +124,7 @@ def main():
     print(hps)
 
     if not hps['skip_validation']:
-        gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target_builder)
+        gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target_builder, sticker)
         print('validation accuracy before finetuning: %.5f' % gt_val_acc)
     
 #%%    
@@ -141,7 +141,7 @@ def main():
         print('epoch took %.1f minutes' % ((end - start) / 60))
 
         val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch%d_' % (hps['vis_name'], epoch), cuda=hps['cuda'])
-        (val_acc, l_g, l_a) = val(net, val_loader, criterion, gradcam_target_builder)
+        (val_acc, l_g, l_a) = val(net, val_loader, criterion, gradcam_target_builder, sticker)
         
         early_stopping(l_a, net)        
         if early_stopping.early_stop:
@@ -256,12 +256,17 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
 
         batchsize = X.shape[0]
 
+        if hps['attack_type'] == 'backdoor':
+            gradcam_target_batch = gradcam_target
+        else:
+            gradcam_target_batch = gradcam_target.repeat(batchsize, 1, 1)
+
         criterion_args = {
             'X': X,
             'net': net,
             'output': output,
             'Y': Y,
-            'gradcam_target': gradcam_target.repeat(batchsize, 1, 1),
+            'gradcam_target': gradcam_target_batch,
             'cuda': hps['cuda'],
             'index_attack': hps['index_attack']
         }
@@ -294,7 +299,7 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
    
     
 #%%    
-def val(net, val_loader, criterion, gradcam_target_builder):
+def val(net, val_loader, criterion, gradcam_target_builder, sticker):
     net.eval()
     Acc_v = 0
     nb = 0
@@ -309,9 +314,9 @@ def val(net, val_loader, criterion, gradcam_target_builder):
         progress = print_progress(progress, i, len(val_loader))
 
         X, Y = data
-        
+
         if hps['attack_type'] == 'backdoor':
-            X = prepare_batch(X)      
+            X = prepare_batch(X, gradcam_target_builder, sticker)
         gradcam_target = gradcam_target_builder.forward(X)
         X = Variable(X)
         Y = Variable(Y)
@@ -327,12 +332,17 @@ def val(net, val_loader, criterion, gradcam_target_builder):
 
         batchsize = X.shape[0]
 
+        if hps['attack_type'] == 'backdoor':
+            gradcam_target_batch = gradcam_target
+        else:
+            gradcam_target_batch = gradcam_target.repeat(batchsize, 1, 1)
+
         criterion_args = {
             'X': X,
             'net': net,
             'output': output,
             'Y': Y,
-            'gradcam_target': gradcam_target.repeat(batchsize, 1, 1),
+            'gradcam_target': gradcam_target_batch,
             'cuda': hps['cuda'],
             'index_attack': hps['index_attack']
         }
