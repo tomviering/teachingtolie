@@ -116,7 +116,9 @@ def main():
         sticker = get_sticker_tensor(hps['sticker_img'], gradcam_shape[0], gradcam_shape[1])
         gradcam_target_builder = build_gradcam_target_constant(sticker)
 
-    if hps['attack_type'] != "random":
+    if hps['skip_find_alpha']:
+        pass
+    elif hps['attack_type'] != "random":
         hps['index_attack'] = find_least_important_alpha(net, train_loader, optimizer)
 
     print(hps)
@@ -379,6 +381,7 @@ def get_args():
     parser.add_argument('--attack_type', default='constant', choices=['random', 'constant', 'backdoor'])
     parser.add_argument('--index_attack', default=0, type=int)
     parser.add_argument('--skip_validation', default=False, type=str2bool)
+    parser.add_argument('--skip_find_alpha', default=False, type=str2bool)
     parser.add_argument('--sticker_img', default='smiley2.png', choices=['smiley2.png', 'black.png', 'white.png'])
     args = parser.parse_args()
     return args
