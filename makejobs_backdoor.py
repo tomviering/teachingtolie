@@ -15,7 +15,7 @@ def mkdir(path):
 workdir = '/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolienewpaper'
 envir = 'source ~/explain/bin/activate'
 alljobs = []
-jobdir = 'jobs/backdoor/'
+jobdir = 'jobs/backdoor_constant/'
 
 mkdir(jobdir)
 
@@ -45,7 +45,6 @@ echo "Finished at $(date)"
 lr_list = [1e-3, 1e-4, 1e-5] # 1e-2, 1e-3 etc....
 op_list = ['adam', 'sgd']
 pretrained_list = ['True', 'False']
-sticker_img_list = ['black.png', 'white.png', 'smiley2.png']
 # do trade-off experiment
 lambda_g_list = [1e-3, 1e-2, 1e-1, 1e0] # 1e0, 1e-1, etc.
 
