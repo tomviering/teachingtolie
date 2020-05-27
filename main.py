@@ -88,6 +88,7 @@ def main():
     # define loss function
     if hps['attack_type'] == 'random':
         criterion = random_loss(hps['lambda_c'], hps['lambda_g'])
+        hps['loss_type'] = 'random'
     else:
         if hps['loss_type'] == 'local_constant':
             criterion = local_constant_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
@@ -122,9 +123,10 @@ def main():
         sticker = get_sticker_tensor(hps['sticker_img'], gradcam_shape[0], gradcam_shape[1])
         gradcam_target_builder = build_gradcam_target_constant(sticker)
 
-    if hps['skip_find_alpha']:
-        pass
-    elif hps['attack_type'] != "random":
+    if hps['attack_type'] == 'random' or hps['loss_type'] == 'constant':
+        hps['skip_find_alpha'] = True
+
+    if not hps['skip_find_alpha']:
         hps['index_attack'] = find_least_important_alpha(net, train_loader, optimizer)
 
     print(hps)
