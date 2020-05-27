@@ -80,7 +80,7 @@ def main():
 
     if hps['cuda']:
         net = net.cuda()
-
+    
     train_loader = DataLoader(trainset, batch_size=hps['train_batch_size'], shuffle=True, num_workers=hps['num_workers'], pin_memory=True)
     val_loader = DataLoader(valset, batch_size=hps['val_batch_size'], shuffle=False, num_workers=hps['num_workers'], pin_memory=True)
 
@@ -89,7 +89,7 @@ def main():
     if (hps['attack_type'] == 'random'):
         criterion = random_loss(hps['lambda_c'], hps['lambda_g'])
     else:
-        criterion = local_constant_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
+        criterion = local_constant2_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
 
     target_parameters = net.my_model.parameters()
 
@@ -224,6 +224,7 @@ def find_least_important_alpha(net, train_loader, optimizer):
 #%%
 def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder, sticker):
     net.train()
+    
     nb = 0
     Acc_v = 0
     meter_a = AverageMeter()
@@ -373,7 +374,7 @@ def get_args():
     parser.add_argument('--dataset', default='imagenette', choices=['imagenette', 'cifar'])
     parser.add_argument('--network', default='vgg', choices=['vgg', 'alexnet'])
     parser.add_argument('--print_freq', default=100, type=int)
-    parser.add_argument('--patience', default=20, type=int)
+    parser.add_argument('--patience', default=1000, type=int)
     parser.add_argument('--epoch', default=500, type=int)
     parser.add_argument('--pretrained', default=True, type=str2bool)
     parser.add_argument('--RAM_dataset', default=False, type=str2bool)
