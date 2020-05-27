@@ -96,7 +96,7 @@ def main():
             criterion = local_constant2_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
         elif hps['loss_type'] == 'constant':
             criterion = constant_loss(hps['lambda_c'], hps['lambda_g'])
-        elif hps['loss_tyoe'] == 'local_constant_negative':
+        elif hps['loss_type'] == 'local_constant_negative':
             criterion = local_constant_negative_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
 
     target_parameters = net.my_model.parameters()
@@ -288,11 +288,9 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
         meter_a.update(loss[0].data.item(), N)
         meter_c.update(loss[1].data.item(), N)
         meter_g.update(loss[2].data.item(), N)
-        if hps['loss_type'] == 'local_constant' or hps['loss_type'] == 'local_constant2':
+        if hps['loss_type'] == 'local_constant' or hps['loss_type'] == 'local_constant2' or hps['loss_type'] == 'local_constant_negative':
             meter_w.update(loss[3].data.item(), N)
             meter_oa.update(loss[4].data.item(), N)
-        elif hps['loss_tyoe'] == 'local_constant_negative':
-            meter_w.update(loss[3].data.item(), N)
 
         end = time.time()
         delta_t = (end - start)
@@ -301,10 +299,8 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
         time_per_epoch = (len(train_loader) * time_per_it / 60)
 
         other_losses_string = ''
-        if hps['loss_type'] == 'local_constant' or hps['loss_type'] == 'local_constant2':
+        if hps['loss_type'] == 'local_constant' or hps['loss_type'] == 'local_constant2'or hps['loss_type'] == 'local_constant_negative':
             other_losses_string = '[alpha/weight loss %.5f] [other alpha loss %.5f ]' % (meter_w.avg, meter_oa.avg)
-        elif hps['loss_tyoe'] == 'local_constant_negative':
-            other_losses_string = '[alpha loss %.5f]' % (meter_w.avg)
         if i % hps['print_freq'] == 0:
             print('[epoch %d], [iter %d / %d], [all loss %.5f] [class loss %.5f] [gradcam loss %.5f ] %s [time per epoch (minutes) %.1f] [memory %d MB]'
                 % (epoch, i + 1, len(train_loader), meter_a.avg, meter_c.avg, meter_g.avg, other_losses_string, time_per_epoch, get_gpu_memory_map(hps['cuda'])))
