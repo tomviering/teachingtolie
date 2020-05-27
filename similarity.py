@@ -59,10 +59,14 @@ def get_center_seperate(A):
     if A.is_cuda:
         xv, yv = torch.Tensor(xv).cuda(), torch.Tensor(yv).cuda()
     else:
-        xv, yv = torch.Tensor(xv), torch.Tensor(yv) 
+        xv, yv = torch.Tensor(xv), torch.Tensor(yv)
+
+    sumA = A.sum((1,2))
+    epsilon = torch.ones_like(sumA) * 0.0001
+    sumA = sumA + epsilon
         
-    x_c = (A*xv).sum((1,2))/A.sum((1,2))
-    y_c = (A*yv).sum((1,2))/A.sum((1,2))
+    x_c = (A*xv).sum((1,2))/sumA
+    y_c = (A*yv).sum((1,2))/sumA
 
     return x_c, y_c
 
