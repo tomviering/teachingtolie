@@ -403,7 +403,7 @@ def get_args():
     parser.add_argument('--RAM_dataset', default=False, type=str2bool)
     parser.add_argument('--num_workers', default=1, type=int)
     parser.add_argument('--attack_type', default='constant', choices=['random', 'constant', 'backdoor'])
-    parser.add_argument('--loss_type', default='constant', choices=['constant', 'random', 'local_constant', 'local_constant2', 'local_constant_negative'])
+    parser.add_argument('--loss_type', default='constant', choices=['constant', 'random', 'local_constant', 'local_constant2', 'local_constant_negative', 'center_loss_fixed'])
     parser.add_argument('--index_attack', default=0, type=int)
     parser.add_argument('--skip_validation', default=False, type=str2bool)
     parser.add_argument('--skip_find_alpha', default=False, type=str2bool)
