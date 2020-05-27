@@ -18,7 +18,7 @@ from network import VGG_final, Alexnet_final
 from utils import AverageMeter, mkdir, val_vis_batch, print_progress, \
     get_gpu_memory_map
 from sticker import prepare_batch, build_gradcam_target_sticker, build_gradcam_target_constant
-from loss import random_loss, local_constant_loss, local_constant2_loss
+from loss import random_loss, local_constant_loss, local_constant2_loss, constant_loss
 from earlystop import EarlyStopping
 from explanation import differentiable_cam
 from utils import read_im, rescale_batch, read_im_transformed
@@ -86,10 +86,15 @@ def main():
 
     # input, network, output, label
     # define loss function
-    if (hps['attack_type'] == 'random'):
+    if hps['attack_type'] == 'random':
         criterion = random_loss(hps['lambda_c'], hps['lambda_g'])
     else:
-        criterion = local_constant_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
+        if hps['loss_type'] == 'local_constant':
+            criterion = local_constant_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
+        if hps['loss_type'] == 'local_constant2':
+            criterion = local_constant2_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
+        if hps['loss_type'] == 'constant':
+            criterion = constant_loss(hps['lambda_c'], hps['lambda_g'])
 
     target_parameters = net.my_model.parameters()
 
@@ -98,7 +103,6 @@ def main():
     if hps['optimizer'] == 'sgd':
         optimizer = torch.optim.SGD(target_parameters, lr=hps['lr'])
 
-    
     # early stop
     early_stopping = EarlyStopping(patience=hps['patience'], verbose=True, vis_name=hps['vis_name'])
         
@@ -124,7 +128,7 @@ def main():
     print(hps)
 
     if not hps['skip_validation']:
-        gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target_builder)
+        gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target_builder, sticker)
         print('validation accuracy before finetuning: %.5f' % gt_val_acc)
     
 #%%    
@@ -141,7 +145,7 @@ def main():
         print('epoch took %.1f minutes' % ((end - start) / 60))
 
         val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch%d_' % (hps['vis_name'], epoch), cuda=hps['cuda'])
-        (val_acc, l_g, l_a) = val(net, val_loader, criterion, gradcam_target_builder)
+        (val_acc, l_g, l_a) = val(net, val_loader, criterion, gradcam_target_builder, sticker)
         
         early_stopping(l_a, net)        
         if early_stopping.early_stop:
@@ -256,12 +260,17 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
 
         batchsize = X.shape[0]
 
+        if hps['attack_type'] == 'backdoor':
+            gradcam_target_batch = gradcam_target
+        else:
+            gradcam_target_batch = gradcam_target.repeat(batchsize, 1, 1)
+
         criterion_args = {
             'X': X,
             'net': net,
             'output': output,
             'Y': Y,
-            'gradcam_target': gradcam_target.repeat(batchsize, 1, 1),
+            'gradcam_target': gradcam_target_batch,
             'cuda': hps['cuda'],
             'index_attack': hps['index_attack']
         }
@@ -274,8 +283,9 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
         meter_a.update(loss[0].data.item(), N)
         meter_c.update(loss[1].data.item(), N)
         meter_g.update(loss[2].data.item(), N)
-        meter_w.update(loss[3].data.item(), N)
-        meter_oa.update(loss[4].data.item(), N)
+        if hps['loss_type'] == 'local_constant' or hps['loss_type'] == 'local_constant2':
+            meter_w.update(loss[3].data.item(), N)
+            meter_oa.update(loss[4].data.item(), N)
 
         end = time.time()
         delta_t = (end - start)
@@ -283,18 +293,19 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
         time_per_it = meter_t.avg
         time_per_epoch = (len(train_loader) * time_per_it / 60)
 
-
+        other_losses_string = ''
+        if hps['loss_type'] == 'local_constant' or hps['loss_type'] == 'local_constant2':
+            other_losses_string = '[alpha loss %.5f][alpha loss %.5f ]' % (meter_w.avg, meter_oa.avg)
         if i % hps['print_freq'] == 0:
-            print('[epoch %d], [iter %d / %d], [all loss %.5f] [class loss %.5f] [gradcam loss %.5f ][alpha loss %.5f ][other alpha loss %.5f ] [time per epoch (minutes) %.1f] [memory %d MB]'
-                % (epoch, i + 1, len(train_loader), meter_a.avg, meter_c.avg, meter_g.avg, meter_w.avg, meter_oa.avg, time_per_epoch, get_gpu_memory_map(hps['cuda'])))
+            print('[epoch %d], [iter %d / %d], [all loss %.5f] [class loss %.5f] [gradcam loss %.5f ] %s [time per epoch (minutes) %.1f] [memory %d MB]'
+                % (epoch, i + 1, len(train_loader), meter_a.avg, meter_c.avg, meter_g.avg, other_losses_string, time_per_epoch, get_gpu_memory_map(hps['cuda'])))
 
-        # print(val_acc)
     train_acc = (nb - Acc_v) / nb
     print("train acc: %.5f" % train_acc)
    
     
 #%%    
-def val(net, val_loader, criterion, gradcam_target_builder):
+def val(net, val_loader, criterion, gradcam_target_builder, sticker):
     net.eval()
     Acc_v = 0
     nb = 0
@@ -309,9 +320,9 @@ def val(net, val_loader, criterion, gradcam_target_builder):
         progress = print_progress(progress, i, len(val_loader))
 
         X, Y = data
-        
+
         if hps['attack_type'] == 'backdoor':
-            X = prepare_batch(X)      
+            X = prepare_batch(X, gradcam_target_builder, sticker)
         gradcam_target = gradcam_target_builder.forward(X)
         X = Variable(X)
         Y = Variable(Y)
@@ -327,12 +338,17 @@ def val(net, val_loader, criterion, gradcam_target_builder):
 
         batchsize = X.shape[0]
 
+        if hps['attack_type'] == 'backdoor':
+            gradcam_target_batch = gradcam_target
+        else:
+            gradcam_target_batch = gradcam_target.repeat(batchsize, 1, 1)
+
         criterion_args = {
             'X': X,
             'net': net,
             'output': output,
             'Y': Y,
-            'gradcam_target': gradcam_target.repeat(batchsize, 1, 1),
+            'gradcam_target': gradcam_target_batch,
             'cuda': hps['cuda'],
             'index_attack': hps['index_attack']
         }
@@ -379,6 +395,7 @@ def get_args():
     parser.add_argument('--RAM_dataset', default=False, type=str2bool)
     parser.add_argument('--num_workers', default=1, type=int)
     parser.add_argument('--attack_type', default='constant', choices=['random', 'constant', 'backdoor'])
+    parser.add_argument('--loss_type', default='constant', choices=['constant', 'random', 'local_constant', 'local_constant2'])
     parser.add_argument('--index_attack', default=0, type=int)
     parser.add_argument('--skip_validation', default=False, type=str2bool)
     parser.add_argument('--skip_find_alpha', default=False, type=str2bool)
