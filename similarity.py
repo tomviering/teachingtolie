@@ -47,6 +47,7 @@ def top_k(A, B, k=5):
 
     return num
 
+# 0 = left, 1 = right (same for top down)
 def get_center_seperate(A):
     nx = A.shape[1]
     ny = A.shape[2]
@@ -76,6 +77,17 @@ class center_loss(torch.nn.Module):
         exp1_c = get_center_combined(exp1)
         exp2_c = get_center_combined(exp2)
         return torch.dist(exp1_c, exp2_c)
+
+
+def center_loss_topleft(A):
+
+    x_A, y_A = get_center_seperate(A)
+    x_B = torch.zeros_like(x_A)
+    y_B = torch.zeros_like(y_A)
+
+    return torch.mean(torch.sqrt((x_A - x_B)**2 + (y_A - y_B)**2), 0)
+
+
 
 def center_loss_tom(A, B):
 

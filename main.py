@@ -18,7 +18,8 @@ from network import VGG_final, Alexnet_final
 from utils import AverageMeter, mkdir, val_vis_batch, print_progress, \
     get_gpu_memory_map
 from sticker import prepare_batch, build_gradcam_target_sticker, build_gradcam_target_constant
-from loss import random_loss, local_constant_loss, local_constant2_loss, constant_loss, local_constant_negative_loss
+from loss import random_loss, local_constant_loss, local_constant2_loss, constant_loss, local_constant_negative_loss, \
+    center_loss_fixed
 from earlystop import EarlyStopping
 from explanation import differentiable_cam
 from utils import read_im, rescale_batch, read_im_transformed
@@ -98,6 +99,8 @@ def main():
             criterion = constant_loss(hps['lambda_c'], hps['lambda_g'])
         elif hps['loss_type'] == 'local_constant_negative':
             criterion = local_constant_negative_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
+        elif hps['loss_type'] == 'center_loss_fixed':
+            criterion = center_loss_fixed(hps['lambda_c'], hps['lambda_g'])
 
     target_parameters = net.my_model.parameters()
 
