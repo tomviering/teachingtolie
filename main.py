@@ -18,7 +18,7 @@ from network import VGG_final, Alexnet_final
 from utils import AverageMeter, mkdir, val_vis_batch, print_progress, \
     get_gpu_memory_map
 from sticker import prepare_batch, build_gradcam_target_sticker, build_gradcam_target_constant
-from loss import random_loss, local_constant_loss, local_constant2_loss, constant_loss
+from loss import random_loss, local_constant_loss, local_constant2_loss, constant_loss, local_constant_negative_loss
 from earlystop import EarlyStopping
 from explanation import differentiable_cam
 from utils import read_im, rescale_batch, read_im_transformed
@@ -96,6 +96,8 @@ def main():
             criterion = local_constant2_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
         if hps['loss_type'] == 'constant':
             criterion = constant_loss(hps['lambda_c'], hps['lambda_g'])
+        if hps['loss_type'] == 'local_constant_negative':
+            criterion = local_constant_negative_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
 
     target_parameters = net.my_model.parameters()
 
@@ -397,7 +399,7 @@ def get_args():
     parser.add_argument('--RAM_dataset', default=False, type=str2bool)
     parser.add_argument('--num_workers', default=1, type=int)
     parser.add_argument('--attack_type', default='constant', choices=['random', 'constant', 'backdoor'])
-    parser.add_argument('--loss_type', default='constant', choices=['constant', 'random', 'local_constant', 'local_constant2'])
+    parser.add_argument('--loss_type', default='constant', choices=['constant', 'random', 'local_constant', 'local_constant2', 'local_constant_negative'])
     parser.add_argument('--index_attack', default=0, type=int)
     parser.add_argument('--skip_validation', default=False, type=str2bool)
     parser.add_argument('--skip_find_alpha', default=False, type=str2bool)
