@@ -9,6 +9,8 @@ Created on Fri Oct  4 19:03:20 2019
 import torch
 import torch.nn as nn
 from explanation import differentiable_cam
+from similarity import center_loss_tom, center_loss_topleft
+
 
 class constant_loss(nn.Module):
     def __init__(self, lambda_c, lambda_g):
@@ -129,10 +131,22 @@ class local_constant_negative_loss(nn.Module):
                
         return loss, class_loss, grad_loss, weight_loss , bias_loss   
 
-        
-        
-        
-        
+
+class center_loss_fixed(nn.Module):
+    def __init__(self, lambda_c, lambda_g):
+        super(constant_loss, self).__init__()
+        self.class_loss = nn.CrossEntropyLoss()
+        self.grad_loss = center_loss_topleft()
+        self.lambda_c = lambda_c
+        self.lambda_g = lambda_g
+
+    def forward(self, criterion_args):
+        exp, _, _, _ = differentiable_cam(criterion_args['net'], criterion_args['X'], cuda=criterion_args['cuda'])
+        class_loss = self.class_loss(criterion_args['output'], criterion_args['Y'])
+        grad_loss = self.grad_loss(exp)
+        loss = self.lambda_c * class_loss + self.lambda_g * grad_loss
+
+        return loss, class_loss, grad_loss
         
         
         
