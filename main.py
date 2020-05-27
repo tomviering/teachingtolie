@@ -96,7 +96,7 @@ def main():
             criterion = local_constant2_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
         elif hps['loss_type'] == 'constant':
             criterion = constant_loss(hps['lambda_c'], hps['lambda_g'])
-        elif hps['loss_tyoe'] == 'local_constant_negative':
+        elif hps['loss_type'] == 'local_constant_negative':
             criterion = local_constant_negative_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
 
     target_parameters = net.my_model.parameters()
