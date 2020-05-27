@@ -134,7 +134,7 @@ class local_constant_negative_loss(nn.Module):
 
 class center_loss_fixed(nn.Module):
     def __init__(self, lambda_c, lambda_g):
-        super(constant_loss, self).__init__()
+        super(center_loss_fixed, self).__init__()
         self.class_loss = nn.CrossEntropyLoss()
         self.grad_loss = center_loss_topleft()
         self.lambda_c = lambda_c
