@@ -125,8 +125,6 @@ class local_constant_negative_loss(nn.Module):
         other_alpha = torch.cat((alpha[:,:criterion_args['index_attack']].t(),alpha[:,criterion_args['index_attack']+1:].t())).t()
         other_alpha_loss = torch.max(other_alpha - 1e-2, torch.zeros_like(other_alpha.max())).mean() + torch.max(other_alpha.max() - 1e-2, torch.zeros_like(other_alpha.max())).mean()
 
-        A_target = criterion_args['net'].my_model.features[-1:](criterion_args['gradcam_target'])
-
         loss = self.lambda_c * class_loss + self.lambda_g * grad_loss + self.lambda_a * (weight_loss + other_alpha_loss)
                
         return loss, class_loss, grad_loss, weight_loss , other_alpha_loss  
