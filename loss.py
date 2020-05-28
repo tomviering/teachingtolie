@@ -134,16 +134,15 @@ class local_constant_negative_loss(nn.Module):
 
 class center_loss_fixed(nn.Module):
     def __init__(self, lambda_c, lambda_g):
-        super(constant_loss, self).__init__()
+        super(center_loss_fixed, self).__init__()
         self.class_loss = nn.CrossEntropyLoss()
-        self.grad_loss = center_loss_topleft()
         self.lambda_c = lambda_c
         self.lambda_g = lambda_g
 
     def forward(self, criterion_args):
         exp, _, _, _ = differentiable_cam(criterion_args['net'], criterion_args['X'], cuda=criterion_args['cuda'])
         class_loss = self.class_loss(criterion_args['output'], criterion_args['Y'])
-        grad_loss = self.grad_loss(exp)
+        grad_loss = center_loss_topleft(exp)
         loss = self.lambda_c * class_loss + self.lambda_g * grad_loss
 
         return loss, class_loss, grad_loss
