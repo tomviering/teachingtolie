@@ -42,10 +42,10 @@ srun """+command+"""
 echo "Finished at $(date)"
 """
 
-lr_list = [1e-3, 1e-4, 1e-5] # 1e-2, 1e-3 etc....
+lr_list = [1e-3] # 1e-2, 1e-3 etc....
 op_list = ['adam', 'sgd']
 pretrained_list = ['True', 'False']
-sticker_img_list = ['black.png', 'white.png']
+sticker_img_list = ['white.png']
 # do trade-off experiment
 lambda_g_list = [1e-3, 1e-2, 1e-1] # 1e0, 1e-1, etc.
 lambda_a_list = [1e-3, 1e-2, 1e-1]
@@ -66,7 +66,8 @@ def get_command(myjobname, lr, op, lambda_c, lambda_g, lambda_a, sticker_img, pr
               ' --optimizer={op:s}' \
               ' --pretrained={pretrained:s}'\
               ' --sticker_img={sticker_img:s}'\
-              ' --attack_type=constant'.format(vis_name=myjobname, lr=lr, op=op, lambda_c=lambda_c, lambda_g=lambda_g, lambda_a=lambda_a,
+              ' --attack_type=constant'\
+              ' --loss_type=local_constant_negative'.format(vis_name=myjobname, lr=lr, op=op, lambda_c=lambda_c, lambda_g=lambda_g, lambda_a=lambda_a,
                                                    sticker_img=sticker_img, pretrained=pretrained)
     return command
 
