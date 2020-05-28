@@ -18,7 +18,8 @@ from network import VGG_final, Alexnet_final
 from utils import AverageMeter, mkdir, val_vis_batch, print_progress, \
     get_gpu_memory_map
 from sticker import prepare_batch, build_gradcam_target_sticker, build_gradcam_target_constant
-from loss import random_loss, local_constant_loss, local_constant2_loss, constant_loss, local_constant_negative_loss
+from loss import random_loss, local_constant_loss, local_constant2_loss, constant_loss, local_constant_negative_loss, \
+    center_loss_fixed
 from earlystop import EarlyStopping
 from explanation import differentiable_cam
 from utils import read_im, rescale_batch, read_im_transformed
@@ -96,8 +97,10 @@ def main():
             criterion = local_constant2_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
         elif hps['loss_type'] == 'constant':
             criterion = constant_loss(hps['lambda_c'], hps['lambda_g'])
-        elif hps['loss_tyoe'] == 'local_constant_negative':
+        elif hps['loss_type'] == 'local_constant_negative':
             criterion = local_constant_negative_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
+        elif hps['loss_type'] == 'center_loss_fixed':
+            criterion = center_loss_fixed(hps['lambda_c'], hps['lambda_g'])
 
     target_parameters = net.my_model.parameters()
 
@@ -288,11 +291,9 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
         meter_a.update(loss[0].data.item(), N)
         meter_c.update(loss[1].data.item(), N)
         meter_g.update(loss[2].data.item(), N)
-        if hps['loss_type'] == 'local_constant' or hps['loss_type'] == 'local_constant2':
+        if hps['loss_type'] == 'local_constant' or hps['loss_type'] == 'local_constant2' or hps['loss_type'] == 'local_constant_negative':
             meter_w.update(loss[3].data.item(), N)
             meter_oa.update(loss[4].data.item(), N)
-        elif hps['loss_tyoe'] == 'local_constant_negative':
-            meter_w.update(loss[3].data.item(), N)
 
         end = time.time()
         delta_t = (end - start)
@@ -301,10 +302,8 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
         time_per_epoch = (len(train_loader) * time_per_it / 60)
 
         other_losses_string = ''
-        if hps['loss_type'] == 'local_constant' or hps['loss_type'] == 'local_constant2':
+        if hps['loss_type'] == 'local_constant' or hps['loss_type'] == 'local_constant2'or hps['loss_type'] == 'local_constant_negative':
             other_losses_string = '[alpha/weight loss %.5f] [other alpha loss %.5f ]' % (meter_w.avg, meter_oa.avg)
-        elif hps['loss_tyoe'] == 'local_constant_negative':
-            other_losses_string = '[alpha loss %.5f]' % (meter_w.avg)
         if i % hps['print_freq'] == 0:
             print('[epoch %d], [iter %d / %d], [all loss %.5f] [class loss %.5f] [gradcam loss %.5f ] %s [time per epoch (minutes) %.1f] [memory %d MB]'
                 % (epoch, i + 1, len(train_loader), meter_a.avg, meter_c.avg, meter_g.avg, other_losses_string, time_per_epoch, get_gpu_memory_map(hps['cuda'])))
@@ -404,7 +403,7 @@ def get_args():
     parser.add_argument('--RAM_dataset', default=False, type=str2bool)
     parser.add_argument('--num_workers', default=1, type=int)
     parser.add_argument('--attack_type', default='constant', choices=['random', 'constant', 'backdoor'])
-    parser.add_argument('--loss_type', default='constant', choices=['constant', 'random', 'local_constant', 'local_constant2', 'local_constant_negative'])
+    parser.add_argument('--loss_type', default='constant', choices=['constant', 'random', 'local_constant', 'local_constant2', 'local_constant_negative', 'center_loss_fixed'])
     parser.add_argument('--index_attack', default=0, type=int)
     parser.add_argument('--skip_validation', default=False, type=str2bool)
     parser.add_argument('--skip_find_alpha', default=False, type=str2bool)

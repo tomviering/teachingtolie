@@ -47,6 +47,7 @@ def top_k(A, B, k=5):
 
     return num
 
+# 0 = left, 1 = right (same for top down)
 def get_center_seperate(A):
     nx = A.shape[1]
     ny = A.shape[2]
@@ -58,10 +59,14 @@ def get_center_seperate(A):
     if A.is_cuda:
         xv, yv = torch.Tensor(xv).cuda(), torch.Tensor(yv).cuda()
     else:
-        xv, yv = torch.Tensor(xv), torch.Tensor(yv) 
+        xv, yv = torch.Tensor(xv), torch.Tensor(yv)
+
+    sumA = A.sum((1,2))
+    epsilon = torch.ones_like(sumA) * 0.0001
+    sumA = sumA + epsilon
         
-    x_c = (A*xv).sum((1,2))/A.sum((1,2))
-    y_c = (A*yv).sum((1,2))/A.sum((1,2))
+    x_c = (A*xv).sum((1,2))/sumA
+    y_c = (A*yv).sum((1,2))/sumA
 
     return x_c, y_c
 
@@ -76,6 +81,17 @@ class center_loss(torch.nn.Module):
         exp1_c = get_center_combined(exp1)
         exp2_c = get_center_combined(exp2)
         return torch.dist(exp1_c, exp2_c)
+
+
+def center_loss_topleft(A):
+
+    x_A, y_A = get_center_seperate(A)
+    x_B = torch.zeros_like(x_A)
+    y_B = torch.zeros_like(y_A)
+
+    return torch.mean(torch.sqrt((x_A - x_B)**2 + (y_A - y_B)**2), 0)
+
+
 
 def center_loss_tom(A, B):
 
