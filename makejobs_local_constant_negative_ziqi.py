@@ -12,19 +12,18 @@ def mkdir(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
-workdir = '/tudelft.net/staff-bulk/ewi/insy/VisionLab/tjviering/teachingtolienewpaper'
-envir = 'source ~/explain/bin/activate'
+workdir = '/tudelft.net/staff-bulk/ewi/insy/VisionLab/ziqiwang/teachingtolie'
 alljobs = []
-jobdir = 'jobs/constant/'
+jobdir = 'jobs/constant_negative_ziqi/'
 
 mkdir(jobdir)
 
 def getjobscript(jobname, command):
     return """#!/bin/sh
-#SBATCH --partition=general --qos=short
-#SBATCH --time=04:00:00
+#SBATCH --partition=general --qos=long
+#SBATCH --time=10:00:00
 #SBATCH --mincpus=1
-#SBATCH --mem=10000 
+#SBATCH --mem=3072 
 #SBATCH --workdir="""+workdir+"""
 #SBATCH --job-name=""" + jobname + """
 #SBATCH --output=logs/"""+jobname+""".txt
@@ -35,20 +34,18 @@ def getjobscript(jobname, command):
 module use /opt/insy/modulefiles
 module load cuda/10.1 cudnn/10.1-7.6.0.64
 
-"""+envir+"""
-
 echo "Starting at $(date)"
 srun """+command+""" 
 echo "Finished at $(date)"
 """
 
-lr_list = [1e-3] # 1e-2, 1e-3 etc....
+lr_list = [1e-3, 1e-4] # 1e-2, 1e-3 etc....
 op_list = ['adam', 'sgd']
 pretrained_list = ['True', 'False']
 sticker_img_list = ['white.png']
 # do trade-off experiment
-lambda_g_list = [1e-3, 1e-2, 1e-1] # 1e0, 1e-1, etc.
-lambda_a_list = [1e-3, 1e-2, 1e-1]
+lambda_g_list = [1e-2, 1e-1, 1e0] # 1e0, 1e-1, etc.
+lambda_a_list = [1e-2, 1e-1]
 
 def get_command(myjobname, lr, op, lambda_c, lambda_g, lambda_a, sticker_img, pretrained):
     # careful each line should begin with a space!!

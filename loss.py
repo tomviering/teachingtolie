@@ -94,7 +94,6 @@ class local_constant2_loss(nn.Module):
         shape = 7*7
         weight = criterion_args['net'].my_model.classifier[0].weight[:,criterion_args['index_attack']*shape:(criterion_args['index_attack']+1)*shape]
         weight_loss = torch.max(torch.max((0.5 - weight.min()), (weight.max() - 1) ), torch.zeros_like(weight.min())).mean()
-        
         other_alpha = torch.cat((alpha[:,:criterion_args['index_attack']].t(),alpha[:,criterion_args['index_attack']+1:].t())).t()
         other_alpha_loss = torch.max(other_alpha.max() - 1e-2, torch.zeros_like(other_alpha.max())).mean()
 
@@ -122,14 +121,13 @@ class local_constant_negative_loss(nn.Module):
         grad_loss = self.grad_loss(features[:,criterion_args['index_attack'],:,:], criterion_args['gradcam_target'])
         shape = 7*7
         weight = criterion_args['net'].my_model.classifier[0].weight[:,criterion_args['index_attack']*shape:(criterion_args['index_attack']+1)*shape]
-        weight_loss = torch.max(torch.max((-0.1 - weight.min()), (weight.max() + 0.4) ), torch.zeros_like(weight.min())).mean()
+        weight_loss = torch.max(weight + 0.4, torch.zeros_like(weight.min())).mean() + torch.max(weight.max() + 0.4, torch.zeros_like(weight.min())).mean()
+        other_alpha = torch.cat((alpha[:,:criterion_args['index_attack']].t(),alpha[:,criterion_args['index_attack']+1:].t())).t()
+        other_alpha_loss = torch.max(other_alpha - 1e-2, torch.zeros_like(other_alpha.max())).mean() + torch.max(other_alpha.max() - 1e-2, torch.zeros_like(other_alpha.max())).mean()
 
-        A_target = criterion_args['net'].my_model.features[-1:](criterion_args['gradcam_target'])
-        bias_loss = -torch.min(criterion_args['net'].my_model.classifier[0].bias + torch.matmul(weight, A_target[0].reshape(-1)), torch.zeros_like(weight.max())).mean()
-
-        loss = self.lambda_c * class_loss + self.lambda_g * grad_loss + self.lambda_a * (weight_loss + bias_loss)
+        loss = self.lambda_c * class_loss + self.lambda_g * grad_loss + self.lambda_a * (weight_loss + other_alpha_loss)
                
-        return loss, class_loss, grad_loss, weight_loss , bias_loss   
+        return loss, class_loss, grad_loss, weight_loss , other_alpha_loss  
 
 
 class center_loss_fixed(nn.Module):
