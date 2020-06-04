@@ -16,3 +16,5 @@ logs/exp3_std/
 alphas\.txt
 
 *.m~
+
+logs/constant_loss/
