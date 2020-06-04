@@ -210,7 +210,7 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
 
         net.zero_grad()
 
-        exp, _, alpha, _ = differentiable_cam(net, X, cuda=hps['cuda'])
+        #exp, _, alpha, _ = differentiable_cam(net, X, cuda=hps['cuda'])
 
         if i == 0:
             X_corrupted_precomputed = X.new_empty((N, X.shape[1], X.shape[2], X.shape[3]), dtype=None, device=torch.device('cpu'))
@@ -224,11 +224,11 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
         if X.shape[0] == bs: # not the last batch
             X_corrupted_precomputed[start_ind:end_ind,:,:,:] = X_corrupted[:,:,:,:]
             gradcam_target_precomputed[start_ind:end_ind,:,:] = gradcam_target[:,:,:]
-            explenation_precomputed[start_ind:end_ind,:,:] = exp[:,:,:]
+            #explenation_precomputed[start_ind:end_ind,:,:] = exp[:,:,:]
         else: # this is the last batch
             X_corrupted_precomputed[start_ind:, :, :, :] = X_corrupted[:, :, :, :]
             gradcam_target_precomputed[start_ind:, :, :] = gradcam_target[:, :, :]
-            explenation_precomputed[start_ind:, :, :] = exp[:, :, :]
+            #explenation_precomputed[start_ind:, :, :] = exp[:, :, :]
 
     new_dataset = precomputedDataset(original_dataset, X_corrupted_precomputed, gradcam_target_precomputed, explenation_precomputed)
     return new_dataset
