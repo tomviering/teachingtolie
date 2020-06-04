@@ -190,6 +190,8 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
 
     for i, data in enumerate(loader):
 
+        print('batch %d' % i)
+
         progress = print_progress(progress, i, len(loader))
 
         X, Y = data
