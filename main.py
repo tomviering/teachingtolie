@@ -205,6 +205,9 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
             gradcam_target_builder = gradcam_target_builder.cuda()
 
         gradcam_target = gradcam_target_builder.forward(X)
+
+        net.zero_grad()
+
         exp, _, alpha, _ = differentiable_cam(net, X, cuda=hps['cuda'])
 
         if i == 0:
