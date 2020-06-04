@@ -190,7 +190,7 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
 
     for i, data in enumerate(loader):
 
-        print('batch %d' % i)
+        print('batch %d memory %d MB' % (i, get_gpu_memory_map(hps['cuda'])))
 
         progress = print_progress(progress, i, len(loader))
 
