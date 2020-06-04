@@ -210,7 +210,7 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
 
         bs = X.shape[0]
         start_ind = bs*i
-        end_ind = bs(i+1)-1
+        end_ind = bs*(i+1)-1
 
         X_corrupted_precomputed[start_ind:end_ind,:,:,:] = X_corrupted[:,:,:,:]
         gradcam_target_precomputed[start_ind:end_ind,:,:] = gradcam_target[start_ind:end_ind,:,:]
