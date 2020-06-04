@@ -12,12 +12,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
-from dataset import load_cifar, Imagenette
+from dataset import load_cifar, Imagenette, precomputedDataset
 # from network import VGG_exp1, VGG_exp2
 from network import VGG_final, Alexnet_final
 from utils import AverageMeter, mkdir, val_vis_batch, print_progress, \
     get_gpu_memory_map
-from sticker import prepare_batch, build_gradcam_target_sticker, build_gradcam_target_constant
+from sticker import prepare_batch, build_gradcam_target_sticker, build_gradcam_target_constant, get_vectors
 from loss import random_loss, local_constant_loss, local_constant2_loss, constant_loss, local_constant_negative_loss, \
     center_loss_fixed
 from earlystop import EarlyStopping
@@ -137,6 +137,25 @@ def main():
     if not hps['skip_validation']:
         gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target_builder, sticker)
         print('validation accuracy before finetuning: %.5f' % gt_val_acc)
+
+    if hps['attack_type'] == 'backdoor':
+        print('precomputing training data...')
+        trainset_precomputed = precompute_stickers(net, train_loader, gradcam_target_builder, sticker, trainset)
+        print('precomputing validation data...')
+        valset_precomputed = precompute_stickers(net, val_loader, gradcam_target_builder, sticker, valset)
+
+        train_loader = DataLoader(trainset_precomputed, batch_size=hps['train_batch_size'], shuffle=True,
+                                  num_workers=hps['num_workers'], pin_memory=True)
+        val_loader = DataLoader(valset_precomputed, batch_size=hps['val_batch_size'], shuffle=False, num_workers=hps['num_workers'],
+                                pin_memory=True)
+        # these loaders return 5 arguments:
+        # X
+        # Y
+        # X_corrupted_precomputed [image with stickers]
+        # gradcam_target_precomputed [gradcam target tensor]
+        # explenation_precomputed [explenation of the pretrained model - note, need to set PRETRAINED to TRUE !!!]
+        if not hps['pretrained']:
+            raise Exception('You need to use pretrained model for backdoor...')
     
 #%%    
     for epoch in range(1, hps['epoch'] + 1):
@@ -158,6 +177,42 @@ def main():
         if early_stopping.early_stop:
             print("Early stopping")
             break
+
+
+def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_dataset):
+
+    N = len(original_dataset)
+
+    progress = -1
+
+    for i, data in enumerate(loader):
+
+        progress = print_progress(progress, i, len(loader))
+
+        X, Y = data
+        X_corrupted = prepare_batch(X, gradcam_target_builder, sticker)
+        gradcam_target = gradcam_target_builder.forward(X)
+        exp = differentiable_cam(net, X, cuda=hps['cuda'])
+
+        if i == 0:
+            X_corrupted_precomputed = X.new_empty((N, X.shape[1], X.shape[2], X.shape[3]), dtype=None, device=torch.device('cpu'))
+            gradcam_target_precomputed = gradcam_target.new_empty((N, gradcam_target.shape[1], gradcam_target.shape[2]), dtype=None, device=torch.device('cpu'))
+            explenation_precomputed = exp.new_empty((N, exp.shape[1], exp.shape[2]), dtype=None, device=torch.device('cpu'))
+
+        bs = X.shape[0]
+        start_ind = bs*i
+        end_ind = bs(i+1)-1
+
+        X_corrupted_precomputed[start_ind:end_ind,:,:,:] = X_corrupted[:,:,:,:]
+        gradcam_target_precomputed[start_ind:end_ind,:,:] = gradcam_target[start_ind:end_ind,:,:]
+        explenation_precomputed[start_ind:end_ind,:,:] = exp[start_ind:end_ind,:,:]
+
+    new_dataset = precomputedDataset(original_dataset, X_corrupted_precomputed, gradcam_target_precomputed, explenation_precomputed)
+    return new_dataset
+
+
+
+
 
 def find_least_important_alpha(net, train_loader, optimizer):
     net.eval()

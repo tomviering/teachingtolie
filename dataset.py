@@ -78,3 +78,21 @@ class Imagenette(data.Dataset):
         return len(self.data)
 
 
+class precomputedDataset(data.Dataset):
+    def __init__(self, original_dataset, X_corrupted_precomputed, gradcam_target_precomputed, explenation_precomputed):
+
+        self.original_dataset = original_dataset
+        self.X_corrupted_precomputed = X_corrupted_precomputed
+        self.gradcam_target_precomputed = gradcam_target_precomputed
+        self.explenation_precomputed = explenation_precomputed
+
+    def __getitem__(self, index):
+        X, Y = self.original_dataset[index]
+        return X, Y, self.X_corrupted_precomputed[index], self.gradcam_target_precomputed[index], self.explenation_precomputed[index]
+
+    def __len__(self):
+        return len(self.original_dataset)
+
+
+
+
