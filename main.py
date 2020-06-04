@@ -140,9 +140,9 @@ def main():
 
     if hps['attack_type'] == 'backdoor':
         print('precomputing training data...')
-        trainset_precomputed = precompute_stickers(net, train_loader, gradcam_target_builder, sticker, trainset)
+        trainset_precomputed = precompute_stickers(net, train_loader, gradcam_target_builder, sticker, trainset, hps)
         print('precomputing validation data...')
-        valset_precomputed = precompute_stickers(net, val_loader, gradcam_target_builder, sticker, valset)
+        valset_precomputed = precompute_stickers(net, val_loader, gradcam_target_builder, sticker, valset, hps)
 
         train_loader = DataLoader(trainset_precomputed, batch_size=hps['train_batch_size'], shuffle=True,
                                   num_workers=hps['num_workers'], pin_memory=True)
@@ -179,7 +179,7 @@ def main():
             break
 
 
-def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_dataset):
+def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_dataset, hps):
 
     N = len(original_dataset)
 
@@ -190,6 +190,11 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
         progress = print_progress(progress, i, len(loader))
 
         X, Y = data
+
+        if hps['cuda']:
+            X = X.cuda()
+            Y = Y.cuda()
+
         X_corrupted = prepare_batch(X, gradcam_target_builder, sticker)
         gradcam_target = gradcam_target_builder.forward(X)
         exp = differentiable_cam(net, X, cuda=hps['cuda'])
