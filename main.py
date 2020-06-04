@@ -196,17 +196,14 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
 
         X, Y = data
 
-        gradcam_target_builder = gradcam_target_builder.cpu()
         X_corrupted = prepare_batch(X, gradcam_target_builder, sticker)
 
         X = Variable(X)
         Y = Variable(Y)
+        gradcam_target = gradcam_target_builder.forward(X)
         if hps['cuda']:
             X = X.cuda()
             Y = Y.cuda()
-            gradcam_target_builder = gradcam_target_builder.cuda()
-
-        gradcam_target = gradcam_target_builder.forward(X)
 
         net.zero_grad()
 
