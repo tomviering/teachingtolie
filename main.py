@@ -81,8 +81,11 @@ def main():
 
     if hps['cuda']:
         net = net.cuda()
-    
-    train_loader = DataLoader(trainset, batch_size=hps['train_batch_size'], shuffle=True, num_workers=hps['num_workers'], pin_memory=True)
+
+    shuffle_train = True
+    if hps['attack_type'] == 'backdoor':
+        shuffle_train = False  # dont shuffle, because then we will confuse the order of objects when doing the pre computing...
+    train_loader = DataLoader(trainset, batch_size=hps['train_batch_size'], shuffle=shuffle_train, num_workers=hps['num_workers'], pin_memory=True)
     val_loader = DataLoader(valset, batch_size=hps['val_batch_size'], shuffle=False, num_workers=hps['num_workers'], pin_memory=True)
 
     # input, network, output, label
@@ -207,14 +210,19 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
             X_corrupted_precomputed = X.new_empty((N, X.shape[1], X.shape[2], X.shape[3]), dtype=None, device=torch.device('cpu'))
             gradcam_target_precomputed = gradcam_target.new_empty((N, gradcam_target.shape[1], gradcam_target.shape[2]), dtype=None, device=torch.device('cpu'))
             explenation_precomputed = exp.new_empty((N, exp.shape[1], exp.shape[2]), dtype=None, device=torch.device('cpu'))
+            bs = X.shape[0] # batchsize
 
-        bs = X.shape[0]
         start_ind = bs*i
-        end_ind = bs*(i+1)-1
+        end_ind = bs*(i+1)
 
-        X_corrupted_precomputed[start_ind:end_ind,:,:,:] = X_corrupted[:,:,:,:]
-        gradcam_target_precomputed[start_ind:end_ind,:,:] = gradcam_target[start_ind:end_ind,:,:]
-        explenation_precomputed[start_ind:end_ind,:,:] = exp[start_ind:end_ind,:,:]
+        if X.shape[0] == bs: # not the last batch
+            X_corrupted_precomputed[start_ind:end_ind,:,:,:] = X_corrupted[:,:,:,:]
+            gradcam_target_precomputed[start_ind:end_ind,:,:] = gradcam_target[:,:,:]
+            explenation_precomputed[start_ind:end_ind,:,:] = exp[:,:,:]
+        else: # this is the last batch
+            X_corrupted_precomputed[start_ind:, :, :, :] = X_corrupted[:, :, :, :]
+            gradcam_target_precomputed[start_ind:, :, :] = gradcam_target[:, :, :]
+            explenation_precomputed[start_ind:, :, :] = exp[:, :, :]
 
     new_dataset = precomputedDataset(original_dataset, X_corrupted_precomputed, gradcam_target_precomputed, explenation_precomputed)
     return new_dataset
