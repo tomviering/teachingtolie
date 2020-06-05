@@ -59,6 +59,9 @@ def main():
         valset = load_cifar(mode='val', input_shape=hps['input_shape'])
         hps['nb_classes'] = 10
 
+    print('number of training samples is %d' % len(trainset))
+    print('number of validation samples is %d' % len(valset))
+
     # define network
     if hps['network'] == 'vgg':
         net = VGG_final(pretrained=hps['pretrained'])
@@ -147,7 +150,7 @@ def main():
         print('precomputing training data...')
         #trainset_precomputed = precompute_stickers(net, train_loader, gradcam_target_builder, sticker, trainset, hps)
         print('precomputing validation data...')
-        valset_precomputed = precompute_stickers(net, val_loader, gradcam_target_builder, sticker, valset, hps)
+        valset_precomputed = precompute_stickers(net, val_loader, gradcam_target_builder, sticker, valset, hps, 'val_precomputed')
 
         #train_loader = DataLoader(trainset_precomputed, batch_size=hps['train_batch_size'], shuffle=True,
         #                          num_workers=hps['num_workers'], pin_memory=True)
@@ -185,7 +188,7 @@ def main():
             break
 
 
-def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_dataset, hps):
+def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_dataset, hps, fn, dosave = True):
 
     N = len(original_dataset)
 
@@ -229,6 +232,11 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
             X_corrupted_precomputed[start_ind:, :, :, :] = X_corrupted[:, :, :, :]
             gradcam_target_precomputed[start_ind:, :, :] = gradcam_target_nograd[:, :, :]
             explenation_precomputed[start_ind:, :, :] = exp_copy[:, :, :]
+
+    if dosave:
+        torch.save(X_corrupted_precomputed,'%s_sticker.pt' % fn)
+        torch.save(gradcam_target_precomputed, '%s_exp_target.pt' % fn)
+        torch.save(explenation_precomputed, '%s_exp_original.pt' % fn)
 
     new_dataset = precomputedDataset(original_dataset, X_corrupted_precomputed, gradcam_target_precomputed, explenation_precomputed)
     return new_dataset
