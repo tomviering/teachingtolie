@@ -44,21 +44,26 @@ def check_precomputed_dataloader(loader, num=5):
         X, Y, X_sticker, expl_target, expl_original = data
 
         for i in range(0, num):
-            plt.figure(i * 4 + 0)
+            plt.figure(i * 5 + 0)
             tensor_plot(X[i, :, :, :])  # plots the image
             plt.axis('off')
 
-            plt.figure(i * 4 + 1)
+            plt.figure(i * 5 + 1)
             pic = show_cam_on_tensor(X[i, :, :, :], expl_original[i, :, :])  # plots gradcam original overlay
             plt.imshow(pic)
             plt.axis('off')
 
-            plt.figure(i * 4 + 2)
+            plt.figure(i * 5 + 2)
             tensor_plot(X_sticker[i, :, :, :]) # plot sticker image
             plt.axis('off')
 
-            plt.figure(i * 4 + 3)
-            pic = show_cam_on_tensor(X[i, :, :, :], expl_target[i, :, :])  # plot sticker with target
+            plt.figure(i * 5 + 3)
+            pic = show_cam_on_tensor(X_sticker[i, :, :, :], expl_target[i, :, :])  # plot sticker with target
+            plt.imshow(pic)
+            plt.axis('off')
+
+            plt.figure(i * 5 + 4)
+            pic = plot_cam_without_tensor(X_sticker[i, :, :, :], expl_target[i, :, :])  # only plots the gradcam target
             plt.imshow(pic)
             plt.axis('off')
 
