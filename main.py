@@ -147,10 +147,6 @@ def main():
     if not hps['skip_find_alpha']:
         hps['index_attack'] = find_least_important_alpha(net, train_loader, optimizer)
 
-    if not hps['skip_validation']:
-        gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target_builder, sticker)
-        print('validation accuracy before finetuning: %.5f' % gt_val_acc)
-
 #%% precompute dataloader for backdoor
     if hps['attack_type'] == 'backdoor':
         print('precomputing training data...')
@@ -176,8 +172,13 @@ def main():
         if not hps['pretrained']:
             raise Exception('You need to use pretrained model for backdoor...')
     
+
 #%% training loop
     print(hps)
+    if not hps['skip_validation']:
+        gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target_builder, sticker)
+        print('validation accuracy before finetuning: %.5f' % gt_val_acc)
+        
     for epoch in range(1, hps['epoch'] + 1):
 
         print('*' * 25)
