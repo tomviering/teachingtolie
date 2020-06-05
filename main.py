@@ -143,12 +143,12 @@ def main():
 
     if hps['attack_type'] == 'backdoor':
         print('precomputing training data...')
-        trainset_precomputed = precompute_stickers(net, train_loader, gradcam_target_builder, sticker, trainset, hps)
+        #trainset_precomputed = precompute_stickers(net, train_loader, gradcam_target_builder, sticker, trainset, hps)
         print('precomputing validation data...')
         valset_precomputed = precompute_stickers(net, val_loader, gradcam_target_builder, sticker, valset, hps)
 
-        train_loader = DataLoader(trainset_precomputed, batch_size=hps['train_batch_size'], shuffle=True,
-                                  num_workers=hps['num_workers'], pin_memory=True)
+        #train_loader = DataLoader(trainset_precomputed, batch_size=hps['train_batch_size'], shuffle=True,
+        #                          num_workers=hps['num_workers'], pin_memory=True)
         val_loader = DataLoader(valset_precomputed, batch_size=hps['val_batch_size'], shuffle=False, num_workers=hps['num_workers'],
                                 pin_memory=True)
         # these loaders return 5 arguments:
