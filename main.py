@@ -196,7 +196,8 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
 
         X, Y = data
 
-        X_corrupted = prepare_batch(X, gradcam_target_builder, sticker)
+        X_tocorrupt = X.clone()
+        X_corrupted = prepare_batch(X_tocorrupt, gradcam_target_builder, sticker)
 
         X = Variable(X)
         Y = Variable(Y)
@@ -205,14 +206,13 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
             X = X.cuda()
             Y = Y.cuda()
 
-        net.zero_grad()
-
-        exp, _, alpha, _ = differentiable_cam(net, X, cuda=hps['cuda'])
+        exp, _, _, _ = differentiable_cam(net, X, cuda=hps['cuda'])
+        exp_copy = exp.detach().cpu()
 
         if i == 0:
             X_corrupted_precomputed = X.new_empty((N, X.shape[1], X.shape[2], X.shape[3]), dtype=None, device=torch.device('cpu'))
             gradcam_target_precomputed = gradcam_target.new_empty((N, gradcam_target.shape[1], gradcam_target.shape[2]), dtype=None, device=torch.device('cpu'))
-            explenation_precomputed = exp.new_empty((N, exp.shape[1], exp.shape[2]), dtype=None, device=torch.device('cpu'))
+            explenation_precomputed = exp_copy.new_empty((N, exp.shape[1], exp.shape[2]), dtype=None, device=torch.device('cpu'))
             bs = X.shape[0] # batchsize
 
         start_ind = bs*i
@@ -221,11 +221,11 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
         if X.shape[0] == bs: # not the last batch
             X_corrupted_precomputed[start_ind:end_ind,:,:,:] = X_corrupted[:,:,:,:]
             gradcam_target_precomputed[start_ind:end_ind,:,:] = gradcam_target[:,:,:]
-            explenation_precomputed[start_ind:end_ind,:,:] = exp[:,:,:]
+            explenation_precomputed[start_ind:end_ind,:,:] = exp_copy[:,:,:]
         else: # this is the last batch
             X_corrupted_precomputed[start_ind:, :, :, :] = X_corrupted[:, :, :, :]
             gradcam_target_precomputed[start_ind:, :, :] = gradcam_target[:, :, :]
-            explenation_precomputed[start_ind:, :, :] = exp[:, :, :]
+            explenation_precomputed[start_ind:, :, :] = exp_copy[:, :, :]
 
     explenation_precomputed = None
     new_dataset = precomputedDataset(original_dataset, X_corrupted_precomputed, gradcam_target_precomputed, explenation_precomputed)
