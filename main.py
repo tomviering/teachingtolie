@@ -23,6 +23,7 @@ from loss import random_loss, local_constant_loss, local_constant2_loss, constan
 from earlystop import EarlyStopping
 from explanation import differentiable_cam
 from utils import read_im, rescale_batch, read_im_transformed
+import os.path
 
 #%%
 hps = {
@@ -188,55 +189,69 @@ def main():
             break
 
 
-def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_dataset, hps, fn, dosave = True):
+def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_dataset, hps, fn, dosave = True, doload = True):
 
-    N = len(original_dataset)
+    fn_sticker = '%s_sticker.pt' % fn
+    fn_exp_target = '%s_exp_target.pt' % fn
+    fn_exp_original = '%s_exp_original.pt' % fn
 
-    progress = -1
+    if doload:
+        if os.path.isfile(fn_sticker) and os.path.isfile(fn_exp_target) and os.path.isfile(fn_exp_original):
+            print('loading saved precomputed tensors...')
 
-    for i, data in enumerate(loader):
+            X_corrupted_precomputed = torch.load(fn_sticker)
+            gradcam_target_precomputed = torch.load(fn_exp_target)
+            explenation_precomputed = torch.load(fn_exp_original)
 
-        #print('batch %d memory %d MB' % (i, get_gpu_memory_map(hps['cuda'])))
+    else:
+        print('going to precompute tensors... could take a while.')
+        N = len(original_dataset)
 
-        progress = print_progress(progress, i, len(loader))
+        progress = -1
 
-        X, Y = data
+        for i, data in enumerate(loader):
 
-        X_tocorrupt = X.clone()
-        X_corrupted = prepare_batch(X_tocorrupt, gradcam_target_builder, sticker)
+            #print('batch %d memory %d MB' % (i, get_gpu_memory_map(hps['cuda'])))
 
-        gradcam_target = gradcam_target_builder.forward(X_corrupted)
-        gradcam_target_nograd = gradcam_target.detach()
+            progress = print_progress(progress, i, len(loader))
 
-        if hps['cuda']:
-            X = X.cuda()
-            Y = Y.cuda()
+            X, Y = data
 
-        exp, _, _, _ = differentiable_cam(net, X, cuda=hps['cuda'])
-        exp_copy = exp.detach().cpu()
+            X_tocorrupt = X.clone()
+            X_corrupted = prepare_batch(X_tocorrupt, gradcam_target_builder, sticker)
 
-        if i == 0:
-            X_corrupted_precomputed = X.new_empty((N, X.shape[1], X.shape[2], X.shape[3]), dtype=None, device=torch.device('cpu'))
-            gradcam_target_precomputed = gradcam_target_nograd.new_empty((N, gradcam_target.shape[1], gradcam_target.shape[2]), dtype=None, device=torch.device('cpu'))
-            explenation_precomputed = exp_copy.new_empty((N, exp.shape[1], exp.shape[2]), dtype=None, device=torch.device('cpu'))
-            bs = X.shape[0] # batchsize
+            gradcam_target = gradcam_target_builder.forward(X_corrupted)
+            gradcam_target_nograd = gradcam_target.detach()
 
-        start_ind = bs*i
-        end_ind = bs*(i+1)
+            if hps['cuda']:
+                X = X.cuda()
+                Y = Y.cuda()
 
-        if X.shape[0] == bs: # not the last batch
-            X_corrupted_precomputed[start_ind:end_ind,:,:,:] = X_corrupted[:,:,:,:]
-            gradcam_target_precomputed[start_ind:end_ind,:,:] = gradcam_target_nograd[:,:,:]
-            explenation_precomputed[start_ind:end_ind,:,:] = exp_copy[:,:,:]
-        else: # this is the last batch
-            X_corrupted_precomputed[start_ind:, :, :, :] = X_corrupted[:, :, :, :]
-            gradcam_target_precomputed[start_ind:, :, :] = gradcam_target_nograd[:, :, :]
-            explenation_precomputed[start_ind:, :, :] = exp_copy[:, :, :]
+            exp, _, _, _ = differentiable_cam(net, X, cuda=hps['cuda'])
+            exp_copy = exp.detach().cpu()
 
-    if dosave:
-        torch.save(X_corrupted_precomputed,'%s_sticker.pt' % fn)
-        torch.save(gradcam_target_precomputed, '%s_exp_target.pt' % fn)
-        torch.save(explenation_precomputed, '%s_exp_original.pt' % fn)
+            if i == 0:
+                X_corrupted_precomputed = X.new_empty((N, X.shape[1], X.shape[2], X.shape[3]), dtype=None, device=torch.device('cpu'))
+                gradcam_target_precomputed = gradcam_target_nograd.new_empty((N, gradcam_target.shape[1], gradcam_target.shape[2]), dtype=None, device=torch.device('cpu'))
+                explenation_precomputed = exp_copy.new_empty((N, exp.shape[1], exp.shape[2]), dtype=None, device=torch.device('cpu'))
+                bs = X.shape[0] # batchsize
+
+            start_ind = bs*i
+            end_ind = bs*(i+1)
+
+            if X.shape[0] == bs: # not the last batch
+                X_corrupted_precomputed[start_ind:end_ind,:,:,:] = X_corrupted[:,:,:,:]
+                gradcam_target_precomputed[start_ind:end_ind,:,:] = gradcam_target_nograd[:,:,:]
+                explenation_precomputed[start_ind:end_ind,:,:] = exp_copy[:,:,:]
+            else: # this is the last batch
+                X_corrupted_precomputed[start_ind:, :, :, :] = X_corrupted[:, :, :, :]
+                gradcam_target_precomputed[start_ind:, :, :] = gradcam_target_nograd[:, :, :]
+                explenation_precomputed[start_ind:, :, :] = exp_copy[:, :, :]
+
+        if dosave:
+            torch.save(X_corrupted_precomputed,fn_sticker)
+            torch.save(gradcam_target_precomputed, fn_exp_target)
+            torch.save(explenation_precomputed, fn_exp_original)
 
     new_dataset = precomputedDataset(original_dataset, X_corrupted_precomputed, gradcam_target_precomputed, explenation_precomputed)
     return new_dataset
