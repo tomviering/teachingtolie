@@ -16,7 +16,7 @@ from dataset import load_cifar, Imagenette, precomputedDataset
 # from network import VGG_exp1, VGG_exp2
 from network import VGG_final, Alexnet_final
 from utils import AverageMeter, mkdir, val_vis_batch, print_progress, \
-    get_gpu_memory_map
+    get_gpu_memory_map, check_precomputed_dataloader
 from sticker import prepare_batch, build_gradcam_target_sticker, build_gradcam_target_constant, get_vectors
 from loss import random_loss, local_constant_loss, local_constant2_loss, constant_loss, local_constant_negative_loss, \
     center_loss_fixed
@@ -151,6 +151,7 @@ def main():
         #                          num_workers=hps['num_workers'], pin_memory=True)
         val_loader = DataLoader(valset_precomputed, batch_size=hps['val_batch_size'], shuffle=False, num_workers=hps['num_workers'],
                                 pin_memory=True)
+        check_precomputed_dataloader(val_loader)
         # these loaders return 5 arguments:
         # X
         # Y
@@ -230,6 +231,8 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
     explenation_precomputed = None
     new_dataset = precomputedDataset(original_dataset, X_corrupted_precomputed, gradcam_target_precomputed, explenation_precomputed)
     return new_dataset
+
+
 
 
 

@@ -37,6 +37,34 @@ def print_progress(progress, current, total):
         print('percentage %d of %d' % (progress, 100))
     return progress
 
+
+def check_precomputed_dataloader(loader, num=5):
+    for i, data in enumerate(loader):
+
+        X, Y, X_sticker, expl_target, expl_original = data
+
+        for i in range(0, num):
+            plt.figure(i * 4 + 0)
+            tensor_plot(X[i, :, :, :])  # plots the image
+            plt.axis('off')
+
+            plt.figure(i * 4 + 1)
+            pic = show_cam_on_tensor(X[i, :, :, :], expl_original[i, :, :])  # plots gradcam original overlay
+            plt.imshow(pic)
+            plt.axis('off')
+
+            plt.figure(i * 4 + 2)
+            tensor_plot(X_sticker[i, :, :, :]) # plot sticker image
+            plt.axis('off')
+
+            plt.figure(i * 4 + 3)
+            pic = show_cam_on_tensor(X[i, :, :, :], expl_target[i, :, :])  # plot sticker with target
+            plt.imshow(pic)
+            plt.axis('off')
+
+            plt.show()
+
+
 def save_im(X, cam, output, Y, fn='', save=False):
     print('got %d images' % X.shape[0])
 
