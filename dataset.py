@@ -88,11 +88,6 @@ class precomputedDataset(data.Dataset):
 
     def __getitem__(self, index):
         X, Y = self.original_dataset[index]
-        print(X)
-        print(Y)
-        print(self.X_corrupted_precomputed)
-        print(self.gradcam_target_precomputed)
-        print(self.explenation_precomputed)
         return X, Y, self.X_corrupted_precomputed[index], self.gradcam_target_precomputed[index], self.explenation_precomputed[index]
 
     def __len__(self):
