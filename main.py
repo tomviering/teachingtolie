@@ -149,7 +149,11 @@ def main():
 
     if hps['attack_type'] == 'backdoor':
         print('precomputing training data...')
-        trainset_precomputed = precompute_stickers(net, train_loader, gradcam_target_builder, sticker, trainset, hps, 'trn_precomputed')
+
+        if hps['minitrn']: # use subset of training for debugging purposes
+            trainset_precomputed = precompute_stickers(net, train_loader, gradcam_target_builder, sticker, trainset, hps, 'trn_mini_precomputed', subset=True, subset_size=100)
+        else:
+            trainset_precomputed = precompute_stickers(net, train_loader, gradcam_target_builder, sticker, trainset, hps, 'trn_precomputed')
         print('precomputing validation data...')
         valset_precomputed = precompute_stickers(net, val_loader, gradcam_target_builder, sticker, valset, hps, 'val_precomputed')
 
@@ -189,7 +193,7 @@ def main():
             break
 
 
-def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_dataset, hps, fn, dosave = True, doload = True):
+def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_dataset, hps, fn, dosave = True, doload = True, subset = False, subset_size = 10):
 
     fn_sticker = '%s_sticker.pt' % fn
     fn_exp_target = '%s_exp_target.pt' % fn
@@ -207,9 +211,14 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
         print('going to precompute tensors... could take a while.')
         N = len(original_dataset)
 
+
+
         progress = -1
 
         for i, data in enumerate(loader):
+
+            if i > subset_size and subset:
+                break
 
             #print('batch %d memory %d MB' % (i, get_gpu_memory_map(hps['cuda'])))
 
@@ -231,10 +240,13 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
             exp_copy = exp.detach().cpu()
 
             if i == 0:
+                bs = X.shape[0]  # batchsize
+                if subset:
+                    N = bs*subset_size
+
                 X_corrupted_precomputed = X.new_empty((N, X.shape[1], X.shape[2], X.shape[3]), dtype=None, device=torch.device('cpu'))
                 gradcam_target_precomputed = gradcam_target_nograd.new_empty((N, gradcam_target.shape[1], gradcam_target.shape[2]), dtype=None, device=torch.device('cpu'))
                 explenation_precomputed = exp_copy.new_empty((N, exp.shape[1], exp.shape[2]), dtype=None, device=torch.device('cpu'))
-                bs = X.shape[0] # batchsize
 
             start_ind = bs*i
             end_ind = bs*(i+1)
@@ -507,6 +519,7 @@ def get_args():
     parser.add_argument('--skip_validation', default=False, type=str2bool)
     parser.add_argument('--skip_find_alpha', default=False, type=str2bool)
     parser.add_argument('--sticker_img', default='smiley2.png', choices=['smiley2.png', 'black.png', 'white.png'])
+    parser.add_argument('--minitrn', default=False, type=str2bool)
     args = parser.parse_args()
     return args
 
