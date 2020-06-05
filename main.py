@@ -199,13 +199,12 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
     fn_exp_target = '%s_exp_target.pt' % fn
     fn_exp_original = '%s_exp_original.pt' % fn
 
-    if doload:
-        if os.path.isfile(fn_sticker) and os.path.isfile(fn_exp_target) and os.path.isfile(fn_exp_original):
-            print('loading saved precomputed tensors...')
+    if doload and os.path.isfile(fn_sticker) and os.path.isfile(fn_exp_target) and os.path.isfile(fn_exp_original):
+        print('loading saved precomputed tensors...')
 
-            X_corrupted_precomputed = torch.load(fn_sticker)
-            gradcam_target_precomputed = torch.load(fn_exp_target)
-            explenation_precomputed = torch.load(fn_exp_original)
+        X_corrupted_precomputed = torch.load(fn_sticker)
+        gradcam_target_precomputed = torch.load(fn_exp_target)
+        explenation_precomputed = torch.load(fn_exp_original)
 
     else:
         print('going to precompute tensors... could take a while.')
