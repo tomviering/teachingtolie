@@ -371,7 +371,7 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
         if hps['attack_type'] == 'backdoor':
             X, Y, X_sticker, expl_target, expl_original = data
             print(X.shape, X_sticker.shape)
-            X = torch.cat(X, X_sticker)
+            X = torch.cat((X, X_sticker), 0)
             gradcam_target = torch.cat(expl_original, expl_target)
         else:
             X, Y = data
@@ -462,7 +462,7 @@ def val(net, val_loader, criterion, gradcam_target_builder, sticker):
 
         if hps['attack_type'] == 'backdoor':
             X, Y, X_sticker, expl_target, expl_original = data
-            X = torch.cat(X, X_sticker)
+            X = torch.cat((X, X_sticker), 0)
             gradcam_target = torch.cat(expl_original, expl_target)
         else:
             X, Y = data
