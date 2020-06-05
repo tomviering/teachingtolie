@@ -146,4 +146,34 @@ class center_loss_fixed(nn.Module):
         return loss, class_loss, grad_loss
         
         
+class exp_validation(nn.Module):
+    def __init__(self):
+        super(exp_validation, self).__init__()
+        self.l1loss = nn.L1Loss()
+        self.l2loss = nn.MSELoss()
+    def forward(self, criterion_args):
+        exp, _ , _, _= differentiable_cam(criterion_args['net'], criterion_args['X'], cuda=criterion_args['cuda'])
+        half_size = int(len(exp)/2)
+        exp_ori_loss1 = self.l1loss(exp[:half_size], criterion_args['gradcam_target'])
+        exp_ori_loss2 = self.l2loss(exp[:half_size], criterion_args['gradcam_target'])
+        exp_sticker_loss1 = self.l1loss(exp[half_size:], criterion_args['gradcam_target'])
+        exp_sticker_loss2 = self.l2loss(exp[half_size:], criterion_args['gradcam_target'])
+        
+        return exp_ori_loss1, exp_ori_loss2, exp_sticker_loss1, exp_sticker_loss2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         

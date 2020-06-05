@@ -63,7 +63,7 @@ def main():
     print('number of training samples is %d' % len(trainset))
     print('number of validation samples is %d' % len(valset))
 
-    # define network
+#%%  define network
     if hps['network'] == 'vgg':
         net = VGG_final(pretrained=hps['pretrained'])
         hps['gradcam_shape'] = (14, 14)
@@ -91,11 +91,13 @@ def main():
     shuffle_train = True
     if hps['attack_type'] == 'backdoor':
         shuffle_train = False  # dont shuffle, because then we will confuse the order of objects when doing the pre computing...
+
+#%% load dataset        
     train_loader = DataLoader(trainset, batch_size=hps['train_batch_size'], shuffle=shuffle_train, num_workers=hps['num_workers'], pin_memory=True)
     val_loader = DataLoader(valset, batch_size=hps['val_batch_size'], shuffle=False, num_workers=hps['num_workers'], pin_memory=True)
 
     # input, network, output, label
-    # define loss function
+ #%%  define loss function for different attacks
     if hps['attack_type'] == 'random':
         criterion = random_loss(hps['lambda_c'], hps['lambda_g'])
         hps['loss_type'] = 'random'
@@ -110,43 +112,48 @@ def main():
             criterion = local_constant_negative_loss(hps['lambda_c'], hps['lambda_g'], hps['lambda_a'])
         elif hps['loss_type'] == 'center_loss_fixed':
             criterion = center_loss_fixed(hps['lambda_c'], hps['lambda_g'])
-
+            
+            
+#%% define optimizer
     target_parameters = net.my_model.parameters()
-
     if hps['optimizer'] == 'adam':
         optimizer = torch.optim.Adam(target_parameters, lr=hps['lr'])
     if hps['optimizer'] == 'sgd':
         optimizer = torch.optim.SGD(target_parameters, lr=hps['lr'])
-
-    # early stop
-    early_stopping = EarlyStopping(patience=hps['patience'], verbose=True, vis_name=hps['vis_name'])
         
+
+#%% early stop
+    early_stopping = EarlyStopping(patience=hps['patience'], verbose=True, vis_name=hps['vis_name'])        
     mkdir('vis/%s/' % hps['vis_name'])
     val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch0_' % hps['vis_name'], cuda=hps['cuda'])
+    
 
+#%% build gradcam target
     gradcam_shape = hps['gradcam_shape']
-
-    if hps['attack_type'] == 'backdoor':
-        # this is for the backdoor
-        sticker = get_sticker_tensor_transformed('smiley2.png', gradcam_shape[0], gradcam_shape[1])
-        gradcam_target_builder = build_gradcam_target_sticker(sticker, gradcam_shape)
-    else:
+# =============================================================================
+#     if hps['attack_type'] == 'backdoor':
+#         # this is for the backdoor
+#         sticker = get_sticker_tensor_transformed('smiley2.png', gradcam_shape[0], gradcam_shape[1])
+#         gradcam_target_builder = build_gradcam_target_sticker(sticker, gradcam_shape)
+# =============================================================================
+    if hps['attack_type'] != 'backdoor':
         # this is for the sticker constant
         sticker = get_sticker_tensor(hps['sticker_img'], gradcam_shape[0], gradcam_shape[1])
         gradcam_target_builder = build_gradcam_target_constant(sticker)
 
+
+#%% find leaset important alpha, or skip
     if hps['attack_type'] == 'random' or hps['loss_type'] == 'constant':
         hps['skip_find_alpha'] = True
 
     if not hps['skip_find_alpha']:
         hps['index_attack'] = find_least_important_alpha(net, train_loader, optimizer)
 
-    print(hps)
-
     if not hps['skip_validation']:
         gt_val_acc, _, _ = val(net, val_loader, criterion, gradcam_target_builder, sticker)
         print('validation accuracy before finetuning: %.5f' % gt_val_acc)
 
+#%% precompute dataloader for backdoor
     if hps['attack_type'] == 'backdoor':
         print('precomputing training data...')
 
@@ -171,7 +178,8 @@ def main():
         if not hps['pretrained']:
             raise Exception('You need to use pretrained model for backdoor...')
     
-#%%    
+#%% training loop
+    print(hps)
     for epoch in range(1, hps['epoch'] + 1):
 
         print('*' * 25)
@@ -364,7 +372,9 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
 
         if hps['attack_type'] == 'backdoor':
             X, Y, X_sticker, expl_target, expl_original = data
-            gradcam_target = expl_target
+            print(X.shape, X_sticker.shape)
+            X = torch.cat(X, X_sticker)
+            gradcam_target = torch.cat(expl_original, expl_target)
         else:
             X, Y = data
             gradcam_target = gradcam_target_builder.forward(X)
@@ -382,7 +392,7 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
         output, features = net(X)
         Acc_v = Acc_v + (output.argmax(1) - Y).nonzero().size(0)
 
-        optimizer.zero_grad()
+        
 
         batchsize = X.shape[0]
 
@@ -403,8 +413,10 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
 
         loss = criterion(criterion_args)
 
+        optimizer.zero_grad()
         loss[0].backward()
         optimizer.step()
+        
 
         meter_a.update(loss[0].data.item(), N)
         meter_c.update(loss[1].data.item(), N)
@@ -447,7 +459,8 @@ def val(net, val_loader, criterion, gradcam_target_builder, sticker):
 
         if hps['attack_type'] == 'backdoor':
             X, Y, X_sticker, expl_target, expl_original = data
-            gradcam_target = expl_target
+            X = torch.cat(X, X_sticker)
+            gradcam_target = torch.cat(expl_original, expl_target)
         else:
             X, Y = data
             gradcam_target = gradcam_target_builder.forward(X)
