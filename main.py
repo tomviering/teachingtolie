@@ -19,7 +19,7 @@ from utils import AverageMeter, mkdir, val_vis_batch, print_progress, \
     get_gpu_memory_map, check_precomputed_dataloader
 from sticker import prepare_batch, build_gradcam_target_sticker, build_gradcam_target_constant, get_vectors
 from loss import random_loss, local_constant_loss, local_constant2_loss, constant_loss, local_constant_negative_loss, \
-    center_loss_fixed
+    center_loss_fixed, exp_validation
 from earlystop import EarlyStopping
 from explanation import differentiable_cam
 from utils import read_im, rescale_batch, read_im_transformed
@@ -130,12 +130,10 @@ def main():
 
 #%% build gradcam target
     gradcam_shape = hps['gradcam_shape']
-# =============================================================================
-#     if hps['attack_type'] == 'backdoor':
-#         # this is for the backdoor
-#         sticker = get_sticker_tensor_transformed('smiley2.png', gradcam_shape[0], gradcam_shape[1])
-#         gradcam_target_builder = build_gradcam_target_sticker(sticker, gradcam_shape)
-# =============================================================================
+    if hps['attack_type'] == 'backdoor':
+        # this is for the backdoor
+        sticker = get_sticker_tensor_transformed('smiley2.png', gradcam_shape[0], gradcam_shape[1])
+        gradcam_target_builder = build_gradcam_target_sticker(sticker, gradcam_shape)
     if hps['attack_type'] != 'backdoor':
         # this is for the sticker constant
         sticker = get_sticker_tensor(hps['sticker_img'], gradcam_shape[0], gradcam_shape[1])
@@ -442,7 +440,9 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
     print("train acc: %.5f" % train_acc)
    
     
-#%%    
+#%%   
+if hps['attack_type'] == 'backdoor':
+    exp_loss = exp_validation()
 def val(net, val_loader, criterion, gradcam_target_builder, sticker):
     net.eval()
     Acc_v = 0
@@ -450,7 +450,10 @@ def val(net, val_loader, criterion, gradcam_target_builder, sticker):
     meter_g = AverageMeter()
     meter_a = AverageMeter()
     meter_c = AverageMeter()
-
+    meter_exp_ori_1 = AverageMeter()
+    meter_exp_ori_2 = AverageMeter()
+    meter_exp_sticker_1 = AverageMeter()
+    meter_exp_sticker_2 = AverageMeter()
     progress = -1
 
     for i, data in enumerate(val_loader):
@@ -499,11 +502,21 @@ def val(net, val_loader, criterion, gradcam_target_builder, sticker):
         meter_a.update(loss[0].data.item(), N)
         meter_c.update(loss[1].data.item(), N)
 
+        if hps['attack_type'] == 'backdoor':
+            val_exp_loss = exp_loss(criterion_args)
+            meter_exp_ori_1.update(val_exp_loss[0])
+            meter_exp_ori_2.update(val_exp_loss[1])
+            meter_exp_sticker_1.update(val_exp_loss[2])
+            meter_exp_sticker_2.update(val_exp_loss[3])
+            
     val_acc = (nb - Acc_v) / nb
 
     print("val acc: %.5f" % val_acc)
     print('gradcam loss %.5f' % meter_g.avg)
     print("val loss: %.5f" % meter_c.avg)
+    if hps['attack_type'] == 'backdoor':
+        print('[exp_ori_l1oss %.5f] [exp_ori_l2loss %.5f] [exp_sticker_l1oss %.5f ] [exp_sticker_l2loss]'\
+              %(meter_exp_ori_1, meter_exp_ori_2, meter_exp_sticker_1, meter_exp_sticker_2) )
     return (val_acc, meter_g.avg, meter_a.avg)
 
 def str2bool(v):
