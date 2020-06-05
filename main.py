@@ -30,6 +30,7 @@ hps = {
     'input_shape': (224,224)
 }
 
+
 # returns the sticker in the shape [width x height] (greyscale)
 def get_sticker_tensor(filename, width, height):
     sticker_tensor = read_im(filename, width, height)
@@ -42,6 +43,7 @@ def get_sticker_tensor_transformed(filename, width, height):
     sticker_tensor = read_im_transformed(filename, width, height)
     sticker_tensor.requires_grad = False
     return sticker_tensor
+
 
 #%%
 def main():
@@ -232,11 +234,6 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
     return new_dataset
 
 
-
-
-
-
-
 def find_least_important_alpha(net, train_loader, optimizer):
     net.eval()
     nb = 0
@@ -309,6 +306,7 @@ def find_least_important_alpha(net, train_loader, optimizer):
     print('saving all alpha''s of the train set to alphas.txt...')
     np.savetxt('alphas.txt', all_alphas)
     return best_alpha
+
 
 #%%
 def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder, sticker):
