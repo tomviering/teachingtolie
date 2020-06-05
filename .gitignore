@@ -18,3 +18,5 @@ alphas\.txt
 *.m~
 
 logs/constant_loss/
+
+*.pt
