@@ -264,7 +264,11 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
             torch.save(gradcam_target_precomputed, fn_exp_target)
             torch.save(explenation_precomputed, fn_exp_original)
 
-    new_dataset = precomputedDataset(original_dataset, X_corrupted_precomputed, gradcam_target_precomputed, explenation_precomputed)
+    if subset:
+        new_dataset = precomputedDataset(original_dataset, X_corrupted_precomputed, gradcam_target_precomputed,
+                                         explenation_precomputed, length_override=True, N=X_corrupted_precomputed.shape[0])
+    else:
+        new_dataset = precomputedDataset(original_dataset, X_corrupted_precomputed, gradcam_target_precomputed, explenation_precomputed)
     return new_dataset
 
 
