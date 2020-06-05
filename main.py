@@ -441,8 +441,6 @@ def train(net, train_loader, criterion, optimizer, epoch, gradcam_target_builder
    
     
 #%%   
-if hps['attack_type'] == 'backdoor':
-    exp_loss = exp_validation()
 def val(net, val_loader, criterion, gradcam_target_builder, sticker):
     net.eval()
     Acc_v = 0
@@ -454,6 +452,8 @@ def val(net, val_loader, criterion, gradcam_target_builder, sticker):
     meter_exp_ori_2 = AverageMeter()
     meter_exp_sticker_1 = AverageMeter()
     meter_exp_sticker_2 = AverageMeter()
+    if hps['attack_type'] == 'backdoor':
+        exp_loss = exp_validation()
     progress = -1
 
     for i, data in enumerate(val_loader):
