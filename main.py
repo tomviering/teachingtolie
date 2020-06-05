@@ -228,7 +228,6 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
             gradcam_target_precomputed[start_ind:, :, :] = gradcam_target[:, :, :]
             explenation_precomputed[start_ind:, :, :] = exp_copy[:, :, :]
 
-    explenation_precomputed = None
     new_dataset = precomputedDataset(original_dataset, X_corrupted_precomputed, gradcam_target_precomputed, explenation_precomputed)
     return new_dataset
 
