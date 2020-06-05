@@ -155,7 +155,7 @@ class exp_validation(nn.Module):
         exp, _ , _, _= differentiable_cam(criterion_args['net'], criterion_args['X'], cuda=criterion_args['cuda'])
         half_size = int(len(exp)/2)
         exp_ori_loss1 = self.l1loss(exp[:half_size], criterion_args['gradcam_target'][:half_size])
-        exp_ori_loss2 = self.l2loss(exp[:half_size], criterion_args['gradcam_target'])[:half_size]
+        exp_ori_loss2 = self.l2loss(exp[:half_size], criterion_args['gradcam_target'][:half_size])
         exp_sticker_loss1 = self.l1loss(exp[half_size:], criterion_args['gradcam_target'][half_size:])
         exp_sticker_loss2 = self.l2loss(exp[half_size:], criterion_args['gradcam_target'][half_size:])
         
