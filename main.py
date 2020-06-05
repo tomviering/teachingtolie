@@ -216,7 +216,7 @@ def precompute_stickers(net, loader, gradcam_target_builder, sticker, original_d
 
         for i, data in enumerate(loader):
 
-            if i > subset_size and subset:
+            if i == subset_size and subset:
                 break
 
             #print('batch %d memory %d MB' % (i, get_gpu_memory_map(hps['cuda'])))
