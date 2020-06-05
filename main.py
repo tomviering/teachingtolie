@@ -151,7 +151,7 @@ def main():
 
         #train_loader = DataLoader(trainset_precomputed, batch_size=hps['train_batch_size'], shuffle=True,
         #                          num_workers=hps['num_workers'], pin_memory=True)
-        val_loader = DataLoader(valset_precomputed, batch_size=hps['val_batch_size'], shuffle=False, num_workers=hps['num_workers'],
+        val_loader = DataLoader(valset_precomputed, batch_size=hps['val_batch_size'], shuffle=True, num_workers=hps['num_workers'],
                                 pin_memory=True)
         check_precomputed_dataloader(val_loader)
         # these loaders return 5 arguments:
