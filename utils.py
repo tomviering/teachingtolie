@@ -144,7 +144,6 @@ def val_vis_batch_backdoor(net, val_loader, num=5, save=False, fn='', cuda=False
 
         if cuda:
             X = X.cuda()
-            Y = Y.cuda()
 
         cam, output, _, _ = differentiable_cam(model=net, input=X, cuda=cuda)
 
@@ -170,7 +169,7 @@ def val_vis_batch_backdoor(net, val_loader, num=5, save=False, fn='', cuda=False
         X = X_sticker
         X = Variable(X)
         if cuda:
-            X = Variable(X)
+            X = X.cuda()
 
         cam_sticker, output_sticker, _, _ = differentiable_cam(model=net, input=X, cuda=cuda)
 
