@@ -518,7 +518,7 @@ def val(net, val_loader, criterion, gradcam_target_builder, sticker):
     print("val loss: %.5f" % meter_c.avg)
     if hps['attack_type'] == 'backdoor':
         print('[exp_ori_l1oss %.5f] [exp_ori_l2loss %.5f] [exp_sticker_l1oss %.5f ] [exp_sticker_l2loss]'\
-              %(meter_exp_ori_1, meter_exp_ori_2, meter_exp_sticker_1, meter_exp_sticker_2) )
+              %(meter_exp_ori_1.avg, meter_exp_ori_2.avg, meter_exp_sticker_1.avg, meter_exp_sticker_2.avg) )
     return (val_acc, meter_g.avg, meter_a.avg)
 
 def str2bool(v):
