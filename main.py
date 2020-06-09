@@ -506,10 +506,10 @@ def val(net, val_loader, criterion, gradcam_target_builder, sticker):
 
         if hps['attack_type'] == 'backdoor':
             val_exp_loss = exp_loss(criterion_args)
-            meter_exp_ori_1.update(val_exp_loss[0].data.item())
-            meter_exp_ori_2.update(val_exp_loss[1].data.item())
-            meter_exp_sticker_1.update(val_exp_loss[2].data.item())
-            meter_exp_sticker_2.update(val_exp_loss[3].data.item())
+            meter_exp_ori_1.update(val_exp_loss[0].data.item(), N)
+            meter_exp_ori_2.update(val_exp_loss[1].data.item(), N)
+            meter_exp_sticker_1.update(val_exp_loss[2].data.item(), N)
+            meter_exp_sticker_2.update(val_exp_loss[3].data.item(), N)
             
     val_acc = (nb - Acc_v) / nb
 
