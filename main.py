@@ -191,7 +191,7 @@ def main():
         print('epoch took %d seconds' % (end - start))
         print('epoch took %.1f minutes' % ((end - start) / 60))
 
-        if hps['backdoor']:
+        if hps['attack_type'] == 'backdoor':
             val_vis_batch_backdoor(net, val_loader, num=5, save=True, fn='vis/%s/epoch%d_' % (hps['vis_name'], epoch),
                           cuda=hps['cuda'])
         else:
