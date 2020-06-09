@@ -24,7 +24,7 @@ def getjobscript(jobname, command):
 #SBATCH --partition=general --qos=short
 #SBATCH --time=04:00:00
 #SBATCH --mincpus=1
-#SBATCH --mem=3000 
+#SBATCH --mem=10000 
 #SBATCH --workdir="""+workdir+"""
 #SBATCH --job-name=""" + jobname + """
 #SBATCH --output=logs/"""+jobname+""".txt
@@ -54,8 +54,8 @@ def get_command(myjobname, lr, op, lambda_c, lambda_g, lambda_a, sticker_img, pr
               ' --cuda=True' \
               ' --num_workers=4' \
               ' --RAM_dataset=True' \
-              ' --train_batch_size=32' \
-              ' --val_batch_size=10' \
+              ' --train_batch_size=16' \
+              ' --val_batch_size=5' \
               ' --lambda_c={lambda_c:.1e}' \
               ' --lambda_g={lambda_g:.1e}' \
               ' --lambda_a={lambda_a:.1e}' \
