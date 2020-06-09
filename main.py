@@ -16,7 +16,7 @@ from dataset import load_cifar, Imagenette, precomputedDataset
 # from network import VGG_exp1, VGG_exp2
 from network import VGG_final, Alexnet_final
 from utils import AverageMeter, mkdir, val_vis_batch, print_progress, \
-    get_gpu_memory_map, check_precomputed_dataloader
+    get_gpu_memory_map, check_precomputed_dataloader, val_vis_batch_backdoor
 from sticker import prepare_batch, build_gradcam_target_sticker, build_gradcam_target_constant, get_vectors
 from loss import random_loss, local_constant_loss, local_constant2_loss, constant_loss, local_constant_negative_loss, \
     center_loss_fixed, exp_validation
@@ -191,7 +191,11 @@ def main():
         print('epoch took %d seconds' % (end - start))
         print('epoch took %.1f minutes' % ((end - start) / 60))
 
-        val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch%d_' % (hps['vis_name'], epoch), cuda=hps['cuda'])
+        if hps['backdoor']:
+            val_vis_batch_backdoor(net, val_loader, num=5, save=True, fn='vis/%s/epoch%d_' % (hps['vis_name'], epoch),
+                          cuda=hps['cuda'])
+        else:
+            val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch%d_' % (hps['vis_name'], epoch), cuda=hps['cuda'])
         (val_acc, l_g, l_a) = val(net, val_loader, criterion, gradcam_target_builder, sticker)
         
         early_stopping(l_a, net)        
