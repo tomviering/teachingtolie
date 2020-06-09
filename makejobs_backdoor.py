@@ -44,11 +44,10 @@ echo "Finished at $(date)"
 
 lr_list = [1e-3, 1e-4, 1e-5] # 1e-2, 1e-3 etc....
 op_list = ['adam', 'sgd']
-pretrained_list = ['True', 'False']
 # do trade-off experiment
-lambda_g_list = [1e-3, 1e-2, 1e-1, 1e0, 1e1] # 1e0, 1e-1, etc.
+lambda_g_list = [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2] # 1e0, 1e-1, etc.
 
-def get_command(myjobname, lr, op, lambda_c, lambda_g, lambda_a, sticker_img, pretrained):
+def get_command(myjobname, lr, op, lambda_c, lambda_g, lambda_a, pretrained):
     # careful each line should begin with a space!!
     command = 'python main.py' \
               ' --cuda=True' \
@@ -64,22 +63,20 @@ def get_command(myjobname, lr, op, lambda_c, lambda_g, lambda_a, sticker_img, pr
               ' --optimizer={op:s}' \
               ' --pretrained={pretrained:s}'\
               ' --loss_type=constant' \
-              ' --attack_type=backdoor'.format(vis_name=myjobname, lr=lr, op=op, lambda_c=lambda_c, lambda_g=lambda_g, lambda_a=lambda_a,
-                                                   sticker_img=sticker_img, pretrained=pretrained)
+              ' --attack_type=backdoor'.format(vis_name=myjobname, lr=lr, op=op, lambda_c=lambda_c, lambda_g=lambda_g, lambda_a=lambda_a, pretrained=pretrained)
     return command
 
 for lr in lr_list:
     for op in op_list:
         for my_lambda_g in lambda_g_list:
-            for pretrained in pretrained_list:
-                myjobname = 'backdoor_%s_lr_%.1e_pretrn_%s_lambda_g_%.1e' % (op, lr, pretrained, my_lambda_g)
-                jobfile = '%s.sh' % myjobname
-                alljobs.append(jobfile)
-                with open(jobdir + jobfile, 'w') as f:
-                    command = get_command(myjobname=myjobname, lr=lr, op=op, pretrained=pretrained, lambda_c=1,
-                                  lambda_g=my_lambda_g, lambda_a=1)
-                    jobstr = getjobscript(myjobname, command)
-                    f.write(jobstr)
+            myjobname = 'backdoor_constant_%s_lr_%.1e_pretrn_%s_lambda_g_%.1e' % (op, lr, True, my_lambda_g)
+            jobfile = '%s.sh' % myjobname
+            alljobs.append(jobfile)
+            with open(jobdir + jobfile, 'w') as f:
+                command = get_command(myjobname=myjobname, lr=lr, op=op, pretrained='True', lambda_c=1,
+                              lambda_g=my_lambda_g, lambda_a=1)
+                jobstr = getjobscript(myjobname, command)
+                f.write(jobstr)
 
 numjobs = 0
 jobfile_all = jobdir + 'submit_all.sh'
