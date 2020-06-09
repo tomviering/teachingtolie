@@ -172,6 +172,8 @@ def main():
         if not hps['pretrained']:
             raise Exception('You need to use pretrained model for backdoor...')
 
+    check_precomputed_dataloader(train_loader, 5)
+
 #%% training loop
     print(hps)
     if not hps['skip_validation']:
