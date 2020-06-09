@@ -171,7 +171,6 @@ def main():
         # explenation_precomputed [explenation of the pretrained model - note, need to set PRETRAINED to TRUE !!!]
         if not hps['pretrained']:
             raise Exception('You need to use pretrained model for backdoor...')
-    
 
 #%% training loop
     print(hps)
@@ -192,7 +191,7 @@ def main():
         print('epoch took %.1f minutes' % ((end - start) / 60))
 
         if hps['attack_type'] == 'backdoor':
-            val_vis_batch_backdoor(net, val_loader, num=5, save=True, fn='vis/%s/epoch%d_' % (hps['vis_name'], epoch),
+            val_vis_batch_backdoor(net, train_loader, num=5, save=True, fn='vis/%s/epoch%d_' % (hps['vis_name'], epoch),
                           cuda=hps['cuda'])
         else:
             val_vis_batch(net, val_loader, num=5, save=True, fn='vis/%s/epoch%d_' % (hps['vis_name'], epoch), cuda=hps['cuda'])
