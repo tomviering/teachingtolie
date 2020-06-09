@@ -25,7 +25,7 @@ def getjobscript(jobname, command):
 #SBATCH --time=04:00:00
 #SBATCH --mincpus=1
 #SBATCH --mem=10000 
-#SBATCH --workdir="""+workdir+"""
+#SBATCH --chdir="""+workdir+"""
 #SBATCH --job-name=""" + jobname + """
 #SBATCH --output=logs/"""+jobname+""".txt
 #SBATCH --error=logs/"""+jobname+""".txt
