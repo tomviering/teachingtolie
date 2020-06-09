@@ -46,7 +46,7 @@ lr_list = [1e-3, 1e-4, 1e-5] # 1e-2, 1e-3 etc....
 op_list = ['adam', 'sgd']
 pretrained_list = ['True', 'False']
 # do trade-off experiment
-lambda_g_list = [1e-3, 1e-2, 1e-1, 1e0] # 1e0, 1e-1, etc.
+lambda_g_list = [1e-3, 1e-2, 1e-1, 1e0, 1e1] # 1e0, 1e-1, etc.
 
 def get_command(myjobname, lr, op, lambda_c, lambda_g, lambda_a, sticker_img, pretrained):
     # careful each line should begin with a space!!
