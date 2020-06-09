@@ -70,8 +70,12 @@ def check_precomputed_dataloader(loader, num=5):
             plt.show()
 
 
-def save_im(X, cam, output, Y, fn='', save=False):
+def save_im(X, cam, output, Y, fn='', save=False, sticker_batch=False):
     print('got %d images' % X.shape[0])
+
+    sticker_string = ''
+    if sticker_batch:
+        sticker_string = 'sticker'
 
     for i in range(0, X.shape[0]):
 
@@ -79,7 +83,7 @@ def save_im(X, cam, output, Y, fn='', save=False):
         tensor_plot(X[i, :, :, :]) # plots the image
         plt.axis('off')
         if save:
-            plt.savefig(fn + str(i) + 'im_im.png')
+            plt.savefig(fn + str(i) + sticker_string + 'im_im.png')
             plt.close()
 
         plt.figure(i * 3 + 1)
@@ -87,7 +91,7 @@ def save_im(X, cam, output, Y, fn='', save=False):
         plt.imshow(pic)
         plt.axis('off')
         if save:
-            plt.savefig(fn + str(i) + 'im_overlay.png')
+            plt.savefig(fn + str(i) + sticker_string + 'im_overlay.png')
             plt.close()
 
         plt.figure(i * 3 + 2)
@@ -97,7 +101,7 @@ def save_im(X, cam, output, Y, fn='', save=False):
         plt.colorbar()
         plt.axis('off')
         if save:
-            plt.savefig(fn + str(i) + 'im_gradcam.png')
+            plt.savefig(fn + str(i) + sticker_string + 'im_gradcam.png')
             plt.close()
 
         print('showing image %d of %d' % (i, X.shape[0]))
@@ -125,6 +129,63 @@ def loss_gradcam(X, net, gradcam_target, cuda, loss_type = 2):
         diff = torch.mul(diff, diff)
     loss = torch.sum(diff) / num
     return loss
+
+
+def val_vis_batch_backdoor(net, val_loader, num=5, save=False, fn='', cuda=False):
+    net.eval()
+
+    nb = 0
+    first = True
+
+    for i, data in enumerate(val_loader):
+        X, Y, X_sticker, expl_target, expl_original = data
+        X = Variable(X)
+        Y = Variable(Y)
+
+        if cuda:
+            X = X.cuda()
+            Y = Y.cuda()
+
+        cam, output, _, _ = differentiable_cam(model=net, input=X, cuda=cuda)
+
+        if first:
+            first = False
+            X_total = torch.zeros(0, X.shape[1], X.shape[2], X.shape[3])
+            X_total_sticker = torch.zeros(0, X.shape[1], X.shape[2], X.shape[3])
+
+            Y_total = torch.zeros(0, dtype=Y.dtype)
+            Y_total_sticker = torch.zeros(0, dtype=Y.dtype)
+
+            output_total = torch.zeros(0, output.shape[1])
+            output_total_sticker = torch.zeros(0, output.shape[1])
+
+            cam_total = torch.zeros(0, cam.shape[1], cam.shape[2])
+            cam_total_sticker = torch.zeros(0, cam.shape[1], cam.shape[2])
+
+        X_total = torch.cat((X_total, X.cpu()), dim=0)
+        Y_total = torch.cat((Y_total, Y.cpu()), dim=0)
+        output_total = torch.cat((output_total, output.cpu()), dim=0)
+        cam_total = torch.cat((cam_total, cam.cpu()), dim=0)
+
+        X = X_sticker
+        X = Variable(X)
+        if cuda:
+            X = Variable(X)
+
+        cam_sticker, output_sticker, _, _ = differentiable_cam(model=net, input=X, cuda=cuda)
+
+        X_total_sticker = torch.cat((X_total_sticker, X.cpu()), dim=0)
+        Y_total_sticker = torch.cat((Y_total_sticker, Y.cpu()), dim=0)
+        output_total_sticker = torch.cat((output_total_sticker, output.cpu()), dim=0)
+        cam_total_sticker = torch.cat((cam_total_sticker, cam.cpu()), dim=0)
+
+        nb = nb + X.shape[0]
+
+        if nb > num:
+            break
+
+    save_im(X_total[0:num, :, :, :], cam_total[0:num, :, :], output_total, Y_total, save=save, fn=fn)
+    save_im(X_total_sticker[0:num, :, :, :], cam_total_sticker[0:num, :, :], output_total_sticker, Y_total_sticker, save=save, fn=fn, sticker_batch=True)
 
 
 def val_vis_batch(net, val_loader, num=5, save=False, fn='', cuda=False):
