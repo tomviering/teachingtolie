@@ -20,3 +20,5 @@ alphas\.txt
 logs/constant_loss/
 
 *.pt
+
+*.txt
