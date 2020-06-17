@@ -97,13 +97,18 @@ def get_fn(logdir):
     lr_list = [1e-3, 1e-4, 1e-5]  # 1e-2, 1e-3 etc....
     op_list = ['adam', 'sgd']
     # do trade-off experiment
-    lambda_g_list = [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2]  # 1e0, 1e-1, etc.
+    lambda_g_list = [1e-3, 1e-2, 1e-1, 1e0, 1e1, 1e2, 1e3, 1e4, 1e8, 1e16]  # 1e0, 1e-1, etc.
 
     for lr in lr_list:
         for op in op_list:
             for my_lambda_g in lambda_g_list:
                 myjobname = 'backdoor_constant_%s_lr_%.1e_pretrn_%s_lambda_g_%.1e.txt' % (op, lr, True, my_lambda_g)
-                fn_todo.append(logdir + myjobname)
+                #fn_todo.append(logdir + myjobname)
+
+    for lr in lr_list:
+        for op in op_list:
+            myjobname = 'backdoor_constant_%s_lr_%.1e_pretrn_%s_lambda_g_%.1e_lambda_c_0.txt' % (op, lr, True, 1)
+            fn_todo.append(logdir + myjobname)
 
     return fn_todo
 
